@@ -1,0 +1,97 @@
+<!-- 🌐 Bouton hamburger (mobile uniquement) -->
+<button class="sidebar-toggle d-lg-none" (click)="toggleSidebar()">
+  <i class="mdi mdi-menu"></i>
+</button>
+
+<!-- 🌑 Overlay quand la sidebar est ouverte -->
+<div class="sidebar-overlay" *ngIf="isSidebarOpen" (click)="closeSidebar()"></div>
+
+<!-- 🌟 Sidebar principale -->
+<aside class="app-sidebar" [ngClass]="{ open: isSidebarOpen }">
+
+  <ul class="app-menu">
+    <!-- Tableau de bord -->
+    <li class="menu-item" [ngClass]="{ active: activeMenu === 'dashboard' }" (click)="clickLi('dashboard')">
+      <a routerLink="/admin/dashboard" class="menu-link">
+        <div class="icon-box"><i class="mdi mdi-view-dashboard"></i></div>
+        <span class="menu-label">Tableau de bord</span>
+      </a>
+    </li>
+
+    <!-- Gestion des visiteurs -->
+    <li class="menu-item" [ngClass]="{ active: activeMenu === 'visiteur' }" (click)="clickLi('visiteur')">
+      <a routerLink="/admin/visiteur" class="menu-link">
+        <div class="icon-box"><i class="mdi mdi-account-box-multiple"></i></div>
+        <span class="menu-label">Gestion des visiteurs</span>
+      </a>
+    </li>
+    <!-- Rendez-vous -->
+    <li class="menu-item" [ngClass]="{ active: activeMenu === 'rendezvous' }" (click)="clickLi('rendezvous')">
+      <a routerLink="/admin/rendez-vous" class="menu-link">
+        <div class="icon-box"><i class="mdi mdi-calendar-clock"></i></div>
+        <span class="menu-label">Gestion des rendez-vous</span>
+      </a>
+    </li>
+ 
+    <!-- Gestion du personnel / services -->
+    <li class="menu-item" [ngClass]="{ active: activeMenu === 'agent' }" (click)="clickLi('agent')">
+      <a routerLink="/admin/parametre/agent" class="menu-link">
+        <div class="icon-box"><i class="mdi mdi-account-group"></i></div>
+        <span class="menu-label">Gestion du personnel</span>
+      </a>
+    </li>
+    <!-- Rapports et statistiques -->
+    <li class="menu-item" [ngClass]="{ active: activeMenu === 'rapport' }" (click)="clickLi('rapport')">
+      <a routerLink="/admin/rapport" class="menu-link">
+        <div class="icon-box"><i class="mdi mdi-chart-bar"></i></div>
+        <span class="menu-label">Rapports et statistiques</span>
+      </a>
+    </li>
+
+    <!-- Réclamations -->
+    <li class="menu-item" [ngClass]="{ active: activeMenu === 'reclamations' }" (click)="clickLi('reclamations')">
+      <a routerLink="/admin/reclamation" class="menu-link">
+        <div class="icon-box"><i class="mdi mdi-alert-circle-outline"></i></div>
+        <span class="menu-label">Réclamations</span>
+      </a>
+    </li>
+
+  
+    <!-- Administration / Paramètres -->
+    <li class="menu-item" [ngClass]="{ active: activeMenu === 'parametre' }" (click)="clickLi('parametre')">
+      <a routerLink="/admin/parametre" class="menu-link">
+        <div class="icon-box"><i class="mdi mdi-settings"></i></div>
+        <span class="menu-label">Paramètres</span>
+      </a>
+    </li>
+
+    <!-- Paramètres avec sous-menu -->
+    <li class="menu-item has-submenu" [ngClass]="{ open: settingsOpen }" *ngIf="">
+      <div class="menu-link" (click)="toggleSettingsMenu()" [attr.aria-expanded]="settingsOpen">
+        <div class="icon-box"><i class="mdi mdi-settings"></i></div>
+        <span class="menu-label">Paramètres</span>
+        <i class="mdi" [ngClass]="settingsOpen ? 'mdi-chevron-down' : 'mdi-chevron-right'"></i>
+      </div>
+
+      <ul class="submenu" [@slideToggle]="settingsOpen ? 'open' : 'closed'">
+        <li><a routerLink="/admin/parametre/utilisateur"><i class="mdi mdi-account-outline"></i> Utilisateur</a></li>
+        <li><a routerLink="/admin/parametre/profil"><i class="mdi mdi-account-cog-outline"></i> Profil</a></li>
+        <li><a routerLink="/admin/parametre/cabinet"><i class="mdi mdi-office-building-outline"></i> Services</a></li>
+        <li><a routerLink="/admin/parametre/agent"><i class="mdi mdi-account-group-outline"></i> Type Utilisateurs</a></li>
+      </ul>
+    </li>
+  </ul>
+
+  <!-- 🔻 Footer -->
+<!-- Sidebar Footer -->
+<div class="sidebar-footer text-center">
+  <div class="footer-logo-box">
+    <div class="footer-logo-circle">
+      <img src="assets/images/v1.png" alt="SIGCA" />
+    </div>
+    <h4 class="footer-title">Version</h4>
+    <p class="footer-version">V1.0</p>
+  </div>
+</div>
+
+</aside>

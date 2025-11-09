@@ -1,0 +1,224 @@
+<ngx-loading [show]="loading" [config]="{ backdropBorderRadius: '5px',fullScreenBackdrop:true }"></ngx-loading>
+<div class="rapport-container p-4">
+  <!-- 🔹 En-tête -->
+  <!-- 🌐 En-tête de la section -->
+<div class="d-flex justify-content-between align-items-center mb-4 header-section shadow-sm p-3 rounded">
+  <div>
+    <h3 class="fw-bold mb-1 text-gradient">
+      <i class="mdi mdi-file-table-outline me-2"></i>Rapports & Statistiques
+    </h3>
+    <p class="text-muted mb-0 small">
+      <i class="mdi mdi-chart-line me-1"></i>
+      Suivi des visiteurs, durées et services visités
+    </p>
+  </div>
+
+  <button class="btn btn-export" (click)="exportToExcel()">
+    <i class="mdi mdi-file-excel me-2"></i>Exporter en Excel
+  </button>
+</div>
+
+<!-- 🔍 Filtres -->
+<div class="filter-section card border-0 shadow-sm p-4 rounded-4">
+  <div class="row g-3 align-items-end">
+    
+    <!-- Période -->
+    <div class="col-md-3">
+      <label class="form-label fw-semibold text-muted">Période</label>
+      <p-calendar [(ngModel)]="filtre.dateRange" selectionMode="range"
+        dateFormat="dd/mm/yy" styleClass="w-100 custom-calendar"></p-calendar>
+    </div>
+
+    <!-- Service -->
+    <div class="col-md-3">
+      <label class="form-label fw-semibold text-muted">Service</label>
+      <p-dropdown [options]="services" [(ngModel)]="filtre.service" optionLabel="designation"
+        placeholder="Tous les services" styleClass="w-100 custom-dropdown"></p-dropdown>
+    </div>
+
+    <!-- Type de pièce -->
+    <div class="col-md-3">
+      <label class="form-label fw-semibold text-muted">Type de pièce</label>
+      <p-dropdown [options]="typesPieces" [(ngModel)]="filtre.typePiece"
+        optionLabel="label" optionValue="value" placeholder="Tous"
+        styleClass="w-100 custom-dropdown"></p-dropdown>
+    </div>
+
+    <!-- Bouton Filtrer -->
+    <div class="col-md-3">
+      <button class="btn btn-primary w-100 btn-filter" (click)="filtrerRapport()">
+        <i class="mdi mdi-magnify me-2"></i> Filtrer
+      </button>
+    </div>
+
+  </div>
+</div>
+
+
+
+  <!-- 📋 Tableau principal -->
+<div class="card shadow-sm rounded-4 border-0">
+  <div class="card-body p-4">
+    <p-table 
+      [value]="rapportData" 
+      [paginator]="true" 
+      [rows]="10" 
+      [rowsPerPageOptions]="[10, 20, 50]" 
+      responsiveLayout="scroll" 
+      [showCurrentPageReport]="true"
+      currentPageReportTemplate="Affichage {first} à {last} sur {totalRecords} visites"
+      [rowHover]="true"
+      [styleClass]="'custom-table'"
+    >
+
+      <!-- Caption -->
+      <ng-template pTemplate="caption">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <span class="fw-bold text-primary fs-5">
+            <i class="mdi mdi-database-outline me-2"></i>Liste des visites enregistrées
+          </span>
+          <span class="text-muted small">
+            Total : {{ rapportData?.length }} visite{{ rapportData?.length > 1 ? 's' : '' }}
+          </span>
+        </div>
+      </ng-template>
+
+      <!-- Header -->
+      <ng-template pTemplate="header">
+        <tr class="table-header text-secondary">
+          <th>Visiteur</th>
+          <th>Service</th>
+          <th>Date visite</th>
+          <th>Heure arrivée</th>
+          <th>Heure départ</th>
+          <th>Durée (mn)</th>
+          <th>Statut</th>
+          <th>Action</th>
+        </tr>
+      </ng-template>
+
+      <!-- Body -->
+      <ng-template pTemplate="body" let-item>
+        <tr>
+          <td>{{ item.nomComplet }}</td>
+          <td>{{ item.service }}</td>
+          <td>{{ item.dateVisite | date:'dd/MM/yyyy' }}</td>
+          <td>{{ item.heureArrive }}</td>
+          <td>{{ item.heureDepart }}</td>
+          <td>{{ calculerDuree(item.heureArrive, item.heureDepart) }}</td>
+          <td>
+            <span 
+              class="badge"
+              [ngClass]="{
+                'bg-success': item.statut === 'Terminé',
+                'bg-warning text-dark': item.statut === 'En attente',
+                'bg-secondary': item.statut !== 'Terminé' && item.statut !== 'En attente'
+              }"
+            >
+              {{ item.statut }}
+            </span>
+          </td>
+          <td>
+            <button class="btn btn-sm btn-outline-primary btn-detail" (click)="ouvrirDetails(item)">
+              <i class="mdi mdi-eye me-1"></i> Détails
+            </button>
+          </td>
+        </tr>
+      </ng-template>
+
+      <!-- Empty message -->
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="8" class="text-center text-muted fst-italic py-3">
+            Aucune donnée trouvée.
+          </td>
+        </tr>
+      </ng-template>
+
+    </p-table>
+  </div>
+</div>
+
+
+  <!-- 📊 Résumé -->
+<div class="card mt-4 shadow-sm rounded-4 border-0">
+  <div class="card-body p-4">
+    <h5 class="fw-bold mb-4 text-primary fs-5">
+      <i class="mdi mdi-chart-box-outline me-2"></i>Résumé global
+    </h5>
+
+    <div class="table-responsive">
+      <table class="table table-hover align-middle custom-summary-table">
+        <thead class="table-light">
+          <tr>
+            <th>Service</th>
+            <th>Total visites</th>
+            <th>Durée moyenne</th>
+            <th>Hommes</th>
+            <th>Femmes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let s of resumeServices">
+            <td>
+              <i class="mdi mdi-office-building me-1 text-primary"></i>{{ s.service }}
+            </td>
+            <td>
+              <span class="badge bg-info text-dark px-2 py-1">{{ s.total }}</span>
+            </td>
+            <td>
+              <span class="text-muted">{{ s.dureeMoyenne }} min</span>
+            </td>
+            <td>
+              <span class="badge bg-primary px-2 py-1">{{ s.hommes }}</span>
+            </td>
+            <td>
+              <span class="badge bg-pink px-2 py-1">{{ s.femmes }}</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  <!-- 🧾 MODAL DETAILS -->
+  <p-dialog header="Détails du visiteur" [(visible)]="showDetails" [modal]="true" [style]="{width: '700px'}">
+    <div *ngIf="selectedVisitor">
+      <div class="d-flex align-items-center mb-3">
+        <img [src]="selectedVisitor.photo || 'assets/images/profile/avatar.jpeg'" alt="Visiteur"
+          class="rounded-circle me-3" width="80" height="80">
+        <div>
+          <h5 class="mb-0">{{ selectedVisitor.nomComplet }}</h5>
+          <p class="text-muted mb-0">{{ selectedVisitor.service }}</p>
+        </div>
+      </div>
+
+      <table class="table table-borderless">
+        <tr><th>Sexe :</th><td>{{ selectedVisitor.sexe }}</td></tr>
+        <tr><th>Type pièce :</th><td>{{ selectedVisitor.typePiece }}</td></tr>
+        <tr><th>Numéro pièce :</th><td>{{ selectedVisitor.numeroPiece }}</td></tr>
+        <tr><th>Heure arrivée :</th><td>{{ selectedVisitor.heureArrive }}</td></tr>
+        <tr><th>Heure départ :</th><td>{{ selectedVisitor.heureDepart }}</td></tr>
+        <tr><th>Durée :</th><td>{{ calculerDuree(selectedVisitor.heureArrive, selectedVisitor.heureDepart) }} minutes</td></tr>
+      </table>
+
+      <hr>
+      <h6 class="text-primary mb-2">Signature du visiteur</h6>
+      <img [src]="selectedVisitor.signature || 'assets/images/signature.png'" alt="Signature" width="200">
+
+      <hr>
+      <h6 class="text-primary mb-2">Historique des visites</h6>
+      <ul class="list-group">
+        <li class="list-group-item" *ngFor="let v of selectedVisitor.historique">
+          <i class="mdi mdi-calendar me-2 text-secondary"></i>
+          {{ v.date | date:'dd/MM/yyyy' }} — {{ v.service }}
+        </li>
+      </ul>
+    </div>
+  </p-dialog>
+</div>

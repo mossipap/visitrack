@@ -1,0 +1,106 @@
+
+<section class="auth-content">
+      <img  src="assets/images/logo.png" alt="Nothing" style="margin-top: -15px; float: left;" width="120px" height="120px"/>
+  <div class="auth-menu bg-cab-1" style="padding-top: 120px;">
+    
+   
+    <form (ngSubmit)="Save()" #loginForm="ngForm" novalidate>
+      <div class="row">
+        <div class="col-xs-12 col-sm-1 col-md-1"></div>
+        <div class="col-xs-10 col-sm-10 col-md-10 align-left">
+          <h3 class="fw-bold mb-2">Demander un compte</h3>
+          <p class="text-muted mb-4">Veuillez remplir le formulaire pour avoir un compte</p>
+
+        </div>
+      </div>
+      <br/>
+      <div class="row" style="margin-bottom: 5px;">
+        <div class="col-xs-12 col-sm-1 col-md-1"></div>
+        <div class="col-xs-12 col-sm-10 col-md-10">
+          <div class="form-group has-success align-left ft-w-b">
+            <label class="form-control-label c-cab-2" for="nomComplet">Nom Complet</label>
+            <input class="form-control form-control-w is-valid" id="nomComplet" name="nomComplet" type="nomComplet" [(ngModel)]="utilisateur.nom">
+          </div>
+        </div>
+      </div>
+      <div class="row" style="margin-bottom: 5px;">
+        <div class="col-xs-12 col-sm-1 col-md-1"></div>
+        <div class="col-xs-12 col-sm-10 col-md-10">
+          <div class="form-group has-success align-left ft-w-b">
+            <label class="form-control-label c-cab-2" for="email">Adresse email</label>
+            <input class="form-control form-control-w is-valid" id="email" name="email" type="email" [(ngModel)]="utilisateur.email">
+          </div>
+        </div>
+      </div>
+      <div class="row" style="margin-bottom: 5px;">
+        <div class="col-xs-12 col-sm-1 col-md-1"></div>
+        <div class="col-xs-12 col-sm-10 col-md-10">
+          <div class="form-group has-success align-left ft-w-b">
+            <label class="form-control-label c-cab-2" for="telephone">Télephone</label>
+            <input class="form-control form-control-w is-valid" id="telephone" name="telephone" type="telephone" [(ngModel)]="utilisateur.telephone">
+          </div>
+        </div>
+      </div>
+      <div class="row" style="margin-bottom: 5px;">
+        <div class="col-xs-12 col-sm-1 col-md-1"></div>
+        <div class="col-xs-12 col-sm-10 col-md-10">
+          <div class="form-group has-success align-left ft-w-b">
+            <label class="form-control-label c-cab-2" for="adresse">Adresse</label>
+            <input class="form-control form-control-w is-valid" id="adresse" name="adresse" type="adresse" [(ngModel)]="utilisateur.adresse">
+          </div>
+        </div>
+      </div>
+   <!--    <div class="row">
+        <div class="col-xs-12 col-sm-1 col-md-1"></div>
+        <div class="col-xs-12 col-sm-10 col-md-10">
+          <div class="form-group has-success align-left ft-w-b" *ngIf="!isResetPwd">
+            <label class="form-control-label c-cab-2" for="password">Mot de passe</label>
+            <input class="form-control form-control-w is-valid" [type]="hidden ? 'password' : 'text'" id="password" name="password" type="password" [(ngModel)]="utilisateur.password">
+            <span id="toggle-password" class="eye-icon">
+              <i [class]="hidden ? 'mdi mdi-eye-outline ft-s17' : 'mdi mdi-eye-off-outline ft-s17'" title="Voir ou cacher mot de passe" (click)="toggleShow()"></i>
+            </span>
+          </div>
+
+          <div class="form-group has-success align-left ft-w-b" *ngIf="isResetPwd">
+            <label class="form-control-label c-cab-1" for="login">Votre login actuel</label>
+            <input class="form-control form-control-d is-valid" id="login" name="login" type="text" [(ngModel)]="utilisateur.password">
+          </div>
+        </div>
+      </div> -->
+
+
+   
+      <div class="row">
+        <div class="col-xs-12 col-sm-1 col-md-1"></div>
+        <div [class]="(isResetPwd)? 'col-xs-12 col-sm-5 col-md-5': 'col-xs-12 col-sm-10 col-md-10'">
+          <div class="form-group btn-container">
+            <button class="btn btn-login btn-block" [style]="{'color': isWhite? '#1c1c1c' : '#FFFFFF'}" [disabled]="!loginForm.valid">
+              <i class="fa fa-sign-in" style="font-size: 18px;"></i> Demander un compte
+            </button>
+          </div>
+        </div>
+      </div>
+     
+    </form>
+
+     <div class="row" style="margin-top: 30px;">
+        <div class="col-xs-12 col-sm-1 col-md-1"></div>
+        <div class="col-xs-12 col-sm-5 col-md-5 align-left">
+          <div class="animated-checkbox">
+            <label style="font-size: 13px;">
+              <span class="label-text c-cab-2">Vous avez déjà un compte ?</span>
+            </label>
+          </div>
+        </div>
+        <div class="col-xs-12 col-sm-5 col-md-5">
+          <p class="semibold-text mb-2">
+            <a routerLink="/login" class="c-orange tx-deconone" data-toggle="flip"> Connectez-vous</a>
+          </p>
+        </div>
+      </div>
+  </div>
+
+  <div class="auth-right theme-dark">
+    <img src="assets/images/img-login.png" alt="">
+  </div>
+</section>

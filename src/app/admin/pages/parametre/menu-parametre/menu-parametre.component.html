@@ -1,0 +1,95 @@
+<div class="settings-wrapper d-flex justify-content-center align-items-center">
+  <div class="settings-container card shadow-sm p-4">
+
+    <!-- Header animé -->
+    <div class="settings-header d-flex justify-content-between align-items-center mb-4" [@headerFade]>
+      <h4 class="fw-bold mb-0">
+        <i class="mdi mdi-cog-outline me-2 text-primary"></i> Paramètres
+      </h4>
+     
+    </div>
+
+    <!-- Menu principal animé -->
+    <div class="row gy-4 gx-4 justify-content-center" [@cardsFade]>
+
+      <!-- Utilisateurs -->
+      <div class="col-12 col-sm-6 col-lg-6">
+        <a routerLink="/admin/parametre/utilisateur" routerLinkActive="active-card" class="setting-card text-decoration-none">
+          <div class="icon-wrapper bg-primary-subtle text-primary">
+            <i class="mdi mdi-account"></i>
+          </div>
+          <div>
+            <h6 class="fw-bold mb-1 text-primary">Utilisateurs</h6>
+            <p class="text-muted mb-0">Gérer les comptes et accès des utilisateurs.</p>
+          </div>
+        </a>
+      </div>
+
+      <!-- Profils -->
+      <div class="col-12 col-sm-6 col-lg-6">
+        <a routerLink="/admin/parametre/profil" routerLinkActive="active-card" class="setting-card text-decoration-none">
+          <div class="icon-wrapper bg-danger-subtle text-danger">
+            <i class="mdi mdi-shield"></i>
+          </div>
+          <div>
+            <h6 class="fw-bold mb-1 text-danger">Profils</h6>
+            <p class="text-muted mb-0">Définir les rôles et permissions d’accès.</p>
+          </div>
+        </a>
+      </div>
+
+      <!-- Types d’utilisateurs -->
+      <div class="col-12 col-sm-6 col-lg-6">
+        <a routerLink="/admin/parametre/agent" routerLinkActive="active-card" class="setting-card text-decoration-none">
+          <div class="icon-wrapper bg-warning-subtle text-warning">
+            <i class="mdi mdi-cogs"></i>
+          </div>
+          <div>
+            <h6 class="fw-bold mb-1 text-warning">Types d’utilisateurs</h6>
+            <p class="text-muted mb-0">Catégoriser les profils selon leurs statuts.</p>
+          </div>
+        </a>
+      </div>
+
+      <!-- Services -->
+      <div class="col-12 col-sm-6 col-lg-6">
+        <a routerLink="/admin/parametre/cabinet" routerLinkActive="active-card" class="setting-card text-decoration-none">
+          <div class="icon-wrapper bg-success-subtle text-success">
+            <i class="mdi mdi-briefcase-outline"></i>
+          </div>
+          <div>
+            <h6 class="fw-bold mb-1 text-success">Services</h6>
+            <p class="text-muted mb-0">Gérer les services et modules disponibles.</p>
+          </div>
+        </a>
+      </div>
+
+      <!-- Notifications -->
+      <div class="col-12 col-sm-6 col-lg-6">
+        <a routerLink="/admin/notifications" routerLinkActive="active-card" class="setting-card text-decoration-none">
+          <div class="icon-wrapper bg-info-subtle text-info">
+            <i class="mdi mdi-bell-ring-outline"></i>
+          </div>
+          <div>
+            <h6 class="fw-bold mb-1 text-info">Notifications</h6>
+            <p class="text-muted mb-0">Configurer les alertes et messages système.</p>
+          </div>
+        </a>
+      </div>
+
+      <!-- Sécurité -->
+      <div class="col-12 col-sm-6 col-lg-6">
+        <a routerLink="/admin/securite" routerLinkActive="active-card" class="setting-card text-decoration-none">
+          <div class="icon-wrapper bg-secondary-subtle text-secondary">
+            <i class="mdi mdi-lock"></i>
+          </div>
+          <div>
+            <h6 class="fw-bold mb-1 text-secondary">Sécurité</h6>
+            <p class="text-muted mb-0">Paramétrer les accès et mots de passe.</p>
+          </div>
+        </a>
+      </div>
+
+    </div>
+  </div>
+</div>

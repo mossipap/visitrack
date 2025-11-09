@@ -1,0 +1,53 @@
+.settings-wrapper {
+  padding: 2rem;
+}
+
+.settings-container {
+  width: 100%;
+  max-width: 900px;
+  background: #fff;
+  border-radius: 1rem;
+}
+
+.setting-card {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  background: #fff;
+  border-radius: 1rem;
+  padding: 1.2rem 1.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  min-height: 95px;
+  margin-bottom: 20px;
+
+  &:hover {
+    background: var(--bs-light);
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+}
+
+.icon-wrapper {
+  width: 55px;
+  height: 55px;
+  border-radius: 50%;
+  font-size: 1.7rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.settings-header {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  padding-bottom: 1rem;
+}
+
+/* ✅ Style actif pour le bloc sélectionné */
+.active-card {
+  background: rgba(13, 110, 253, 0.1);
+  border: 1px solid #0d6efd;
+  box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.15);
+  transform: translateY(-2px);
+}

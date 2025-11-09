@@ -1,0 +1,416 @@
+@media print {
+  @page {
+    padding: 0 !important;
+    margin: 0 !important;
+    size: auto !important;
+  }
+  .top_line {
+    position: fixed;
+    top: 0;
+  }
+  .footer_forme {
+    position: fixed;
+    bottom: 0px; /* Tu places ton footer en bas */
+    left: 0px;
+    right: 0px; /* Tu centres ton footer */
+    margin-top: 60px;
+  }
+  .footd_center {
+    text-align: center;
+    margin-left: 4% !important;
+  }
+  .foot_ppef {
+    font-family: Nunito !important;
+    font-size: 16px !important;/* 24 */
+    line-height: 12px;
+    text-align: center;
+    color: #000000 !important;
+    text-underline-position: from-font;
+    text-decoration-skip-ink: none;
+    -webkit-print-color-adjust:exact !important;
+  }
+  .foot_address {
+    font-family: Nunito !important;
+    font-size: 16px !important;/* 18 */
+    font-weight: 400;
+    line-height: 10px;
+    margin-top: .7rem;
+    text-align: left;
+    color: #000000 !important;
+    text-underline-position: from-font;
+    text-decoration-skip-ink: none;
+    -webkit-print-color-adjust:exact !important;
+  }
+  .header_line {
+    width: 100%;
+  }
+  .panel_odji {
+    text-align: right;
+    margin-top: -4% !important;
+    -webkit-print-color-adjust:exact
+  }
+  .psaisine {
+    margin-top: -4% !important;
+    margin-bottom: 1% !important;
+    margin-right: 5% !important;
+    -webkit-print-color-adjust:exact
+  }
+  .notif_txt {
+    font-size: 17px !important;
+    font-weight: 600 !important;
+    margin-left: 6% !important;
+    color: #000000 !important;
+  }
+  .notif_txt_r {
+    font-size: 27px !important;
+    font-weight: 500 !important;
+    color: #000000 !important;
+  }
+  .fs-30p {
+    font-size: 30px !important;
+  }
+  .fs-25p {
+    font-size: 25px !important;
+  }
+  .fs-20p {
+    font-size: 20px !important;
+  }
+  .nous {
+    -webkit-print-color-adjust: exact !important;
+    color: #000000 !important;
+    font-size: 20px;
+    font-weight: 900;
+    line-height: 40px;
+    letter-spacing: 0em;
+  }
+
+  .desc-nous,
+  .desc-para,
+  .fait_form1,
+  .le_date {
+    margin-left: -5% !important;
+    -webkit-print-color-adjust: exact !important;
+  }
+  .desc-nous,
+  .desc-para {
+    margin-right: 5% !important;
+    font-size: 26px !important;
+  }
+  .ml-fait {
+    margin-left: 6% !important;
+  }
+  .ml_detenu {
+    margin-left: 5% !important;
+  }
+  .part_left {
+    margin-left: 30% !important;
+    margin-top: -5% !important;
+  }
+  .part_sign {
+    margin-left: 35% !important;
+  }
+  .mg_bott {
+    margin-bottom: 10% !important;
+  }
+  .ordre_extra {
+    margin-left: 80% !important;
+  }
+  .list-p {
+    margin-left: 5% !important;
+  }
+    .list-inculparq {
+      margin-left: 10% !important;
+    }
+    .signature {
+        margin-right: 5%;
+    }
+    .discu_regle {
+        margin-top: 20% !important;
+    }
+    .txt_sign,
+    .line_signe {
+        width: 42% !important;
+        -webkit-print-color-adjust:exact !important;
+    }
+    .signateur {
+        width: 100%;
+        float: right;
+    }
+    .bloc_rp_ri {
+        margin-left: 5%;
+    }
+    .bloc_num_parque {
+      margin-left: -2% !important;
+    }
+    .first_cab {
+        margin-left: 25px !important;
+    }
+    .titre_forme {
+        margin-left: 33% !important;
+    }
+    .titre_forme4 {
+        margin-left: 30% !important;
+    }
+    .titre_forme5 {
+        margin-left: 30% !important;
+    }
+    .titre_forme6 {
+        margin-left: 38% !important;
+    }
+    .titre_forme8 {
+        margin-left: 32% !important;
+    }
+    .titre_forme11 {
+        margin-left: 38% !important;
+    }
+    .titre_forme12 {
+        margin-left: 31% !important;
+    }
+    .bloc_cabinet {
+        margin-left: 3% !important;
+    }
+    .emblem_inv {
+      height: 110px;
+      margin-top: 30px;
+    }
+    .div_tabinvent {
+      margin-top: -18.5% !important;
+    }
+    .td_invent {
+      padding-bottom: 10% !important;
+    }
+    .w_print {
+      width: 94% !important;
+      margin-left: 3% !important;
+    }
+    .w_print2 {
+      width: 94% !important;
+      margin-left: 3% !important;
+    }
+    .triangle-right,
+    .trglepar-right {
+      margin-top: -1px;
+    }
+    .codebar {
+      margin-top: 10% !important;
+    }
+    .signat_l6 {
+      margin-top: -6% !important;
+    }
+    .ppef {
+      margin-left: 25% !important;
+    }
+    .bg_file,
+    .bg_file_repeat {
+      width: 90% !important;
+      margin-left: 10% !important;
+      margin-right: 3% !important;
+      background-size: 80% !important;
+    }
+    /* information css */
+    .remove_white {
+      margin-top: -87% !important;
+    }
+    .rm_white_2 {
+      margin-top: -67% !important;
+    }
+    .i2_space {
+      margin-bottom: 15% !important;
+      width: 100%;
+    }
+    .i2_space_mission {
+      margin-bottom: 25% !important;
+      width: 100%;
+    }
+    .i2_space_cp {
+      margin-bottom: 10% !important;
+      width: 100%;
+    }
+    .rm_w_i13 {
+      margin-top: 17% !important;
+    }
+    .rm_w_i14 {
+      margin-top: 10% !important;
+    }
+    .rm_w_i15 {
+      margin-top: 5% !important;
+    }
+    .txt_appli {
+      margin-top: 10px;
+      -webkit-print-color-adjust:exact
+    }
+    .lib_num_forme {
+      margin-right: 10%;
+      margin-left: 20px;
+      font-family: Poppins !important;
+      font-weight: 700 !important;
+      -webkit-print-color-adjust:exact !important
+    }
+    .lib_day {
+      margin-left: 20px;
+      font-size: 25px !important;
+      font-weight: 700 !important;
+      -webkit-print-color-adjust:exact !important
+    }
+    .titre_transmis {
+      font-weight: 700 !important;
+      line-height: 40px !important;
+      -webkit-print-color-adjust:exact !important
+    }
+    .jicab {
+      font-size: 33px !important;
+      line-height: 35px !important;
+    }
+    .monsier {
+      font-size: 27px !important;
+    }
+    .mpr {
+      font-size: 30px !important;
+      margin-left: 15% !important;
+      font-weight: 700 !important;
+      -webkit-print-color-adjust:exact !important
+    }
+    .desc_para {
+      font-size: 35px !important;
+      line-height: 25px !important;
+      margin-top: 15px !important;
+      margin-left: 5% !important;
+      -webkit-print-color-adjust:exact !important;
+    }
+    .desc_para_lab {
+      font-size: 35px !important;
+      line-height: 45px !important;
+      margin-top: 15px !important;
+      -webkit-print-color-adjust:exact !important;
+    }
+    .signat_juge {
+      font-size: 35px !important;
+      -webkit-print-color-adjust:exact !important;
+    }
+    .mhei-recep {
+      height: 15% !important;
+      margin-top: -5% !important;
+    }
+    .recept_pad {
+      margin-top: 10% !important;
+      padding-bottom: 60% !important;
+    }
+    .mbspace_print {
+      margin-bottom: 20% !important;
+    }
+    .rem_wcp {
+      margin-top: -8% !important;
+    }
+    .tb_tel {
+      margin-top: 20% !important;
+    }
+    .table_det1 {
+      margin-top: 2% !important;
+      border: 5px solid #000000 !important;
+    }
+    .signator_i1 {
+      margin-top: 35% !important;
+    }
+    .signator_i6 {
+      margin-top: 5% !important;
+    }
+    .titre_inf1 {
+      margin-left: 32% !important;
+    }
+    .titre_inf2 {
+      margin-left: 19% !important;
+    }
+    .sous_title {
+      margin-left: 6% !important;
+    }
+    .ml_form5 {
+      margin-left: 12% !important;
+    }
+    .cabb_20 {
+      margin-bottom: 20px !important;
+    }
+    .cabb_10 {
+      margin-bottom: 10px !important;
+    }
+    .cust_div_i3 {
+      font-size: 30px !important;
+      font-weight: bold !important;
+      color: #000000 !important;
+      -webkit-print-color-adjust:exact !important;
+    }
+    .cesmotif_i4 {
+      margin-top: 8% !important;
+    }
+    .txt_vu {
+      font-family: Poppins !important;
+      font-size: 30px !important;
+    }
+    .adress_etui5 {
+      font-size: 30px !important;
+    }
+    .mb_det4 {
+      padding-bottom: 50% !important;
+    }
+    .ml_printld9 {
+      margin-left: 30% !important;
+    }
+    /* fiche detenu */
+    .rpri_txt {
+      margin-top: 12px;
+    }
+    .triangle-right,
+    .trglepar-right {
+      border-top: 15px solid transparent !important;
+    }
+    .phot_emprint {
+      margin-top: -10% !important;
+      width: 15% !important;
+    }
+    .main_field {
+      margin-left: 12% !important;
+      margin-bottom: 50px !important;
+    }
+    .div_field {
+      width: 100% !important;
+      margin-left: -7% !important;
+    }
+    .legend_lab {
+      font-weight: bold !important;
+      font-size: 25px !important;
+    }
+    .flname {
+      font-size: 30px !important;
+      padding-bottom: 20px !important;
+    }
+    .val_flname {
+      font-size: 25px !important;
+      padding-bottom: 25px !important;
+    }
+    .flname_saisine {
+      font-size: 25px !important;
+      padding-bottom: 6px !important;
+    }
+    .val_flname_saisine {
+      font-size: 20px !important;
+      padding-bottom: 10px !important;
+    }
+    .name_det {
+      font-size: 25px !important;
+    }
+    .id_det {
+      font-size: 18px !important;
+    }
+    .fiche_det {
+      font-size: 29px !important;
+    }
+    .top_line,
+    .footer_line,
+    .footer_line_detenu {
+      width: 101.5% !important;
+    }
+    /* pring js css */
+    .main_bg {
+      background: #FF0000 !important;
+      min-height: 400px !important;
+    }
+}

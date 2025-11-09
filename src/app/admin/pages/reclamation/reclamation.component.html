@@ -1,0 +1,235 @@
+<ngx-loading [show]="loading" [config]="{ backdropBorderRadius: '5px',fullScreenBackdrop:true }"></ngx-loading>
+<div class="row">
+  <div class="col-md-12">
+    <!-- list -->
+    <div [class]="isDark? 'tile theme-dark' : 'tile theme-light'">
+        <!-- ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±± -->
+         <!-- list -->
+    <div [class]="isDark? 'tile theme-dark' : 'tile theme-light'">
+       <div class="user-header d-flex justify-content-between align-items-center p-3 shadow-sm rounded-3">
+        <!-- 🔹 Titre -->
+        <div class="d-flex align-items-center gap-2">
+          <h5 class="fw-bold mb-0 text-dark">
+            Liste des reclamations
+          </h5>
+          <span class="badge-count">{{reclamations.length}}</span>
+        </div>
+        <!-- 🔹 Outils : recherche + boutons -->
+        <div class="d-flex align-items-center gap-2 flex-wrap justify-content-end">
+          <!-- 🔍 Barre de recherche -->
+          <div class="search-wrapper d-flex align-items-center">
+            <i class="mdi mdi-magnify search-icon"></i>
+            <input type="text" [(ngModel)]="searchFilterText" placeholder="Recherche" class="search-input" />
+          </div>
+          <!-- 🧩 Bouton filtre -->
+          <button *ngIf="!isSearch" (click)="isSearch = true"
+            class="btn btn-outline-light filter-btn d-flex align-items-center gap-1">
+            <i class="mdi mdi-filter-variant text-dark"></i>
+            <span class="text-dark">Filtres</span>
+          </button>
+          <div class="row gx-1 align-items-center" *ngIf="isSearch">
+            <div class="col-auto d-flex align-items-center">
+              <label class="lab_input me-1" [class]="isDark? 'c-white' : 'c-black'">Du</label>
+              <p-calendar [(ngModel)]="searchParam.dateDebut" [showIcon]="true"></p-calendar>
+            </div>
+
+            <div class="col-auto d-flex align-items-center">
+              <label class="lab_input me-1" [class]="isDark? 'c-white' : 'c-black'">Au</label>
+              <p-calendar [(ngModel)]="searchParam.dateFin" [showIcon]="true"></p-calendar>
+            </div>
+
+            <div class="col-auto">
+              <p-dropdown [options]="criteriaList" [(ngModel)]="searchParam.criteria" optionLabel="name"
+                placeholder="Critère"></p-dropdown>
+            </div>
+
+            <div class="col-auto">
+              <button class="btn_refresh" (click)="Search()" title="Rafraichir">
+                <i class="mdi mdi-refresh fs-20"></i>
+              </button>
+            </div>
+
+            <div class="col-auto">
+              <button class="btn_refresh text-danger" (click)="isSearch = false" title="Fermer">
+                <i class="mdi mdi-close fs-20"></i>
+              </button>
+            </div>
+          </div>
+          <!-- ➕ Bouton ajout -->
+          <button *ngIf="true" class="btn btn-dark d-flex align-items-center gap-1 px-3"(click)="showAddForm()" type="button" data-backdrop="static" data-toggle="modal" data-target="#reclamationModal">
+            <i class="mdi mdi-plus"></i>
+            <span>Faire une réclamation</span>
+          </button>
+        </div>
+      </div>
+      <div class="table-card">
+        <div class="table-responsive">
+          <table class="table align-middle table-hover table-striped">
+            <thead class="table-light">
+              <tr>
+                <th>
+                  <div class="animated-checkbox">
+                    <label>
+                      <input type="checkbox" [(ngModel)]="selectAll" (change)="toggleSelectAll()" />
+                      <span class="label-text"></span>
+                    </label>
+                  </div>
+                </th>
+                <th>N°</th>
+                <th>Rémarque</th>
+              <th>Statut</th>
+              <th class="text-center action-buttons">Options</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr *ngFor="let reclamation of paginatedList">
+                <td>
+                  <div class="animated-checkbox">
+                    <label>
+                      <input type="checkbox" [(ngModel)]="reclamation.selected" (change)="toggleSelectOne()" />
+                      <span class="label-text"></span>
+                    </label>
+                  </div>
+                </td>
+                <td>{{ reclamation.id }}</td>
+                <td>{{ reclamation.description }}</td>
+                <td>
+                  <span [class]="(reclamation.statut === 'ENVOYER') ? 'acces_active' : 'acces_block'">
+                  <i class="mdi"
+                    [ngClass]="(reclamation.statut === 'ENVOYER') ? 'mdi-check-circle text-success' : 'mdi-timer-sand text-warning'"></i>
+                  {{ (reclamation.statut === 'ENVOYER') ? 'Envoyé' : 'Non envoyé' }}
+                </span>
+                </td>
+                
+                <td class="text-center action-buttons">
+                  <div class="d-flex justify-content-center align-items-center gap-2 flex-wrap">
+                    <button class="btn btn-light btn-icon" title="Modifier" data-backdrop="static" data-toggle="modal" data-target="#reclamationModal" (click)="showEditForm(reclamation)">
+                      <img src="assets/icons/mdi/edit.png" alt="Modifier" class="icon-btn" />
+                    </button>
+
+                    <button class="btn btn-light btn-icon" title="Supprimer" (click)="showDeleteDialog(reclamation)" data-backdrop="static" data-toggle="modal" data-target="#deleteConfirmModal">
+                      <img src="assets/icons/mdi/delete.png" alt="Supprimer" class="icon-btn" />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- 🔹 PAGINATION -->
+        <!-- 🔹 PAGINATION DYNAMIQUE -->
+        <div class="pagination-wrapper d-flex justify-content-between align-items-center mt-3 p-2 border-top">
+          <div class="d-flex align-items-center gap-2">
+            <button class="btn btn-outline-secondary btn-sm" [disabled]="currentPage === 1" (click)="previousPage()">
+              <i class="mdi mdi-chevron-left"></i> Précédent
+            </button>
+            <ng-container *ngFor="let page of [].constructor(totalPages); let i = index">
+              <button class="btn btn-sm"
+                [ngClass]="currentPage === i + 1 ? 'btn-primary text-white' : 'btn-outline-secondary'"
+                (click)="currentPage = i + 1; updatePaginatedList()">
+                {{ i + 1 }}
+              </button>
+            </ng-container>
+
+            <button class="btn btn-outline-secondary btn-sm" [disabled]="currentPage === totalPages"
+              (click)="nextPage()">
+              Suivant <i class="mdi mdi-chevron-right"></i>
+            </button>
+          </div>
+
+          <div class="text-muted small">
+            Page {{ currentPage }} sur {{ totalPages }}
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- /list -->
+      <!-- ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±± -->
+      
+    </div>
+    <!-- /list -->
+
+    <!-- add reclamation modal -->
+  <div class="container demo" *ngIf="currentView === 'add'">
+  <div class="modal fade" id="reclamationModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel2" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document"> <!-- modal centré -->
+      <div class="modal-content" [style]="{'background-color': isDark ? '#1f1f1f' : '#FFFFFF'}">
+        <form #formAddReclamation="ngForm">
+        <!-- Header -->
+        <div class="modal-header">
+          <h5 class="modal-title">
+            {{reclamation.id ? 'Modifier une réclamation' : 'Réclamation'}}
+          </h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close" #closeAddElementDialog>
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <!-- Body -->
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-control-label lab_modal" for="remarques">Notes et remarques</label>
+            <textarea [class]="isDark ? 'form-control form-control-d' : 'form-control form-control-w'"
+                      id="remarques" 
+                      name="remarques" 
+                      [(ngModel)]="reclamation.texte" 
+                      placeholder="Tapez vos remarques ici"
+                      rows="7"
+                      required></textarea>
+          </div>
+        </div>
+        <!-- Footer -->
+        <div class="modal-footer d-flex flex-column">
+          <button [disabled]="!formAddReclamation.valid" class="btn btn-login btn-block btnn_save" (click)="reclamation.id ? Update() : Save()">
+            <img src="assets/images/save.png" alt="" class="icon_save"> Enregistrer et terminer </button>
+          <label class="lab_reset mt-2" data-dismiss="modal" aria-label="Close">Fermer</label>
+        </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+    <!-- /add profik modal -->
+
+
+    <!-- Modal confim delete -->
+    <div *ngIf="currentView === 'list'" class="modal fade text-xs-left" id="deleteConfirmModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel2" aria-hidden="true">
+      <div class="modal-sm modal-dialog " role="document">
+          <div class="modal-content" style="width: 400px;">
+              <div class="modal-header">
+                  <button style="display: none;" type="button" #deleteConfirmDialog class="btn btn-outline-primary" data-backdrop="static" data-toggle="modal" data-target="#deleteConfirmModal" data-backdrop="true"></button>
+                  <h4 class="modal-title" id="myModalLabel2"> <img src="assets/images/close_c.png" alt="" class="im_confirm"> </h4>
+                  <img src="assets/images/close_x.png" alt="" class="cursor-p" data-dismiss="modal">
+              </div>
+              <div class="modal-body">
+                  <span class="txt_confirm">
+                      Bonjour, vous vous appretez à supprimer cette réclamation
+                      {{reclamation?.texte}}
+                  </span><br/>
+                  <span class="desc_confirm">êtes vous sûr de supprimer ce réclamation ?</span> <br>
+
+                  <button class="button_op">
+                      <span class="buttxt_op" [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'">Motif de suppression</span>
+                  </button>
+                  <div class="form-group has-success align-left ft-w-500">
+                      <textarea [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'" placeholder="Taper le motif de suppression ici ..." id="motif" name="motif" type="text" rows="5" required></textarea>
+                  </div>
+              </div>
+              <div class="modal-footer">
+                  <div style="width: 100%;">
+                      <button class="btn btn-supprime btn-sm mr-3 ml-2" (click)="DeleteReclamation()">
+                          <label class="txt_blocked">Supprimerla reclamation</label>
+                      </button>
+                      <button class="btn btn-cancel2 btn-sm" data-dismiss="modal">
+                          <label class="txt_blocked">Annuler</label>
+                      </button>
+                  </div>
+              </div>
+          </div>
+      </div>
+    </div>
+  </div>
+</div>

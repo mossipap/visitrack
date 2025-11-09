@@ -1,0 +1,50 @@
+.notification-container {
+  border-radius: 10px;
+  background-color: var(--bs-body-bg);
+  max-width: 500px;
+}
+
+.notification-item {
+  transition: background-color 0.3s ease;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+
+  &:hover {
+    background-color: rgba(0,0,0,0.03);
+  }
+
+  &.unread {
+    background-color: rgba(0, 123, 255, 0.05);
+    border-left: 4px solid #007bff;
+  }
+}
+
+.icon-circle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  color: white;
+
+  &.success {
+    background-color: #28a745;
+  }
+  &.warning {
+    background-color: #f1b44c;
+  }
+  &.danger {
+    background-color: #dc3545;
+  }
+}
+
+button.btn-light {
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

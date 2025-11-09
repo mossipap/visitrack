@@ -1,0 +1,428 @@
+::ng-deep .mat-form-field-appearance-fill .mat-form-field-underline {
+    display: none !important;
+}
+::ng-deep .mat-form-field-appearance-fill .mat-form-field-flex {
+    padding: 0em .75em 0 .75em !important;
+    height: 36px !important;
+    border: 1px solid #D0D5DD;
+    box-shadow: 0px 4px 8px -2px #00000014;
+    background-color: #FFFFFF !important;
+    border-radius: 8px !important;
+    margin-top: -5px !important ;
+}
+::ng-deep .mat-form-field-appearance-legacy .mat-form-field-wrapper {
+    margin-bottom: 0px !important;
+    margin-top: -7px !important;
+    padding-bottom: .35em !important;
+    padding-left: .35em !important;
+}
+::ng-deep .mat-form-field-appearance-legacy .mat-form-field-underline {
+  bottom: .25em !important;
+  display: none !important;
+}
+.btn-session {
+  color: #FFFFFF !important;
+  background: #CD0508 !important;
+  border-color: #CD0508 !important;
+}
+.btn-nosession {
+  color: #FFFFFF !important;
+  background: #6c757d !important;
+  border-color: #6c757d !important;
+}
+.minw-12 {
+    min-width: 12rem !important;
+    margin-top: -8px !important;
+}
+.app-search__input {
+    border-radius: 25px !important;
+}
+
+.icon-org {
+    width: 25px;
+    margin-top: 15px;
+    cursor: pointer;
+}
+.user-avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+}
+
+.div_role {
+    font-family: Calibri;
+    font-size: 14px;
+    color: #f7931a;
+}
+.ft_cal {
+    font-family: Calibri;
+    font-size: 15px;
+}
+.cursor_p {
+    cursor: pointer;
+}
+.img_timer {
+    width: 30px;
+    height: 26px;
+    margin-bottom: 4px;
+}
+.lib_timer {
+    margin-left: -26px;
+    margin-top: 10px;
+    font-size: 20px;
+    font-family: 'Times New Roman', Times, serif;
+}
+.header-left-w {
+    background-color: #051D43;
+    color: #000000;
+}
+.header-left-d {
+    background-color: #fff;
+    color: #ffffff;
+}
+.header-right-w {
+    background-color: #051D43;
+    max-height: 76px;
+}
+.header-right-d {
+    background-color: #000000;
+    max-height: 76px;
+}
+.c-white {
+    color: #ffffff;
+}
+.c-black {
+    color: #fff;
+    margin-left: 5px;
+}
+
+.time-white {
+    color: #ffffff;
+}
+.time-black {
+    color: #000000;
+}
+.lib-date-w {
+    color: #fff;
+}
+.lib-date-d {
+    color: #b4b8bc;
+}
+.modal-content,
+.dropdown-item {
+    background-color: var(--confirm-bg) !important;
+}
+.icon_mode {
+    width: 30px;
+    margin-top: 10px;
+    cursor: pointer;
+}
+.left_logo {
+    height: 48px;
+    display: block;
+    padding-top: 10px;
+}
+.v {
+    width: 50px;
+    float: left;
+    padding-top: 10px;
+}
+/* generation static */
+::ng-deep .cdk-global-overlay-wrapper,
+::ng-deep .cdk-overlay-container {
+    z-index: 10000 !important;
+}
+/* side right */
+.modal.right .modal-dialog {
+    position: fixed;
+    margin: auto;
+    width: 420px;
+    height: 100%;
+    -webkit-transform: translate3d(0%, 0, 0);
+    -ms-transform: translate3d(0%, 0, 0);
+    -o-transform: translate3d(0%, 0, 0);
+    transform: translate3d(0%, 0, 0);
+    float: right;
+}
+.modal.right .modal-content {
+    height: 100%;
+    overflow-y: auto;
+    background-color: #1f1f1f;
+}
+.modal.right .modal-body {
+    padding: 15px 15px 80px;
+}
+.modal.right.fade .modal-dialog {
+    right: 0px;
+    -webkit-transition: opacity 0.3s linear, right 0.3s ease-out;
+    -moz-transition: opacity 0.3s linear, right 0.3s ease-out;
+    -o-transition: opacity 0.3s linear, right 0.3s ease-out;
+    transition: opacity 0.3s linear, right 0.3s ease-out;
+}
+.modal.right.fade.in .modal-dialog {
+    right: 0 !important;
+}
+.btn_statistics {
+    width: auto;
+/*     height: 31px;
+ */    padding: 5px 5px 5px 5px;
+    border-radius: 4px;
+    margin-top: 15px;
+    background: #fff;
+    color: #3e3c3c;
+    font-family: Calibri;
+    font-size: 15px;
+}
+
+.btn_suivant {
+    width: 100%;
+    height: 35px;
+    padding: 4px 12px 5px 12px;
+    border-radius: 8px;
+    background: #2285E1;
+    color: #FFFFFF;
+    box-shadow: 0px 1px 2px 0px #1018280D;
+}
+.btn_pdf {
+    width: 100%;
+    height: 35px;
+    padding: 4px 12px 5px 12px;
+    border-radius: 8px;
+    border-radius: 8px;
+    background: #FF6441;
+    color: #FFFFFF;
+    box-shadow: 0px 1px 2px 0px #1018280D;
+}
+.label_btn {
+    font-family: Inter;
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 24px;
+    text-align: left;
+    text-underline-position: from-font;
+    text-decoration-skip-ink: none;
+}
+.lab_static {
+    font-family: Inter;
+    font-size: 17px;
+    font-weight: 600;
+    line-height: 28px;
+    text-align: left;
+    text-underline-position: from-font;
+    text-decoration-skip-ink: none;
+    color: #101828;
+}
+.lab_close {
+    margin-bottom: -20px;
+    margin-top: -5px;
+    cursor: pointer;
+}
+.lab_input {
+    font-family: Inter;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 20px;
+    text-align: left;
+    text-underline-position: from-font;
+    text-decoration-skip-ink: none;
+}
+.clore_w {
+    color: #FFFFFF;
+}
+.clore_n {
+    color: #344054;
+}
+.clore_b {
+    color: #fff;
+}
+/* ++++++++++++++++++++++new styld+++++++++++++++++++++++++++++++ */
+.app-nav__item {
+    display: block;
+    padding: 15px;
+    line-height: 20px;
+    color: #fff;
+    -webkit-transition: background-color 0.3s 
+ease;
+    -o-transition: background-color 0.3s ease;
+    transition: background-color 0.3s 
+ease;
+}
+.mdi-settings:before {
+    content: "\F493";
+    color: #fff;
+}
+a:not([href]):not([tabindex]) {
+    color: #fff;
+    text-decoration: none;
+}
+
+
+.user-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #dee2e6;
+}
+
+/* ✅ Petit point vert (connecté) avec animation pulsée */
+.status-indicator {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid #fff; /* petit contour blanc */
+  background-color: #28a745 !important; /* couleur verte */
+  animation: pulse 1.5s infinite ease-in-out; /* animation de pulsation */
+}
+
+/* Animations pour le point de statut */
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Optionnel : pour un statut "déconnecté" avec point rouge, animation similaire */
+.status-indicator-red {
+  background-color: #dc3545 !important; /* rouge */
+  animation: pulseRed 1.5s infinite ease-in-out;
+}
+
+@keyframes pulseRed {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+/* ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±± */
+
+/* Badge Notification */
+.btn_statistics .count {
+  position: absolute;
+  top: 5px;
+  right: -5px;
+  background: #e63946;
+  color: #fff;
+  font-size: 11px;
+  border-radius: 50%;
+  padding: 4px 7px;
+  line-height: 1;
+  min-width: 20px;
+  text-align: center;
+  border: 2px solid #fff;
+}
+/* Animation Pulse */
+@keyframes pulseBadge {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(230, 57, 70, 0.7);
+  }
+  70% {
+    transform: scale(1.12);
+    box-shadow: 0 0 0 8px rgba(230, 57, 70, 0);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(230, 57, 70, 0);
+  }
+}
+
+.btn_statistics .count {
+  animation: pulseBadge 1.6s infinite;
+}
+/* css pour heure en seconde time */
+.time-wrapper {
+  font-size: 18px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.time-display {
+  display: flex;
+  align-items: center;
+  color: #fff;
+  font-weight: 500;
+  background: rgba(255, 255, 255, 0.08);
+  padding: 6px 14px;
+  border-radius: 10px;
+  backdrop-filter: blur(4px);
+}
+
+.time-display i {
+  font-size: 22px;
+  margin-right: 6px;
+  color: #fff;
+}
+
+.time-display span {
+  letter-spacing: 1px;
+}
+/* Effet de lueur douce */
+.time-display {
+  display: flex;
+  align-items: center;
+  color: #fff;
+  font-weight: 500;
+  background: rgba(255, 255, 255, 0.08);
+  padding: 6px 14px;
+  border-radius: 10px;
+  backdrop-filter: blur(4px);
+  box-shadow: 0 0 6px rgba(0, 255, 170, 0.6);
+  animation: glowPulse 2.5s infinite ease-in-out;
+}
+
+/* Icône */
+.time-display i {
+  font-size: 22px;
+  margin-right: 6px;
+  color: #2196f3;
+}
+
+/* Texte */
+.time-display span {
+  letter-spacing: 1px;
+  color: #eafffd;
+}
+
+/* Animation douce */
+@keyframes glowPulse {
+  0% {
+    box-shadow: 0 0 4px rgba(0, 255, 170, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 12px #2196f3;
+  }
+  100% {
+    box-shadow: 0 0 4px rgba(0, 255, 170, 0.4);
+  }
+}
+
+
+/* ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±± */
+/* Icônes à taille homogène */
+.icon-btn {
+  width: 25px;
+  height: 25px;
+  object-fit: contain;
+}

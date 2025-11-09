@@ -1,0 +1,42 @@
+<ngx-loading [show]="loading" [config]="{ backdropBorderRadius: '5px',fullScreenBackdrop:true }"></ngx-loading>
+<div mat-dialog-content [class]="isDark? 'tile bg-dark-d' : 'tile theme-light'">
+    <form #elementForm="ngForm" name="form" style="padding: 0 10px;">
+        <div class="row" style="padding: 10px;margin-bottom: -10px;">
+            <div class="col-xl-10 col-lg-10">
+                <h2 mat-dialog-title [class]="isDark? 'lib-name-d ft-w-700' : 'lib-name-w ft-w-700'">{{typeuser.id? 'Modifier': 'Ajouter'}} type utilisateur</h2>
+            </div>
+            <div class="col-xl-2 col-lg-2">
+                <button class="btn btn-close-d btn-sm w-35 float-right mr-2" type="button" style="border-radius: 45px;" (click)="onNoClick()">
+                    <i class="mdi mdi-close"></i>
+                </button>
+            </div>
+        </div>
+        <!-- form part -->
+        <div class="row">
+            <div class="col-md-12 col-lg-12">
+                <div class="form-group has-success align-left">
+                    <label for="type" [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'">Désignation</label>
+                    <input [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'" id="designation" name="designation" type="text" [(ngModel)]="typeuser.designation">
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12 col-lg-12">
+                <div class="form-group has-success align-left">
+                    <label for="description" [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'">Description</label>
+                    <textarea [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'" id="description" name="description" type="text" [(ngModel)]="typeuser.description"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <br/>
+    </form>
+</div>
+<div mat-dialog-actions align="center" [class]="isDark? 'bg-dark-d' : 'theme-light'">
+    <button class="btn btn-outline-secondary btn-sm mr-1" type="button" (click)="onNoClick()">
+        <i class="fa fa-close"></i> Fermer
+    </button>
+    <button class="btn btn-outline-success btn-save btn-sm" type="button" (click)="saveOrUpdate()" [disabled]="!elementForm.form.valid" cdkFocusInitial>
+        <i class="fa fa-save"></i> Sauvegarder
+    </button>
+</div>

@@ -1,0 +1,409 @@
+<ngx-loading [show]="loading" [config]="{ backdropBorderRadius: '5px',fullScreenBackdrop:true }"></ngx-loading>
+<div class="row">
+  <div class="col-md-12">
+    <!-- list -->
+    <div [class]="isDark? 'tile theme-dark' : 'tile theme-light'">
+       <div class="user-header d-flex justify-content-between align-items-center p-3 shadow-sm rounded-3">
+        <!-- 🔹 Titre -->
+        <div class="d-flex align-items-center gap-2">
+          <h5 class="fw-bold mb-0 text-dark">
+            Liste des cabinets
+          </h5>
+          <span class="badge-count">{{cabinets.length}}</span>
+        </div>
+        <!-- 🔹 Outils : recherche + boutons -->
+        <div class="d-flex align-items-center gap-2 flex-wrap justify-content-end">
+          <!-- 🔍 Barre de recherche -->
+          <div class="search-wrapper d-flex align-items-center">
+            <i class="mdi mdi-magnify search-icon"></i>
+            <input type="text" [(ngModel)]="searchFilterText" placeholder="Recherche" class="search-input" />
+          </div>
+          <!-- 🧩 Bouton filtre -->
+          <button *ngIf="!isSearch" (click)="isSearch = true"
+            class="btn btn-outline-light filter-btn d-flex align-items-center gap-1">
+            <i class="mdi mdi-filter-variant text-dark"></i>
+            <span class="text-dark">Filtres</span>
+          </button>
+          <div class="row gx-1 align-items-center" *ngIf="isSearch">
+            <div class="col-auto d-flex align-items-center">
+              <label class="lab_input me-1" [class]="isDark? 'c-white' : 'c-black'">Du</label>
+              <p-calendar [(ngModel)]="searchParam.dateDebut" [showIcon]="true"></p-calendar>
+            </div>
+
+            <div class="col-auto d-flex align-items-center">
+              <label class="lab_input me-1" [class]="isDark? 'c-white' : 'c-black'">Au</label>
+              <p-calendar [(ngModel)]="searchParam.dateFin" [showIcon]="true"></p-calendar>
+            </div>
+
+            <div class="col-auto">
+              <p-dropdown [options]="criteriaList" [(ngModel)]="searchParam.criteria" optionLabel="name"
+                placeholder="Critère"></p-dropdown>
+            </div>
+
+            <div class="col-auto">
+              <button class="btn_refresh" (click)="Search()" title="Rafraichir">
+                <i class="mdi mdi-refresh fs-20"></i>
+              </button>
+            </div>
+
+            <div class="col-auto">
+              <button class="btn_refresh text-danger" (click)="isSearch = false" title="Fermer">
+                <i class="mdi mdi-close fs-20"></i>
+              </button>
+            </div>
+          </div>
+          <!-- ➕ Bouton ajout -->
+          <button *ngIf="true" class="btn btn-dark d-flex align-items-center gap-1 px-3" (click)="showAddForm()" type="button" data-backdrop="static" data-toggle="modal" data-target="#addCabinetModal">
+            <i class="mdi mdi-plus"></i>
+            <span>{{'cabinet.addcabinet' | translate}}</span>
+          </button>
+        </div>
+      </div>
+      <div class="table-card">
+        <div class="table-responsive">
+          <table class="table align-middle table-hover table-striped">
+            <thead class="table-light">
+              <tr>
+                <th>
+                  <div class="animated-checkbox">
+                    <label>
+                      <input type="checkbox" [(ngModel)]="selectAll" (change)="toggleSelectAll()" />
+                      <span class="label-text"></span>
+                    </label>
+                  </div>
+                </th>
+                <th>N°</th>
+                <th> Services</th>
+               <th> Designation</th>
+              <th> Statut </th>
+              <th class="text-center action-buttons">Opérations</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr *ngFor="let cabine of cabinets">
+                <td>
+                  <div class="animated-checkbox">
+                    <label>
+                      <input type="checkbox" [(ngModel)]="cabine.selected" (change)="toggleSelectOne()" />
+                      <span class="label-text"></span>
+                    </label>
+                  </div>
+                </td>
+                <td>{{ cabine.id }}</td>
+                <td>{{ cabine.designation }}</td>
+                <td>{{ cabine.description }}</td>
+                <td><span [class]="cabine.statut==='Activé'? 'text-c-green ft-w-500' : 'text-c-red ft-w-500'">{{ cabine.statut }}</span></td>
+                
+                <td class="text-center action-buttons">
+                  <div class="d-flex justify-content-center align-items-center gap-2 flex-wrap">
+                    <button class="btn btn-light btn-icon" title="Modifier" data-backdrop="static" data-toggle="modal"
+                      data-target="#addUserModal" (click)="showEditForm(cabinet)">
+                      <img src="assets/icons/mdi/edit.png" alt="Modifier" class="icon-btn" />
+                    </button>
+
+                    <button class="btn btn-light btn-icon" title="Supprimer" data-backdrop="static" data-toggle="modal"
+                      data-target="#deleteConfirmModal" (click)="showDeleteDialog(cabinet)">
+                      <img src="assets/icons/mdi/delete.png" alt="Supprimer" class="icon-btn" />
+                    </button>
+                    <button *ngIf="cabine.statut !== 'Activé'" class="btn btn-primary btn-sm fw-semibold" title="Debloquer" data-backdrop="static"
+                      data-toggle="modal" data-target="#userConfirmModal" (click)="showConfirmDialog(cabinet)">Débloquer</button>
+                    <button *ngIf="cabine.statut == 'Activé'" class="btn btn-danger btn-sm fw-semibold" title="Bloquer" data-backdrop="static"
+                      data-toggle="modal" data-target="#userConfirmModal" (click)="showConfirmDialog(cabinet)">Bloquer</button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- 🔹 PAGINATION -->
+        <!-- 🔹 PAGINATION DYNAMIQUE -->
+        <div class="pagination-wrapper d-flex justify-content-between align-items-center mt-3 p-2 border-top">
+          <div class="d-flex align-items-center gap-2">
+            <button class="btn btn-outline-secondary btn-sm" [disabled]="currentPage === 1" (click)="previousPage()">
+              <i class="mdi mdi-chevron-left"></i> Précédent
+            </button>
+            <ng-container *ngFor="let page of [].constructor(totalPages); let i = index">
+              <button class="btn btn-sm"
+                [ngClass]="currentPage === i + 1 ? 'btn-primary text-white' : 'btn-outline-secondary'"
+                (click)="currentPage = i + 1; updatePaginatedList()">
+                {{ i + 1 }}
+              </button>
+            </ng-container>
+
+            <button class="btn btn-outline-secondary btn-sm" [disabled]="currentPage === totalPages"
+              (click)="nextPage()">
+              Suivant <i class="mdi mdi-chevron-right"></i>
+            </button>
+          </div>
+
+          <div class="text-muted small">
+            Page {{ currentPage }} sur {{ totalPages }}
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- /list -->
+
+    <!-- add cabinet modal -->
+    <div class="container demo" *ngIf="currentView === 'add'">
+      <div class="modal right fade" id="addCabinetModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel2">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content" [style]="{'background-color': isDark ? '#1f1f1f' : '#FFFFFF'}">
+            <div class="d-flex" style="margin-top: 15px;">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="margin-left: 10px;" #closeAddElementDialog>
+                <span aria-hidden="true">
+                  <i [class]="isDark? 'txt-title-d mdi mdi-arrow-left-bold-circle' : 'mdi mdi-arrow-left-bold-circle'"></i>
+                </span>
+                <span [class]="isDark? 'txt-title-d ml-2': 'ml-1'" style="font-size: 12px;">
+                  {{'cabinet.addcabinet' | translate}}
+                </span>
+              </button>
+            </div>
+
+            <div class="modal-body">
+              <div class="row mb-l-20 mb-10">
+                <div class="col-md-12 col-lg-12 p-right-0">
+                  <div class="row mb-l-20 mb-10">
+                    <div class="col-md-12 col-lg-12 p-right-0">
+                      <div [class]="isDark? 'card cust_card_d':'card cust_card_w'">
+                        <div class="card-block">
+                          <div class="row mb-3 mt-2">
+                            <div class="col-md-12 col-lg-12 p-right-0 ta-center">
+                              <label [class]="isDark? 'form-control-label ft-w-b c-cab-1' : 'form-control-label ft-w-b c-cab-2'">
+                                {{'cabinet.infogenerale' | translate}} :
+                              </label>
+                            </div>
+                          </div>
+                          <div class="row mb-l20">
+<!--                             <div class="col-lg-12 p-right-0">
+                              <div class="form-group has-success align-left ft-w-500">
+                                <label [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'" for="numerocabinet">{{'cabinet.numerocabinet' | translate}}</label>
+                                <input [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'" id="numerocabinet" name="numerocabinet" type="text" [(ngModel)]="cabinet.numerocabinet" required>
+                              </div>
+                            </div> -->
+                            <div class="col-lg-12 p-right-0">
+                              <div class="form-group has-success align-left ft-w-500">
+                                <label [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'" for="nomcabinet">{{'cabinet.nomcabinet' | translate}}</label>
+                                <input [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'" id="nomcabinet" name="nomcabinet" type="text" [(ngModel)]="cabinet.designation" required>
+                              </div>
+                            </div>
+                            <div class="col-lg-12 p-right-0">
+                              <div class="form-group has-success align-left ft-w-500">
+                                <label [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'" for="description">{{'cabinet.description' | translate}}</label>
+<!--                                 <input [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'" id="description" name="description" type="text" [(ngModel)]="cabinet.description" required>
+ -->                                <textarea [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'" placeholder="Taper la description ici ..." id="description" name="description" type="text" [(ngModel)]="cabinet.description" rows="10" required></textarea>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div [class]="isDark? 'col-md-12 col-lg-12 p-right-0 div_separate_d':'col-md-12 col-lg-12 p-right-0 div_separate_w'"></div>
+
+                    <div class="col-md-12 col-lg-12 p-right-0" *ngIf="">
+                      <div [class]="isDark? 'card cust_card_d':'card cust_card_w'">
+                        <div class="card-block">
+                          <div class="row mb-3 mt-2">
+                            <div class="col-md-12 col-lg-12 p-right-0 ta-center">
+                              <label [class]="isDark? 'form-control-label ft-w-b c-cab-1' : 'form-control-label ft-w-b c-cab-2'">
+                                {{'cabinet.addpersonne' | translate}} :
+                              </label>
+                            </div>
+                          </div>
+
+                          <div class="row mb-l20">
+                            <div class="col-md-12 col-lg-12 p-right-0">
+                              <div class="form-group has-success align-left">
+                                <mat-form-field appearance="fill" class="full-width select-add">
+                                  <mat-label>Veuillez cocher les personnels pour le cabinet</mat-label>
+                                  <mat-select name="addpersonne" [(ngModel)]="cabinet.personnels" multiple>
+                                    <mat-option *ngFor="let perso of utilisateurs" [value]="perso">{{perso.prenom}} {{perso.nom}}</mat-option>
+                                  </mat-select>
+                                </mat-form-field>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div class="row">
+                            <div class="col-md-11 col-lg-11 cust_row mb-1" *ngFor="let perso of cabinet.personnels; let i=index">
+                              <div class="row">
+                                <div class="col-md-10 col-lg-10 p-right-0">
+                                  <label [class]="isDark? 'form-control-label fs-12 c-cab-1' : 'form-control-label fs-12 c-cab-2'">
+                                    <div class="d-flex">
+                                      <img src="assets/images/profile/ali_soumahoro.png" alt="" class="avatar_av mr-1 ml-2">
+                                      <span> {{perso.prenom}} {{perso.nom}}</span>
+                                    </div>
+                                  </label>
+                                </div>
+                                <div class="col-md-2 col-lg-2 d-flex">
+                                  <button class="btn btn-remove btn-sm mr-1 h-30" type="button" (click)="removePersonnel(perso)">
+                                    <i class="mdi mdi-close fs-18"></i>
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
+                  <div class="row">
+                    <div class="col-md-12">
+                      <button class="btn btn-login btn-block btnn_save" (click)="cabinet.id?Update():Save()">
+                        <img src="assets/images/save.png" alt="" class="icon_save">{{'parametre.save' | translate}}
+                      </button>
+                    </div>
+                    <div class="col-md-12 ta-center">
+                      <label class="lab_reset" *ngIf="!cabinet.id" (click)="showAddForm()">Réinitialiser</label>
+                      <label class="lab_reset" *ngIf="cabinet.id" data-dismiss="modal" aria-label="Close">Fermer</label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- /add cabinet modal -->
+
+    <!-- Modal confim bloque -->
+    <div  class="modal fade text-xs-left" id="elementConfirmModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel2" aria-hidden="true">
+      <div class="modal-sm modal-dialog " role="document">
+        <div class="modal-content" style="width: 340px;">
+          <div class="modal-header">
+            <button style="display: none;" type="button" #openConfirmDialog class="btn btn-outline-primary" data-backdrop="static" data-toggle="modal" data-target="#elementConfirmModal" data-backdrop="true">
+            </button>
+            <h4 class="modal-title" id="myModalLabel2">
+              <img src="assets/images/close_c.png" alt="" class="im_confirm">
+            </h4>
+            <img src="assets/images/close_x.png" alt="" class="cursor-p" data-dismiss="modal">
+          </div>
+          <div class="modal-body">
+            <label class="txt_confirm">
+              Bonjour, vous vous appretez à bloquer le {{cabinet?.designation}}
+            </label><br/>
+            <label class="desc_confirm">etes vous sûr de bloquer ce Service ?</label> <br>
+
+            <button class="button_op">
+                <span class="buttxt_op">Operations</span>
+            </button>
+          </div>
+          <div class="modal-footer">
+            <div style="width: 100%;">
+              <button class="btn btn-blocked btn-sm mr-3 ml-2" type="button" (click)="UpdateStatut('Bloqué')">
+                <label class="txt_blocked">Bloquer</label>
+              </button>
+              <button class="btn btn-cancel btn-sm" type="button" data-dismiss="modal">
+                <label class="txt_blocked">Annuler</label>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal confim delete -->
+    <div *ngIf="currentView === 'deleted'" class="modal fade text-xs-left" id="deleteConfirmModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel2" aria-hidden="true">
+      <div class="modal-sm modal-dialog " role="document">
+        <div class="modal-content" style="width: 400px;">
+          <div class="modal-header">
+            <button style="display: none;" type="button" #deleteConfirmDialog class="btn btn-outline-primary" data-backdrop="static" data-toggle="modal" data-target="#deleteConfirmModal" data-backdrop="true">
+            </button>
+            <h4 class="modal-title" id="myModalLabel2">
+              <img src="assets/images/close_c.png" alt="" class="im_confirm">
+            </h4>
+            <img src="assets/images/close_x.png" alt="" class="cursor-p" data-dismiss="modal">
+          </div>
+          <div class="modal-body">
+            <span class="txt_confirm">
+              Bonjour, vous vous appretez à supprimer le
+              {{cabinet?.designation}}
+            </span><br/>
+            <span class="desc_confirm">etes vous sûr de supprimer ce service ?</span> <br>
+
+           <!--  <button class="button_op">
+                <span class="buttxt_op" [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'">Motif de suppression</span>
+            </button>
+            <div class="form-group has-success align-left ft-w-500">
+              <textarea [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'" placeholder="Taper le motif de suppression ici ..." id="motif" name="motif" type="text" rows="5" required></textarea>
+            </div> -->
+          </div>
+          <div class="modal-footer">
+            <div style="width: 100%;">
+              <button class="btn btn-supprime btn-sm mr-3 ml-2" (click)="onDeleted()">
+                <label class="txt_blocked">Supprimer le service</label>
+              </button>
+              <button class="btn btn-cancel2 btn-sm" data-dismiss="modal">
+                <label class="txt_blocked">Annuler</label>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- MODAL : Confirmation Bloqué -->
+<div class="modal fade" id="elementConfirmModal" tabindex="-1" aria-labelledby="elementConfirmModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-sm modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg rounded-4">
+      <div class="modal-header bg-gradient-danger text-white">
+        <h5 class="modal-title" id="elementConfirmModalLabel">
+          <i class="mdi mdi-alert-circle-outline me-2"></i> Confirmer le blocage
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body text-center p-3">
+        <p>Bonjour, vous vous apprêtez à bloquer le <strong>{{ cabinet?.designation }}</strong></p>
+        <p>Êtes-vous sûr de bloquer ce service ?</p>
+      </div>
+      <div class="modal-footer justify-content-center border-0">
+        <button type="button" class="btn btn-outline-secondary px-3" data-bs-dismiss="modal">Annuler</button>
+        <button type="button" class="btn btn-danger px-3" (click)="UpdateStatut('Bloqué')">
+          Bloquer
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Bouton caché pour déclencher le modal Bootstrap -->
+<button
+  #deleteConfirmDialog
+  type="button"
+  class="btn btn-danger d-none"
+  data-bs-toggle="modal"
+  data-bs-target="#deleteConfirmModal">
+</button>
+
+<!-- Modal de confirmation -->
+    <!-- Modal de confirmation de suppression -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content shadow-lg border-0">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title" id="deleteModalLabel">
+          <i class="mdi mdi-alert"></i> Confirmation de suppression
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fermer"></button>
+      </div>
+      <div class="modal-body text-center">
+        <p>Voulez-vous vraiment supprimer ce service <strong>{{ cabinet?.designation }}</strong> ?</p>
+      </div>
+      <div class="modal-footer justify-content-center">
+        <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">
+          <i class="mdi mdi-close"></i> Annuler
+        </button>
+        <button type="button" class="btn btn-danger px-4" (click)="onDeleted()">
+          <i class="mdi mdi-delete"></i> Supprimer
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,373 @@
+::ng-deep .mat-form-field-appearance-fill .mat-form-field-underline {
+    display: none !important;
+}
+::ng-deep .mat-form-field-appearance-fill .mat-form-field-flex {
+    padding: 0em .75em 0 .75em !important;
+    height: 36px !important;
+    border: 1px solid #D0D5DD;
+    box-shadow: 0px 4px 8px -2px #00000014;
+    background-color: #FFFFFF !important;
+    border-radius: 8px !important;
+    margin-top: -5px !important ;
+}
+::ng-deep .mat-form-field-appearance-legacy .mat-form-field-wrapper {
+    margin-bottom: 0px !important;
+    margin-top: -7px !important;
+    padding-bottom: .35em !important;
+    padding-left: .35em !important;
+}
+::ng-deep .mat-form-field-appearance-legacy .mat-form-field-underline {
+  bottom: .25em !important;
+  display: none !important;
+}
+::ng-deep .mat-icon-button {
+    outline: none !important;
+}
+/* side right */
+.modal.right .modal-dialog {
+    position: fixed;
+    margin: auto;
+    width: 420px;
+    height: 100%;
+    -webkit-transform: translate3d(0%, 0, 0);
+    -ms-transform: translate3d(0%, 0, 0);
+    -o-transform: translate3d(0%, 0, 0);
+    transform: translate3d(0%, 0, 0);
+    float: right;
+}
+.modal.right .modal-content {
+    height: 100%;
+    overflow-y: auto;
+    background-color: #1f1f1f;
+}
+.modal.right .modal-body {
+    padding: 15px 15px 80px;
+}
+.modal.right.fade .modal-dialog {
+    right: 0px;
+    -webkit-transition: opacity 0.3s linear, right 0.3s ease-out;
+    -moz-transition: opacity 0.3s linear, right 0.3s ease-out;
+    -o-transition: opacity 0.3s linear, right 0.3s ease-out;
+    transition: opacity 0.3s linear, right 0.3s ease-out;
+}
+.modal.right.fade.in .modal-dialog {
+    right: 0 !important;
+}
+button.btn_active:focus,
+button.btn_active:active {
+    border-color: #FF8F6B !important; /* Change to desired color after button is clicked */
+    outline: none !important; /* Optional: Remove the default focus outline */
+}
+button.btn_not_active:focus,
+button.btn_not_active:active {
+    border-color: #faf4f3 !important; /* Change to desired color after button is clicked */
+    outline: none !important; /* Optional: Remove the default focus outline */
+}
+.cust_card_d {
+    background-color: #1f1f1f;
+    border: 1px solid #666769 !important;
+    padding: 0 10px;
+}
+.cust_card_w {
+    background-color: #f5f5f5;
+    border: none !important;
+    padding: 0 10px;
+}
+.form-control-w {
+  height: 36px;
+  border-radius: 10px;
+  background-color: #FFFFFF !important;
+  border: 1px solid #ced4da !important;
+}
+.form-texarea-w {
+  border-radius: 10px;
+  color: #000000;
+  background-color: #FFFFFF !important;
+  border: 1px solid #ced4da !important;
+}
+.div_separate_d {
+    width: 100%;
+    height: 25px;
+    background-color: #1f1f1f;
+}
+.div_separate_w {
+    width: 100%;
+    height: 25px;
+    background-color: #ffffff;
+}
+.title_lib {
+    font-family: Calibri;
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 20px;
+    text-align: left;
+    text-underline-position: from-font;
+    text-decoration-skip-ink: none;
+}
+.ft_cal {
+    font-family: Calibri;
+    font-size: 18px;
+}
+.i_option {
+    color: #6c757d;
+    float: right;
+    cursor: pointer;
+}
+.acces_active {
+    font-family: Nunito;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 19.1px;
+    text-align: left;
+    text-underline-position: from-font;
+    text-decoration-skip-ink: none;
+    color: #107C41;
+}
+.acces_block {
+    font-family: Nunito;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 19.1px;
+    text-align: left;
+    text-underline-position: from-font;
+    text-decoration-skip-ink: none;
+    color: #E0880D;
+}
+.acces_supp {
+    font-family: Nunito;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 19.1px;
+    text-align: left;
+    text-underline-position: from-font;
+    text-decoration-skip-ink: none;
+    color: #FF0000;
+}
+
+.w-98 {
+    width: 98%;
+}
+.img-avatar {
+    margin-right: 6px;
+}
+.btn-assign-d {
+    color: #0d0d0d;
+    background-color: #1CDBE9 !important;
+    border-color: #1CDBE9 !important;
+}
+.btn-assign-w {
+    color: #ffffff;
+    background-color: #15CBD7 !important;
+    border-color: #15CBD7 !important;
+}
+/* .btn-admin-d {
+    font-family: Calibri;
+    font-size: 15px;
+    color: #0d0d0d;
+    background-color: #494699 !important;
+    border-color: #494699 !important;
+}
+.btn-admin-w {
+    font-family: Calibri;
+    font-size: 15px;
+    color: #ffffff;
+    background-color: #605BFF !important;
+    border-color: #605BFF !important;
+} */
+button.btn_filtre:focus,
+button.btn_filtre:active,
+button.btn_refresh:focus,
+button.btn_refresh:active {
+    border-color: #F67F00 !important; /* Change to desired color after button is clicked */
+    outline: none !important; /* Optional: Remove the default focus outline */
+}
+.opt-delete-d {
+    width: 30px;
+    height: 30px;
+    padding-top: 4px;
+    border-radius: 50%;
+    text-align: center;
+    background-color: #23191a;
+}
+.opt-delete-w {
+    width: 30px;
+    height: 30px;
+    padding-top: 4px;
+    border-radius: 50%;
+    text-align: center;
+    background-color: #fcf1f2;
+}
+.desc-prof {
+    color: #898989;
+    font-size: 9px;
+    margin-top: -12px;
+    text-transform: capitalize !important;
+}
+.btn-photo-w {
+    color: #15CBD7;
+    border-color: #15CBD7;
+}
+.btn-photo-d {
+    color: #F78E39;
+    border-color: #F78E39;
+}
+.icon_incuh {
+  float: right;
+  cursor: pointer;
+  font-size: 17px;
+}
+/* menu */
+h4 {
+    font-size: 16px;
+    font-weight: bold;
+    text-align: right;
+    color: #000000;
+    font-family: "Algerian Regular";
+    text-transform: uppercase;
+}
+p b {
+    float: right;
+    margin-right: 30px;
+}
+.widget-small .icon {
+    padding: 5px !important;
+}
+a {
+    text-decoration: none;
+}
+h6 {
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 18px;
+}
+/* search */
+.app-search__button {
+    left: 0 !important;
+    right: auto;
+}
+.app-search__input {
+    padding-left: 30px;
+    padding-right: none;
+    background-color: var(--bg-searchbar) !important;
+}
+.btn_filtre {
+    width: 87px !important;
+    height: 36px !important;
+    border-radius: 8px !important;
+    background: #FFFFFF !important;
+    border: 1px solid #D0D5DD !important;
+    box-shadow: 0px 4px 8px -2px #00000014 !important;
+}
+/* table */
+
+
+/* +++++++++++++++++++new style++++++++++++++++++++++ */
+.btn-primary {
+  background-color: #0a66ff; /* bleu vif */
+  border: none;
+}
+
+.btn-primary:hover {
+  background-color: #004ad9;
+}
+
+.btn-outline-primary:hover {
+  background-color: #065cd5;
+  color: white;
+}
+
+.btn-outline-success:hover {
+  background-color: #0d8a3e;
+  color: white;
+}
+
+.btn-outline-warning:hover {
+  background-color: #f1b44c;
+  color: white;
+}
+
+.btn-outline-danger:hover {
+  background-color: #e63946;
+  color: white;
+}
+
+::ng-deep .p-table table {
+  width: 100%;
+  text-align: center;
+}
+
+::ng-deep .p-table th,
+::ng-deep .p-table td {
+  text-align: center !important;
+  vertical-align: middle !important;
+}
+
+/* Pour centrer les boutons ou icônes dans leurs cellules */
+::ng-deep .p-table td .d-flex {
+  justify-content: center;
+  align-items: center;
+}
+
+/* Si tu veux réduire un peu les espaces entre colonnes */
+::ng-deep .p-table td {
+  padding: 0.75rem !important;
+}
+/* ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±± */
+/* ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±± */
+/* ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±± */
+/* ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±± */
+/* ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±± */
+.table-container {
+  width: 100%;
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+::ng-deep .p-table {
+  width: 95%;
+  margin: auto;
+}
+
+::ng-deep .p-table th,
+::ng-deep .p-table td {
+  text-align: center !important;
+  vertical-align: middle !important;
+  padding: 10px 8px !important;
+}
+
+::ng-deep .p-table .d-flex {
+  justify-content: center;
+  align-items: center;
+}
+
+.img-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.desc-prof {
+  font-size: 0.85rem;
+  color: #6c757d;
+}
+
+/* couleurs d’accès */
+.acces_active {
+  color: #28a745;
+  font-weight: 600;
+}
+
+.acces_block {
+  color: #ffc107;
+  font-weight: 600;
+}
+
+.acces_supp {
+  color: #dc3545;
+  font-weight: 600;
+}
+.btn-sm{
+    margin-right: 10px;
+}

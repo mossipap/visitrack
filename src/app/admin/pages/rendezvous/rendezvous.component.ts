@@ -1,0 +1,773 @@
+import { Component, ElementRef, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
+import { AppToastService } from 'src/app/shared/utils/AppToast.service';
+import { environment } from 'src/environments/environment';
+import { AppConfig } from 'src/app/shared/utils/app-config';
+import * as SecureLS from 'secure-ls';
+import { Cabinet } from 'src/app/shared/models/cabinet';
+import { Profil } from 'src/app/shared/models/profil';
+import { TypeUser} from 'src/app/shared/models/type-user';
+import { CabinetService } from 'src/app/shared/services/cabinet.service';
+import { RoleManager } from 'src/app/shared/utils/role-manager';
+import { SearchParam } from 'src/app/shared/utils/search-param';
+import { Demande } from 'src/app/shared/models/demande';
+import { DemandeService } from 'src/app/shared/services/demande.service';
+import { TypeUserService } from 'src/app/shared/services/typeuser.service';
+import { HttpClient } from '@angular/common/http';
+@Component({
+  selector: 'app-rendezvous',
+  templateUrl: './rendezvous.component.html',
+  styleUrls: ['./rendezvous.component.css']
+})
+export class RendezvousComponent implements OnInit {
+ public demandes: Demande[] = [];
+  public activeList: any[] = [];
+  public bloqueList: Demande[] = [];
+  public suppriList: Demande[] = [];
+  public selectedUsers: Demande[] [];
+  public demande: Demande = new Demande();
+  public cabinets: Cabinet[] = [];
+  public cabinetFilter = { designation: '' };
+  public typeUsers: TypeUser[] = [];
+  public typeUserFilter = { designation: '' };
+  public profiles: Profil[] = [];
+  public profileFilter = { nom: '' };
+  public roleManager: RoleManager;
+  public searchParam: SearchParam;
+  public isSearch: boolean = false;
+  public currentUser: any;
+  public loading: boolean;
+  public isDark: boolean;
+  public pageTitle = 'Liste';
+  public searchFilterText: string = '';
+  public dialogAction: string;
+  public confirmPassword: string;
+  public currentIndex: any = 1;
+  public nombreAssistante: number = 0;
+  public nombreGreffier: number = 0;
+  public nombreJuge: number = 0;
+  public step: number = 1;
+  public criteriaList = [
+    { name: 'Prénom et nom' },
+    { name: 'Fonction' },
+    { name: 'Telephone' },
+    { name: 'Cabinet' }
+  ];
+  @ViewChild('openConfirmDialog') openConfirmDialog: any;
+  @ViewChild('deleteConfirmDialog') deleteConfirmDialog: any;
+  @ViewChild('closeAddElementDialog') closeAddElementDialog: any;
+  @ViewChild('fileInputUpload', { static: false }) fileInputUpload: ElementRef;
+@ViewChild('canvas', { static: false }) canvas!: ElementRef<HTMLCanvasElement>;
+  private ctx!: CanvasRenderingContext2D;
+  private drawing = false;
+  signatureImage: string | null = null;
+  paginatedList: any[] = []; // la portion affichée
+  itemsPerPage = 10; // nombre d’éléments par page
+  totalPages = 0;
+  selectAll: boolean = false;
+  public currentView = 'list';
+  public currentPage = 1; 
+  indicatifs: any = {};
+  constructor(
+    private demandeService: DemandeService,
+    private cabinetService: CabinetService,
+    private typeUserService: TypeUserService,
+    private toast: AppToastService,
+    private appConfig: AppConfig,
+    private http: HttpClient
+  ) {
+    this.currentUser = this.appConfig.currentUser;
+    this.roleManager = new RoleManager();
+    this.searchParam = new SearchParam();
+  }
+
+  ngOnInit(): void {
+    const ls = new SecureLS({ encodingType: 'aes', encryptionSecret: 'MyAdminApp' });
+    if (ls.get('current_theme')) {//dark
+      this.isDark = true;
+      const headerLeft = document.getElementsByClassName("theme-light");
+      for(var i = headerLeft.length - 1; i >= 0; --i) {
+        headerLeft[i].classList.replace('theme-light', 'theme-dark');
+      }
+      this.changeRowPad('rgb(21 21 21 / 100%)');
+      this.changeStepLabel('#FFFFFF');
+      this.changeBgsearchbar('rgb(28, 28, 28)');
+      this.changePaginationBg('#000000');
+      this.changePaginationFg('#ffffff');
+      this.changePrimeTbBg('#000000');
+      this.changeTrHover('#1c1c1c');
+      this.changePrimeTbHead('#000000');
+      this.changePaginatorLight('#252116');
+      this.changeBtnDivBg('#252117');
+    } else {//white
+      this.isDark = false;
+      const headerLeft = document.getElementsByClassName("theme-dark");
+      for(var i = headerLeft.length - 1; i >= 0; --i) {
+        headerLeft[i].classList.replace('theme-dark', 'theme-light');
+      }
+      this.changeRowPad('rgb(255 255 255 / 100%)');
+      this.changeStepLabel('#7f56d9');
+      this.changeBgsearchbar('rgba(255, 255, 255, 0.8)');
+      this.changePaginationBg('#ffffff');
+      this.changePaginationFg('#000000');
+      this.changePrimeTbBg('none');
+      this.changeTrHover('rgba(0, 0, 0, 0.3)');
+      this.changePrimeTbHead('#f8f9fa');
+      this.changePaginatorLight('#ecf5ee');
+      this.changeBtnDivBg('#faf4f3');
+      this.changeBgTheader('rgba(255, 199, 154, 0.5)');
+    }
+    this.searchParam.dateFin.setDate(this.searchParam.dateFin.getDate() + 1);
+    this.initUsers();
+  this.activeList = [
+  {
+    "id": 1,
+    "typeUser_id": 2,
+    "cabinet_id": 1,
+    "nomComplet": "Jean Dupont",
+    "sexe": "M",
+    "heureArrive": "08:30",
+    "typePiece": "CNI",
+    "numeroPiece": "CNI123456",
+    "signature": "JeanDupontSignature",
+    "numeroTelephone": "+22370112233",
+    "fonction": "Comptable",
+    "adresse": "Bamako, Mali",
+    "heureVisite": "09:00",
+    "heureDepart": "10:00",
+    "remarque": "Première visite pour dépôt de dossier",
+    "statut": "Actif",
+    "typeUser": {
+      "id": 2,
+      "nom": "Coulibaly",
+      "prenom": "Diakaria",
+      "designation": "Visiteur"
+    },
+    "cabinet": {
+      "id": 1,
+      "designation": "Cabinet Alpha"
+    },
+    "service_name": "Service Comptabilité",
+    "dateCreation": "2025-09-20T08:15:00Z",
+    "dateModification": "2025-09-20T09:45:00Z"
+  },
+  {
+    "id": 2,
+    "typeUser_id": 3,
+    "cabinet_id": 2,
+    "nomComplet": "Awa Traoré",
+    "sexe": "F",
+    "heureArrive": "10:15",
+    "typePiece": "Passeport",
+    "numeroPiece": "PASS987654",
+    "signature": "AwaTraoreSignature",
+    "numeroTelephone": "+22565123456",
+    "fonction": "Juriste",
+    "adresse": "Koulikoro, Mali",
+    "heureVisite": "10:30",
+    "heureDepart": "11:30",
+    "remarque": "Consultation juridique",
+    "statut": "Actif",
+    "typeUser": {
+      "id": 3,
+      "nom": "Samake",
+      "prenom": "Aboudramane",
+      "designation": "Consultant"
+    },
+    "cabinet": {
+      "id": 2,
+      "designation": "Cabinet JurisPlus"
+    },
+    "service_name": "Service Juridique",
+    "dateCreation": "2025-09-21T09:00:00Z",
+    "dateModification": "2025-09-21T09:00:00Z"
+  },
+  {
+    "id": 3,
+    "typeUser_id": 1,
+    "cabinet_id": 3,
+    "nomComplet": "Moussa Konaté",
+    "sexe": "M",
+    "heureArrive": "14:00",
+    "typePiece": "Permis de conduire",
+    "numeroPiece": "PERM445566",
+    "signature": "MoussaKonateSignature",
+    "numeroTelephone": "+22374124567",
+    "fonction": "Technicien",
+    "adresse": "Sikasso, Mali",
+    "heureVisite": "14:15",
+    "heureDepart": "15:00",
+    "remarque": "Réclamation sur un dossier",
+    "statut": "Actif",
+    "typeUser": {
+      "id": 1,
+      "nom": "Diarra",
+      "prenom": "Oumar",
+      "designation": "Employé"
+    },
+    "cabinet": {
+      "id": 3,
+      "designation": "Cabinet Expert Conseil"
+    },
+    "service_name": "Service Clientèle",
+    "dateCreation": "2025-09-18T14:00:00Z",
+    "dateModification": "2025-09-19T08:30:00Z"
+  },
+  {
+    "id": 4,
+    "typeUser_id": 4,
+    "cabinet_id": 1,
+    "nomComplet": "Fatoumata Diarra",
+    "sexe": "F",
+    "heureArrive": "16:20",
+    "typePiece": "CNI",
+    "numeroPiece": "CNI998877",
+    "signature": "FatouDiarraSignature",
+    "numeroTelephone": "+22578112233",
+    "fonction": "Secrétaire",
+    "adresse": "Kayes, Mali",
+    "heureVisite": "16:30",
+    "heureDepart": "17:30",
+    "remarque": "Rendez-vous pour entretien",
+    "statut": "Actif",
+    "typeUser": {
+      "id": 4,
+      "nom": "Coulibaly",
+      "prenom": "Diakaria",
+      "designation": "Partenaire"
+    },
+    "cabinet": {
+      "id": 1,
+      "designation": "Cabinet Alpha"
+    },
+    "service_name": "Service Ressources Humaines",
+    "dateCreation": "2025-09-22T16:00:00Z",
+    "dateModification": "2025-09-22T16:45:00Z"
+  }
+  
+]
+this.activeList = this.activeList.map(item => ({
+    ...item,
+    selected: false
+  }));
+
+this.totalPages = Math.ceil(this.activeList.length / this.itemsPerPage);
+    this.updatePaginatedList();
+   this.loadIndicatifs();
+  }
+
+  loadIndicatifs() {
+    this.http.get('assets/indicatifs.json').subscribe(
+      (data) => {
+        this.indicatifs = data;
+      },
+      (error) => {
+        console.error('Erreur chargement indicatifs', error);
+      }
+    );
+  }
+
+  getFlag(numero: string): string {
+    if (!numero) return '';
+    const code = Object.keys(this.indicatifs).find((prefix) =>
+      numero.startsWith(prefix)
+    );
+    return code ? this.indicatifs[code] : '🌍';
+  }
+ updatePaginatedList() {
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    const endIndex = startIndex + this.itemsPerPage;
+    this.paginatedList = this.activeList.slice(startIndex, endIndex);
+  }
+
+  nextPage() {
+    if (this.currentPage < this.totalPages) {
+      this.currentPage++;
+      this.updatePaginatedList();
+    }
+  }
+
+  previousPage() {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+      this.updatePaginatedList();
+    }
+  }
+getInitials(fullName: string): string {
+  if (!fullName) return '';
+  return fullName
+    .split(' ')
+    .map(p => p.charAt(0).toUpperCase())
+    .join('')
+    .slice(0, 3);
+}
+
+getSexColor(sexe: string): string {
+  if (!sexe) return '#999';
+
+  // Normalisation
+  sexe = sexe.toLowerCase();
+
+  // Homme
+  if (sexe === 'm' || sexe === 'masculin' || sexe === 'male') {
+    return '#2196F3'; // Bleu
+  }
+
+  // Femme
+  if (sexe === 'f' || sexe === 'feminin' || sexe === 'female') {
+    return '#f45187ff'; // Rose doux
+  }
+
+  return '#666'; // Valeur neutre si non défini
+}
+toggleSelectAll() {
+  this.selectAll = !this.selectAll;
+  this.activeList.forEach(item => item.selected = this.selectAll);
+}
+
+toggleSelectOne() {
+  // si tous sont cochés, selectAll = true sinon false
+  this.selectAll = this.activeList.every(item => item.selected);
+}
+  changeRowPad(newValue: string): void {
+    document.documentElement.style.setProperty('--bg-trtable', newValue);
+  }
+  changeTrHover(newValue: string): void {
+    document.documentElement.style.setProperty('--tr-hover', newValue);
+  }
+  changePaginationBg(newValue: string): void {
+    document.documentElement.style.setProperty('--bgpaginator', newValue);
+  }
+  changePaginationFg(newValue: string): void {
+    document.documentElement.style.setProperty('--fgpaginator', newValue);
+  }
+  changePrimeTbBg(newValue: string): void {
+    document.documentElement.style.setProperty('--bgprimetb', newValue);
+  }
+  changePrimeTbHead(newValue: string): void {
+    document.documentElement.style.setProperty('--bgprimetbhead', newValue);
+  }
+  changePaginatorLight(newValue: string): void {
+    document.documentElement.style.setProperty('--paginatorlight', newValue);
+  }
+  changeBgsearchbar(newValue: string): void {
+    document.documentElement.style.setProperty('--bg-searchbar', newValue);
+  }
+  changeStepLabel(newValue: string): void {
+    document.documentElement.style.setProperty('--step-label', newValue);
+  }
+  changeBtnDivBg(newValue: string): void {
+    document.documentElement.style.setProperty('--btndiv', newValue);
+  }
+  changeBgTheader(newValue: string): void {
+    document.documentElement.style.setProperty('--theaderbg', newValue);
+  }
+  activeFiltres () {
+    if (!this.searchFilterText) return this.activeList
+    const search = this.searchFilterText.toLowerCase()
+    return this.activeList.filter(item => {
+      const text = (item.nomComplet + ' ' + item.nomComplet + ' ' + item.numeroTelephone+ ' '+ item.cabinet?.numerocabinet).toLowerCase();
+      return text.indexOf(search) > -1
+    })
+  }
+  bloqueFiltres () {
+    if (!this.searchFilterText) return this.bloqueList
+    const search = this.searchFilterText.toLowerCase()
+    return this.bloqueList.filter(item => {
+      const text = (item.nomComplet + ' ' + item.nomComplet + ' ' + item.numeroTelephone).toLowerCase();
+      return text.indexOf(search) > -1
+    })
+  }
+  supprimeFiltres () {
+    if (!this.searchFilterText) return this.suppriList
+    const search = this.searchFilterText.toLowerCase()
+    return this.suppriList.filter(item => {
+      const text = (item.nomComplet + ' ' + item.nomComplet + ' ' + item.numeroTelephone).toLowerCase();
+      return text.indexOf(search) > -1
+    })
+  }
+
+  onChangeCode(index) {
+    if(index === 1) {//active
+      let btnUserActive = document.getElementById("user_active");
+      let btnUserBlock = document.getElementById("user_block");
+      let btnUserDelete = document.getElementById("user_delete");
+
+      btnUserActive.classList.add("btn_active");
+      btnUserActive.classList.remove("btn_not_active");
+      btnUserBlock.classList.add("btn_not_active");
+      btnUserBlock.classList.remove("btn_active");
+      btnUserDelete.classList.add("btn_not_active");
+      btnUserDelete.classList.remove("btn_active");
+      this.currentIndex = index;
+    } else if(index === 2) {//block
+      let btnUserBlock = document.getElementById("user_block");
+      let btnUserActive = document.getElementById("user_active");
+      let btnUserDelete = document.getElementById("user_delete");
+
+      btnUserBlock.classList.add("btn_active");
+      btnUserBlock.classList.remove("btn_not_active");
+      btnUserActive.classList.add("btn_not_active");
+      btnUserActive.classList.remove("btn_active");
+      btnUserDelete.classList.add("btn_not_active");
+      btnUserDelete.classList.remove("btn_active");
+      this.currentIndex = index;
+    } else {//delete
+      let btnUserDelete = document.getElementById("user_delete");
+      let btnUserActive = document.getElementById("user_active");
+      let btnUserBlock = document.getElementById("user_block");
+
+      btnUserDelete.classList.add("btn_active");
+      btnUserDelete.classList.remove("btn_not_active");
+      btnUserBlock.classList.add("btn_not_active");
+      btnUserBlock.classList.remove("btn_active");
+      btnUserActive.classList.add("btn_not_active");
+      btnUserActive.classList.remove("btn_active");
+      this.currentIndex = index;
+    }
+  }
+
+  showList() {
+    this.currentView = 'list';
+    this.pageTitle = 'Liste'
+  }
+  showAddForm() {
+    this.demande = new Demande();
+    this.findCabinets();
+    this.findTypeUsers();
+    this.currentView = 'add';
+    this.pageTitle = 'Nouveau demande';
+  }
+
+  showEditForm(user: Demande) {
+    this.demande = user;
+    this.findCabinets();
+    this.findTypeUsers();
+    this.currentView = 'edit';
+    this.pageTitle = 'Modification d\'demande';
+  }
+
+  showDetail(user: Demande) {
+    this.demande = user;
+    //this.currentView = 'detail';
+    this.pageTitle = 'Détails user'
+  }
+
+  showResetDialog(demande: Demande): void {
+    this.demande = demande;
+  }
+
+  showConfirmDialog(demande: Demande): void {
+   // this.dialogAction = action;
+    this.demande = demande;
+    this.openConfirmDialog.nativeElement.click();
+  }
+
+  showDeleteDialog(demande: Demande): void {
+    this.demande = demande;
+    this.deleteConfirmDialog.nativeElement.click();
+  }
+
+  initUsers() {
+    this.loading = true;
+    this.demandeService.findAll().subscribe((ret) => {
+      if (ret['code'] == 200) {
+        const users = ret['data'];
+        users.forEach((user: any) => {
+          user.nomComplet = user.prenom + ' ' + user.nom;
+        });
+        if(this.currentUser.service_name === 'siege') {
+          this.demandes = users.filter((u: any) => {return u.service_name === 'siege'});
+        } else {
+          this.demandes = users.filter((u: any) => {return u.service_name === 'parquet'});
+        }
+        const actiList = [];
+        const blocList = [];
+        const deleList = [];
+        this.demandes.forEach(user => {
+          switch(user.statut) {
+            case 'Activé':
+              actiList.push(user);
+              break;
+            case 'Bloqué':
+              blocList.push(user);
+              break;
+            case 'Supprimé':
+              deleList.push(user);
+              break;
+          }
+          switch(user.user_agent_id) {
+            /* siege */
+            case 2:
+              this.nombreAssistante++;
+              break;
+            case 3:
+              this.nombreJuge++;
+              break;
+            case 4:
+              this.nombreGreffier++;
+              break;
+            /* parquet */
+            case 7:
+              this.nombreAssistante++;
+              break;
+            case 8:
+              this.nombreJuge++;
+              break;
+            case 9:
+              this.nombreGreffier++;
+              break;
+            default:
+                break;
+          }
+        });
+        this.activeList = actiList;
+        this.bloqueList = blocList;
+        this.suppriList = deleList;
+        this.loading = false;
+        this.toast.info(this.demandes.length+" demande(s) trouvé(s)");
+      } else {
+        this.toast.error(ret['message']);
+        this.loading = false;
+      }
+      },
+      () => {
+        this.toast.error(environment.erreur_connexion_message);
+        this.loading = false;
+      }
+    );
+  }
+
+  Save() {
+    this.demande.statut = "Activé";
+    this.currentUser.service_name;
+   // this.demande.image = null;
+    this.loading = true;
+    this.demandeService.save(this.demande).subscribe(ret => {
+      if (ret['code'] === 200) {
+        this.demande = ret['data'];
+        this.demandes.push(this.demande);
+        this.closeAddElementDialog.nativeElement.click();
+        this.toast.success("Demande ajouté avec succès");
+        this.loading = false;
+        this.initUsers();
+        this.showList();
+      } else {
+        this.loading = false;
+        this.toast.error(ret['message']);
+      }
+    }, error => {
+      this.toast.error(environment.erreur_connexion_message);
+      this.loading = false;
+    });
+  }
+
+  Update() {
+    this.loading = true;
+    /* this.demande.cabinet_id = this.demande.cabinet.id;
+    this.demande.typeUser_id = this.demande.typeUser.id;
+    this.demande.profil_id = this.demande.profil.id; */
+    this.demandeService.update(this.demande).subscribe(ret => {
+      if (ret['code'] === 200) {
+        this.demande = ret['data'];
+        this.demandes.forEach(user => {
+          if(user.id === this.demande.id) {
+            user = this.demande;
+          }
+        });
+        this.closeAddElementDialog.nativeElement.click();
+        this.toast.success("Demande modifié avec succès");
+        this.loading = false;
+        this.showList();
+        this.initUsers();
+      } else {
+        this.toast.error(ret['message']);
+        this.loading = false;
+      }
+    }, error => {
+      this.toast.error(environment.erreur_connexion_message);
+      this.loading = false;
+    });
+  }
+
+UpdateStatut(statut: string) {
+  this.loading = true;
+  this.demande.statut = statut;
+
+  this.demandeService.updateStatut(this.demande).subscribe(
+    ret => {
+      if (ret['code'] === 200) {
+        this.demande = ret['data'];
+
+        // MAJ dans la liste locale
+        this.demandes.forEach(user => {
+          if (user.id === this.demande.id) {
+            user.statut = this.demande.statut;
+          }
+        });
+
+        // ✅ Fermer la modale Bootstrap via jQuery
+        (('#userConfirmModal') as any).modal('hide');
+
+        // Toast de succès
+        this.toast.success("Statut mis à jour avec succès.");
+
+        this.showList();
+      } else {
+        this.toast.error(ret['message']);
+      }
+      this.loading = false;
+    },
+    error => {
+      this.toast.error(environment.erreur_connexion_message);
+      this.loading = false;
+    }
+  );
+}
+
+
+  checkCabinetUser(cabinetId: number, typeUserId: number) {
+    if(typeUserId !== 3) {
+      return;
+    }
+    if (!cabinetId) {
+      this.toast.error("Veuillez selectionner un cabinet, SVP ..");
+      this.demande.typeUser = null;
+      return
+    }
+    const objetCheck = {
+      cabinet_id: cabinetId,
+      typeUser_id: typeUserId
+    }
+    this.demandeService.verifyJugeOfCabinet(objetCheck).subscribe(ret => {
+      if (ret['code'] === 200) {
+      } else {
+        this.toast.error(ret['message']);
+        this.loading = false;
+        this.demande.cabinet = null;
+        this.demande.typeUser = null;
+      }
+    }, error => {
+      console.log("error===", error);
+      this.toast.error(environment.erreur_connexion_message);
+      this.loading = false;
+    });
+  }
+
+
+  findCabinets() {
+    this.cabinetService.findAll().subscribe(ret => {
+      if (ret['code'] === 200) {
+        this.cabinets = ret['data'];
+        if (this.currentView === 'edit' || this.currentView === 'detail' && this.demande.cabinet && this.cabinets.length > 0) {
+          this.demande.cabinet = this.cabinets.find(p => p.id === this.demande.cabinet.id)
+        }
+        this.loading = false;
+      } else {
+        this.loading = false;
+        this.toast.error(ret['message']);
+      }
+    }, error => {
+      console.log("error===>", error);
+      this.toast.error(environment.erreur_connexion_message);
+      this.loading = false;
+    });
+  }
+
+  findTypeUsers() {
+    this.typeUserService.findAll().subscribe(ret => {
+      if (ret['code'] === 200) {
+        this.typeUsers = ret['data'];
+        if (this.currentView === 'edit' || this.currentView === 'detail' && this.demande.user_agent_id && this.typeUsers.length > 0) {
+          this.demande.typeUser = this.typeUsers.find(p => p.id === this.demande.user_agent_id)
+        }
+        this.loading = false;
+      } else {
+        this.loading = false;
+        this.toast.error(ret['message']);
+      }
+    }, error => {
+      console.log("error===>", error);
+      this.toast.error(environment.erreur_connexion_message);
+      this.loading = false;
+    });
+  }
+
+
+  /* *********************Upload Photo************** */
+  selectPicture() {
+    this.fileInputUpload.nativeElement.click();
+  }
+  deleteImageProfile() {
+  }
+  onFileUploadChange(event) {
+    if (event.target.files.length <= 0) {
+      return;
+    }
+    let file = event.target.files[0];
+    if (!file.type.includes("image")) {
+      this.toast.info("Veuilez choisir une image!");
+      return;
+    }
+    if ((file.size / 1024) > 1024 * 1024 * 5) {
+      this.toast.info("La taille à dépasser 5 Mo");
+      return;
+    }
+    let reader = new FileReader();
+    reader.onload = readerEvent => {
+      //this.imageProfile = (readerEvent.target as any).result;
+    };
+    reader.readAsDataURL(event.target.files[0]);
+  }
+
+  /* +++++++++++++++++++++++++ new code for signature++++++++++++++++++ */
+    ngAfterViewInit() {
+    const canvas = this.canvas.nativeElement;
+    this.ctx = canvas.getContext('2d')!;
+    canvas.addEventListener('mousedown', this.startDrawing.bind(this));
+    canvas.addEventListener('mousemove', this.draw.bind(this));
+    canvas.addEventListener('mouseup', this.stopDrawing.bind(this));
+    canvas.addEventListener('mouseout', this.stopDrawing.bind(this));
+  }
+
+  startDrawing(event: MouseEvent) {
+    this.drawing = true;
+    this.ctx.beginPath();
+    this.ctx.moveTo(event.offsetX, event.offsetY);
+  }
+
+  draw(event: MouseEvent) {
+    if (!this.drawing) return;
+    this.ctx.lineTo(event.offsetX, event.offsetY);
+    this.ctx.strokeStyle = '#000';
+    this.ctx.lineWidth = 2;
+    this.ctx.stroke();
+  }
+
+  stopDrawing() {
+    this.drawing = false;
+  }
+
+  clearSignature() {
+    const canvas = this.canvas.nativeElement;
+    this.ctx.clearRect(0, 0, canvas.width, canvas.height);
+    this.signatureImage = null;
+  }
+
+  saveSignature() {
+    this.signatureImage = this.canvas.nativeElement.toDataURL('image/png');
+    console.log('Signature enregistrée :', this.signatureImage);
+    alert('Signature sauvegardée avec succès ✅');
+  }
+  goToRecap() {
+  this.signatureImage = this.canvas.nativeElement.toDataURL('image/png');
+  this.step = 3;
+}
+formatPhone(numero: string): string {
+  if (!numero) return '';
+  // Exemple simple pour Mali
+  if (numero.startsWith('+223')) {
+    return numero.replace(/(\+223)(\d{2})(\d{2})(\d{2})(\d{2})/, '$1 $2 $3 $4 $5');
+  }
+  return numero;
+}
+}

@@ -1,0 +1,473 @@
+/* You can add global styles to this file, and also import other style files */
+@import '~ngx-toastr/toastr';
+@import "~@angular/material/prebuilt-themes/indigo-pink.css";
+@import '~@ctrl/ngx-emoji-mart/picker';
+@import '~primeicons/primeicons.css';
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap");
+.p-dropdown {
+  height: 36px;
+  width: 100%;
+  border-radius: 10px;
+}
+.p-multiselect {
+  height: 36px;
+  border-radius: 10px;
+}
+.p-dropdown-panel .p-dropdown-items .p-dropdown-item {
+  text-align: left;
+}
+.p-dropdown .p-dropdown-label {
+  margin-top: -4px;
+}
+.p-button.p-button-icon-only {
+  height: 36px;
+  border-top: 1px solid #ced4da;
+  border-bottom: 1px solid #ced4da;
+  border-right: 1px solid #ced4da;
+  border-left: none;
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
+.p-calendar .p-inputtext {
+  height: 36px;
+  border-right: none;
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+  background: #FFFFFF !important;
+}
+.my_calendar {
+  height: 36px;
+  border-right: none;
+  border-top-left-radius: 0px !important;
+  border-bottom-left-radius: 0px !important;
+  background: #FFFFFF !important;
+}
+.mat-mdc-tab-body-content {
+  overflow-x: hidden !important;
+}
+.mat-mdc-menu-panel {
+  max-width: auto !important;
+}
+.p-overlaypanel .p-overlaypanel-content {
+  padding: .3rem;
+}
+.p-button {
+  padding: 0.1rem 1rem;
+}
+.p-calendar {
+  width: 100%;
+}
+
+/* material */
+.mat-horizontal-content-container {
+  padding: 0 !important;
+}
+.mat-step-header {
+    pointer-events: none !important;
+}
+.mat-tab-label {
+  min-width: 80px !important;
+  padding: 0 !important;
+}
+.mat-tab-label-d {
+  color: #000 !important;
+}
+.mat-tab-label-w {
+  color: #fff !important;
+}
+.lab_duau {
+  margin-top: 7px;
+}
+.p-datatable>.p-datatable-wrapper {
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+}
+body {
+    margin: 0;
+    font-family: Calibri;
+    font-size: 17px;
+    font-weight: 400;
+    line-height: 1.5;
+    text-align: left;
+    background-color: #FFF;
+}
+.table-wrapper {
+  .user-table {
+    th, td {
+       text-align: center !important; 
+      vertical-align: middle !important;
+    }
+
+    .img-avatar {
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-bottom: 7px;
+    }
+
+    .desc-prof {
+      font-size: 12px;
+      color: #777;
+    }
+
+    .btn i {
+      vertical-align: middle;
+    }
+  }
+  .btn-sm, .btn-group-sm > .btn {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.765625rem;
+    line-height: 1.5;
+    border-radius: 3px;
+    margin-right: 10px;
+}
+}
+/* ++++++++++++++++++++++++++++++++++++++++++ */
+/* ++++++++++++++++++++++++++++++++++++++++++ */
+/* ++++++++++++++++++++++++++++++++++++++++++ */
+.mailbox-messages {
+  .p-table,
+  table {
+    width: 100%;
+  }
+
+  /* Centrage global des entêtes et cellules */
+  th,
+  td {
+    text-align: center !important;
+    vertical-align: middle !important;
+  }
+
+  /* Centrage des icônes et boutons d’action */
+  .d-flex {
+    justify-content: center !important;
+    align-items: center !important;
+  }
+
+  /* Espacement harmonieux entre les icônes d’opération */
+  .d-flex a {
+    margin: 0 6px;
+  }
+
+  /* Images switch on/off centrées */
+  td img {
+    display: inline-block;
+    margin: auto;
+    vertical-align: middle;
+  }
+
+  /* Avatars des utilisateurs dans le sous-tableau */
+  .img-avatar {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 8px;
+    vertical-align: middle;
+  }
+
+  /* Centrer les éléments même dans les tableaux imbriqués */
+  .p-table tr,
+  .p-table td,
+  .p-table th {
+    text-align: center !important;
+    vertical-align: middle !important;
+  }
+
+  /* Couleurs dynamiques des statuts */
+  .text-c-green {
+    color: #10b981 !important; /* vert doux */
+  }
+  .text-c-red {
+    color: #ef4444 !important; /* rouge doux */
+  }
+
+  /* Petits ajustements visuels */
+  .ft-w-500 {
+    font-weight: 500;
+  }
+  .ft-w-b {
+    font-weight: bold;
+  }
+  .ta-center {
+    text-align: center;
+  }
+}
+
+/* ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±± */
+/* ±±±±±±±±±±±±±±±±±±±±± Table css ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±± */
+
+.table-card{
+  background: #fff;
+  border: 1px solid #e6e6e6;
+  border-radius: 8px;
+  padding: 12px 18px;
+  margin-top: 20px;
+}
+  .avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  table {
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .btn-light {
+    background: #FFFFFF;
+    border: 1px solid #D0D5DD;
+    transition: 0.2s;
+    margin-right: 5px;
+    border-radius: 5px 5px 5px 5px;
+  }
+
+  .btn-light:hover {
+    background: #f5f5f5;
+  }
+
+  .btn-danger {
+    font-size: 13px;
+    padding: 4px 10px;
+  }
+  .btn-outline-secondary {
+    color: #000;
+    background-color: #FFFFFF;
+    background-image: none;
+    border-color: #D0D5DD;
+    border: 1px solid #D0D5DD;
+    margin-right: 10px;
+}
+
+/* Style de base pour table-hover */
+.table-hover tbody tr {
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  cursor: pointer; /* change le curseur pour indiquer l'interaction */
+}
+
+/* Effet au survol */
+.table-hover tbody tr:hover {
+  background-color: #fff0f0; /* Couleur de survol douce */
+  transform: scale(1.0);     /* Petit effet d'agrandissement */
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1); /* Ombre subtile */
+}
+
+/* Pour les cellules individuelles */
+.table-hover tbody tr:hover td {
+  color: #0056b3; /* Changer la couleur du texte au survol */
+  font-weight: 500; /* Légèrement plus gras */
+}
+
+/* Variante colorée pour lignes alternées */
+.table-hover tbody tr:nth-child(odd) {
+  background-color: #E6E6E6;
+}
+
+.table-hover tbody tr:nth-child(even) {
+  background-color: #F6F6F6;
+}
+
+
+.table th, .table td {
+    padding: 0.5rem !important; 
+    vertical-align: top;
+    border-top: none;
+    /* border-top: 1px solid #dee2e6; */
+}
+
+/* Conteneur des boutons */
+.action-buttons {
+  vertical-align: middle; /* centre verticalement dans la ligne du tableau */
+  padding: 10px 0;
+}
+
+/* Regroupe proprement les boutons */
+.action-buttons .btn-group {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: 6px; /* espacement uniforme */
+}
+
+/* Style des boutons icône */
+.btn-icon {
+  width: 36px;
+  height: 36px;
+  padding: 6px;
+  transition: all 0.2s ease;
+}
+
+.btn-icon:hover {
+  background-color: #f2f6ff;
+  transform: scale(1.1);
+}
+
+/* Icônes à taille homogène */
+.icon-btn {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+}
+
+/* Bouton Bloquer plus visible */
+.btn-danger.btn-sm {
+  border-radius: 8px;
+  font-size: 13px;
+  padding: 6px 10px;
+  transition: all 0.2s ease;
+}
+
+.btn-danger.btn-sm:hover {
+  background-color: #b02a37;
+  transform: translateY(-1px);
+}
+.theme-light {
+    background-color: #FFFFFF !important;
+    padding-top: 20px;
+}
+/* ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±± */
+/* ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±± */
+.pagination-wrapper {
+  background: var(--bgprimetb, #fff);
+  border-radius: 0 0 10px 10px;
+}
+
+.pagination-wrapper button {
+  min-width: 35px;
+  transition: 0.2s ease-in-out;
+}
+
+.pagination-wrapper button:hover:not(:disabled) {
+  transform: scale(1.05);
+}
+
+.pagination-wrapper .btn-primary {
+  background-color: #395084;
+  border-color: #395084;
+}
+/* ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±± */
+/* ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±± */
+.avatar-abbr {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: 600;
+  font-size: 15px;
+  text-transform: uppercase;
+  box-shadow: 0 0 6px rgba(0,0,0,0.15);
+}
+.img-avatar {
+    width: 27px;
+    height: 27px;
+    border-radius: 50%;
+    margin-right: 6px;
+    margin-top: -15px;
+    margin-bottom: -12px;
+}
+.desc-prof {
+    color: #898989;
+    font-size: 12px;
+    padding-top: 4px;
+    margin-top: -12px;
+    text-transform: capitalize !important;
+}
+.btn-sm, .btn-group-sm > .btn {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.765625rem;
+    line-height: 1.5;
+    border-radius: 3px;
+    margin-right: 7px;
+}
+/* ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±± */
+/* ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±± */
+.user-header {
+  background: #fff;
+  border: 1px solid #e6e6e6;
+  border-radius: 8px;
+  padding: 12px 18px;
+}
+
+.badge-count {
+  background: #395084;
+  color: #ffffff;
+  border-radius: 50%;
+  font-size: 0.9rem;
+  padding: 4px 8px;
+  font-weight: 600;
+  margin-left: 5px;
+}
+
+.search-wrapper {
+  display: flex;
+  align-items: center;
+  border: 1px solid #dcdcdc;
+  border-radius: 8px;
+  padding: 4px 10px;
+  background: #fff;
+  transition: all 0.2s ease-in-out;
+  margin-right: 10px;
+  width: 400px;
+}
+
+.search-wrapper:hover {
+  border-color: #bdbdbd;
+}
+
+.search-icon {
+  font-size: 1.2rem;
+  color: #666;
+}
+
+.search-input {
+  border: none;
+  outline: none;
+  padding: 5px;
+  font-size: 0.95rem;
+  background: transparent;
+  width: 180px;
+}
+
+.filter-btn {
+  border: 1px solid #dcdcdc;
+  border-radius: 8px;
+  background: #fff;
+  transition: all 0.2s ease;
+  margin-right: 10px;
+}
+
+.filter-btn:hover {
+  background: #f7f7f7;
+}
+
+.btn-dark {
+  background-color: #395084;
+  border-radius: 8px;
+  transition: 0.3s;
+}
+
+.btn-dark:hover {
+  background-color: #395084;
+}
+
+@media (max-width: 768px) {
+  .user-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .search-input {
+    width: 100%;
+  }
+}
+.btn_active {
+    background: #3f51b5 !important;
+    color: #FFFFFF !important;
+}

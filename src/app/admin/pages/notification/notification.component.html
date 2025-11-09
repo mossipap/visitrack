@@ -1,0 +1,38 @@
+<ngx-loading [show]="loading" [config]="{ backdropBorderRadius: '5px',fullScreenBackdrop:true }"></ngx-loading>
+<div class="notification-container card shadow-sm p-3">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h5 class="mb-0 fw-bold">🔔 Notifications</h5>
+    <button class="btn btn-sm btn-outline-primary" (click)="markAllAsRead()">
+      <i class="mdi mdi-check-all me-1"></i> Marquer tout comme lu
+    </button>
+  </div>
+
+  <ul class="list-group list-group-flush">
+    <li *ngFor="let notif of notifications" 
+        class="list-group-item d-flex align-items-start justify-content-between notification-item"
+        [ngClass]="{ 'unread': !notif.read }">
+
+      <div class="d-flex align-items-start">
+        <div class="icon-circle me-3" [ngClass]="notif.type">
+          <i class="mdi" [ngClass]="notif.icon"></i>
+        </div>
+        <div>
+          <h6 class="mb-1">{{ notif.title }}</h6>
+          <p class="text-muted small mb-0">{{ notif.message }}</p>
+          <small class="text-muted"><i class="mdi mdi-clock-outline"></i> {{ notif.time }}</small>
+        </div>
+      </div>
+
+      <button class="btn btn-sm btn-light ms-2" (click)="markAsRead(notif)">
+        <i class="mdi mdi-eye"></i>
+      </button>
+    </li>
+  </ul>
+
+  <div *ngIf="notifications.length === 0" class="text-center text-muted mt-3">
+    <i class="mdi mdi-bell-off-outline fs-4 d-block mb-2"></i>
+    Aucune notification
+  </div>
+</div>
+
+

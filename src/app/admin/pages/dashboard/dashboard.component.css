@@ -1,0 +1,129 @@
+.card_brd {
+  border-radius: 18.76px !important;
+}
+.mycard {
+  min-height: 250px;
+  border-radius: 18.76px !important;
+  padding: .8rem 1rem !important;
+  box-shadow: 0px 3.75px 75.05px 0px #00000014;
+}
+.icon_incuh {
+  color: #101010;
+  float: right;
+  cursor: pointer;
+  padding-right: 10px;
+  margin-top: 10px;
+  font-size: 20px;
+}
+.lab_content {
+  font-family: Inter;
+  font-weight: 400;
+  font-style: Regular;
+  font-size: 16px;
+  line-height: 120%;
+  letter-spacing: 0px;
+  color: #878787;
+}
+.ico_arrowup {
+  color: #12B76A;
+  font-size: 18px;
+}
+.txt_purcent {
+  font-family: Inter;
+  font-weight: 500;
+  font-size: 17px;
+  line-height: 20px;
+  letter-spacing: 0%;
+  text-align: center;
+  color: #027A48;
+  margin-left: 2px;
+  margin-right: 5px;
+}
+.btn_flot {
+  width: 45px;
+  height: 22px;
+  border-radius: 93.81px;
+  padding-top: 0px;
+  padding-right: 15.01px;
+  padding-bottom: 3.75px;
+  padding-left: 15.01px;
+  float: right;
+  cursor: pointer;
+  color: #FFFFFF;
+  background: #0664FC;
+  border: 1px solid #0664FC;
+  box-shadow: 0px 6px 12px 0px #0A8DD033;
+}
+button.btn_flot:focus,
+button.btn_flot:active {
+  border-color: #FF8F6B !important;
+  outline: none !important;
+}
+.mr_5 {
+  margin-right: -5px;
+}
+.fs-17 {
+  font-size: 20px !important;
+  font-family: Cambria;
+}
+.txt_dash {
+  font-family: Calibri;
+  font-weight: 400;
+  font-style: Regular;
+  font-size: 20px;
+  line-height: 120%;
+  letter-spacing: 0px;
+  color: #1D1D21;
+}
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
+  padding-top: 25px;
+  padding-left: 25px;
+
+  h2 {
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 0.3rem;
+
+    span {
+      color: #051D43;
+    }
+  }
+
+  p {
+    color: #6c757d;
+    margin: 0;
+  }
+
+  .filter-buttons {
+    display: flex;
+    gap: 0.5rem;
+
+    .filter-btn {
+      background: #fff;
+      border: 1px solid #dee2e6;
+      border-radius: 8px;
+      padding: 0.5rem 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease-in-out;
+
+      &:hover {
+        background: #f1f1f1;
+      }
+
+      &.active {
+        background: #051D43;
+        color: white;
+        border-color: #051D43;
+      }
+    }
+  }
+}
+
+
+

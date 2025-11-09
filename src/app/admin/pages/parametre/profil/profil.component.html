@@ -1,0 +1,313 @@
+<ngx-loading [show]="loading" [config]="{ backdropBorderRadius: '5px',fullScreenBackdrop:true }"></ngx-loading>
+<div class="row">
+  <div class="col-md-12">
+    <!-- list -->
+    <div [class]="isDark ? 'tile theme-dark' : 'tile theme-light'">
+      <!-- En-tête -->
+      <div class="row">
+        <div class="col-md-6">
+          <div class="toolbar-btn">
+            <b [class]="isDark ? 'c-white ff_calibre' : 'c-black ff_calibre ml-2'">
+              {{ 'profile.profils' | translate }}
+            </b>
+          </div>
+        </div>
+        <div class="col-md-6 ta-right">
+          <div class="toolbar-btn">
+            <button
+              [class]="isDark ? 'btn btn-admin-d btn-sm mr-2' : 'btn btn-admin-w btn-sm mr-2'"
+              (click)="showAddForm()"
+              type="button"
+              data-backdrop="static"
+              data-toggle="modal"
+              data-target="#addProfilModal">
+              <i class="mdi mdi-plus"></i>
+              <span>{{ 'profile.addprofil' | translate }}</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Table liste profils -->
+      <div class="table-responsive mailbox-messages">
+        <p-table
+          [value]="profilFiltres()"
+          dataKey="id"
+          responsiveLayout="scroll"
+          class="table table-hover"
+          [(selection)]="selectedProfils"
+          [paginator]="true"
+          [rowHover]="true"
+          [rows]="15"
+          [showCurrentPageReport]="true"
+          currentPageReportTemplate="Affichant {first} à {last} sur {totalRecords} profils">
+
+          <!-- Header -->
+          <ng-template pTemplate="header">
+            <tr class="tr_boxnone">
+              <th></th>
+              <th [class]="isDark ? 'th-d th_brnone' : 'th-w th_brnone'">{{ 'profile.numprofil' | translate }}</th>
+              <th [class]="isDark ? 'th-d th_brnone' : 'th-w th_brnone'">{{ 'profile.nom' | translate }}</th>
+              <th [class]="isDark ? 'th-d th_brnone' : 'th-w th_brnone'">{{ 'profile.description' | translate }}</th>
+              <th [class]="isDark ? 'th-d th_brnone' : 'th-w th_brnone'">{{ 'profile.statut' | translate }}</th>
+              <th [class]="isDark ? 'th-d th_brnone' : 'th-w th_brnone'">{{ 'profile.bloqued' | translate }}</th>
+              <th [class]="isDark ? 'th-d th_brnone' : 'th-w th_brnone'">{{ 'profile.operation' | translate }}</th>
+            </tr>
+          </ng-template>
+
+          <!-- Body -->
+          <ng-template pTemplate="body" let-profil>
+            <tr *ngIf="profil">
+              <td [class]="isDark ? 'td-d' : 'td-w'">
+                <div class="animated-checkbox ml-chec-3">
+                  <label>
+                    <input type="checkbox" />
+                    <span class="label-text"></span>
+                  </label>
+                </div>
+              </td>
+              <td [class]="isDark ? 'td-d' : 'td-w'">{{ profil?.id }}</td>
+              <td [class]="isDark ? 'td-d' : 'td-w'">{{ profil?.nom }}</td>
+              <td [class]="isDark ? 'td-d' : 'td-w'">{{ profil?.description }}</td>
+              <td [class]="isDark ? 'td-d' : 'td-w'">
+                <span [class]="profil?.statut === 'Activ\u00e9' ? 'text-c-green ft-w-500' : 'text-c-red ft-w-500'">
+                  {{ profil?.statut }}
+                </span>
+              </td>
+              <td [class]="isDark ? 'td-d' : 'td-w'">
+                <span class="ml-5">
+                  <img
+                    *ngIf="profil?.statut === 'Activ\u00e9'"
+                    title="Bloquer"
+                    src="assets/images/switch_on.png"
+                    alt="On"
+                    style="cursor: pointer; width: 20px"
+                    (click)="showConfirmDialog(profil, 'Désactivé')" />
+                  <img
+                    *ngIf="profil?.statut !== 'Activ\u00e9'"
+                    title="Débloquer"
+                    src="assets/images/switch_off.png"
+                    alt="Off"
+                    style="cursor: pointer; width: 30px"
+                    (click)="showConfirmDialog(profil, 'Activ\u00e9')" />
+                </span>
+              </td>
+              <td [class]="isDark ? 'td-d' : 'td-w'">
+                <div class="d-flex ml-5">
+                  <a title="Modifier"
+                     *ngIf="profil"
+                     (click)="showEditForm(profil)"
+                     data-toggle="modal"
+                     data-target="#addProfilModal">
+                    <div [class]="isDark ? 'opt-edit-d' : 'opt-edit-w'">
+                      <i class="mdi mdi-pencil-lock" style="color: #ffd56b; cursor: pointer"></i>
+                    </div>
+                  </a>
+                  <a title="Supprimer"
+                     *ngIf="profil"
+                     (click)="showDeleteDialog(profil)"
+                     data-toggle="modal"
+                     data-target="#deleteConfirmModal">
+                    <div [class]="isDark ? 'opt-delete-d' : 'opt-delete-w'">
+                      <i class="mdi mdi-delete" style="color: #e32131; cursor: pointer"></i>
+                    </div>
+                  </a>
+                </div>
+              </td>
+            </tr>
+          </ng-template>
+
+          <!-- Ligne des droits -->
+          <ng-template pTemplate="rowexpansion" let-lineDroit>
+            <tr *ngIf="lineDroit">
+              <td colspan="7">
+                <div class="p-1" style="margin-left: 2%; width: 98%">
+                  <p-table [value]="lineDroit?.droits || []" dataKey="id">
+                    <ng-template pTemplate="body" let-droit>
+                      <tr *ngIf="droit">
+                        <td [class]="isDark ? 'td-d' : 'td-w'">{{ droit?.id }}</td>
+                        <td [class]="isDark ? 'td-d' : 'td-w'">{{ droit?.nom }}</td>
+                        <td [class]="isDark ? 'td-d' : 'td-w'">{{ droit?.description }}</td>
+                        <td [class]="isDark ? 'td-d' : 'td-w'">{{ droit?.status }}</td>
+                      </tr>
+                    </ng-template>
+                  </p-table>
+                </div>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    </div>
+
+    <!-- add profil modal -->
+    <div class="container demo" *ngIf="currentPage === 'add' && profil">
+      <div class="modal right fade" id="addProfilModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel2">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content" [style]="{'background-color': isDark ? '#1f1f1f' : '#FFFFFF'}">
+            <div class="d-flex" style="margin-top: 15px;">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close" #closeAddElementDialog>
+                <span aria-hidden="true">
+                  <i [class]="isDark ? 'txt-title-d mdi mdi-arrow-left-bold-circle' : 'mdi mdi-arrow-left-bold-circle'"></i>
+                </span>
+                <span class="form-control-label lab_modal">
+                  {{ profil?.id ? 'Modification d\'un profil' : 'Création d\'un nouveau profil' }}
+                </span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <div class="row mb-l-20 mb-10">
+                <div class="col-md-12 col-lg-12 p-right-0">
+                  <div [class]="isDark ? 'card cust_card_d' : 'card cust_card_w'">
+                    <div class="card-block">
+                      <div class="form-group">
+                        <label class="form-control-label lab_modal" for="nomProfil">{{ 'profile.nom' | translate }} *</label>
+                        <input
+                          [class]="isDark ? 'form-control form-control-d' : 'form-control form-control-w'"
+                          id="nomProfil"
+                          name="nomProfil"
+                          type="text"
+                          [(ngModel)]="profil.nom"
+                          required />
+                      </div>
+
+                      <div class="form-group">
+                        <label class="form-control-label lab_modal" for="describProfil">{{ 'profile.description' | translate }}</label>
+                        <textarea
+                          [class]="isDark ? 'form-control form-control-d' : 'form-control form-control-w'"
+                          id="describProfil"
+                          name="describProfil"
+                          [(ngModel)]="profil.description"></textarea>
+                      </div>
+
+                      <div align="center">
+                        <label class="form-control-label lab_modal">Choix des droits</label>
+                        <div class="search-container">
+                          <input type="text" name="droitFilter" [(ngModel)]="droitFilter.nom" [placeholder]="'assistante.searchPlaceholder' | translate" />
+                          <i class="fa fa-search"></i>
+                        </div>
+                      </div>
+                      <div class="col-lg-12" style="height: 350px; overflow-y: scroll;">
+                        <mat-checkbox [(ngModel)]="isSelectedRole" color="primary" name="list_roles" (change)="checkedAllRole()">Sélectionner tous</mat-checkbox>
+                        <div *ngFor="let droit of droits | filterBy: droitFilter">
+                          <mat-checkbox [(ngModel)]="droit.checked" [name]="'droit-'+droit?.id" color="primary">
+                            {{ droit?.nom }}
+                          </mat-checkbox>
+                        </div>
+                      </div>
+                      <div class="col-md-12">
+                        <button class="btn btn-login btn-block btnn_save" (click)="profil?.id ? Update() : Save()">
+                          <img src="assets/images/save.png" alt="" class="icon_save" />
+                          {{ 'parametre.save' | translate }}
+                        </button>
+                      </div>
+                      <div class="col-md-12 ta-center">
+                        <label class="lab_reset" *ngIf="!profil?.id" (click)="showAddForm()">Réinitialiser</label>
+                        <label class="lab_reset" *ngIf="profil?.id" data-dismiss="modal" aria-label="Close">Fermer</label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Modal de confirmation de suppression -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content shadow-lg border-0">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title" id="deleteModalLabel">
+          <i class="mdi mdi-alert"></i> Confirmation de suppression
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fermer"></button>
+      </div>
+      <div class="modal-body text-center">
+        <p>Voulez-vous vraiment supprimer le profil <strong>{{ profil?.nom }}</strong> ?</p>
+      </div>
+      <div class="modal-footer justify-content-center">
+        <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">
+          <i class="mdi mdi-close"></i> Annuler
+        </button>
+        <button type="button" class="btn btn-danger px-4" (click)="DeleteProfile()">
+          <i class="mdi mdi-delete"></i> Supprimer
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+  </div>
+</div>
+
+   <!-- Modal confim bloque -->
+    <div class="modal fade text-xs-left" id="elementConfirmModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel2" aria-hidden="true">
+      <div class="modal-sm modal-dialog " role="document">
+        <div class="modal-content" style="width: 340px;">
+          <div class="modal-header">
+            <button style="display: none;" type="button" #openConfirmDialog class="btn btn-outline-primary" data-backdrop="static" data-toggle="modal" data-target="#elementConfirmModal" data-backdrop="true">
+            </button>
+            <h4 class="modal-title" id="myModalLabel2">
+              <img src="assets/images/close_c.png" alt="" class="im_confirm">
+            </h4>
+            <img src="assets/images/close_x.png" alt="" class="cursor-p" data-dismiss="modal">
+          </div>
+          <div class="modal-body">
+            <label class="txt_confirm">
+              Bonjour, vous vous appretez à bloquer le {{profil?.nom}}
+            </label><br/>
+            <label class="desc_confirm">etes vous sûr de bloquer ce Service ?</label> <br>
+
+            <button class="button_op">
+                <span class="buttxt_op">Operations</span>
+            </button>
+          </div>
+          <div class="modal-footer">
+            <div style="width: 100%;">
+              <button class="btn btn-blocked btn-sm mr-3 ml-2" type="button" (click)="UpdateStatut('Bloqué')">
+                <label class="txt_blocked">Bloquer</label>
+              </button>
+              <button class="btn btn-cancel btn-sm" type="button" data-dismiss="modal">
+                <label class="txt_blocked">Annuler</label>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+<!-- Bouton caché pour déclencher le modal Bootstrap -->
+<button
+  #deleteConfirmDialog
+  type="button"
+  class="btn btn-danger d-none"
+  data-bs-toggle="modal"
+  data-bs-target="#deleteConfirmModal">
+</button>
+<!-- Modal de confirmation -->
+    <!-- Modal de confirmation de suppression -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content shadow-lg border-0">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title" id="deleteModalLabel">
+          <i class="mdi mdi-alert"></i> Confirmation de suppression
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fermer"></button>
+      </div>
+      <div class="modal-body text-center">
+        <p>Voulez-vous vraiment supprimer ce type <strong>{{ profil?.nom }}</strong> ?</p>
+      </div>
+      <div class="modal-footer justify-content-center">
+        <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">
+          <i class="mdi mdi-close"></i> Annuler
+        </button>
+        <button type="button" class="btn btn-danger px-4" (click)="DeleteProfile()">
+          <i class="mdi mdi-delete"></i> Supprimer
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+

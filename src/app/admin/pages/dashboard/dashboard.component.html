@@ -1,0 +1,255 @@
+<ngx-loading [show]="loading" [config]="{ backdropBorderRadius: '5px',fullScreenBackdrop:true }"></ngx-loading>
+  
+
+
+
+
+
+
+
+
+
+
+<div class="dashboard-header">
+    <div>
+      <h2> Rebonjour, <span>Mr Koeta</span></h2>
+      <p>Vous avez le dashboard qui vous permet de consulter toutes les statistiques de la plateforme.</p>
+    </div>
+  
+  </div>
+
+<div class="card-deck mb-l-20">
+  <div class="card card_brd theme-light mr_5">
+    <div class="card-body mycard">
+      <div class="wd_100">
+        <label class="myright">
+          <label [class]="isDark? 'c-white txt_dash m-b-0' : 'c-black txt_dash m-b-0'">Visiteurs du jour</label>
+          <h4 class="nbr_dash">{{nbrDossierRecu<=9? 0 : ''}}{{nbrDossierRecu | number: '': 'fr-FR'}}</h4>
+        </label>
+        <label class="mb-0" mat-icon-button [matMenuTriggerFor]="menu" style="float: right;">
+          <i class="fa fa-ellipsis-v icon_incuh"></i>
+        </label>
+        <mat-menu #menu="matMenu">
+          <button mat-menu-item>
+            <img src="assets/images/calendar.png" alt="" class="wd_11 mr-2"><span class="cal_color">Par semaine</span>
+          </button>
+          <button mat-menu-item>
+            <img src="assets/images/calendar.png" alt="" class="wd_11 mr-2"><span class="cal_color">Par mois</span>
+          </button>
+          <button mat-menu-item>
+            <img src="assets/images/calendar.png" alt="" class="wd_11 mr-2"><span class="cal_color">Par années</span>
+          </button>
+        </mat-menu>
+        <div class="wd_100">
+          <label class="lab_content"><i class="mdi mdi-arrow-up ico_arrowup"></i><span class="txt_purcent">40%</span>par rapport au semaine dernier</label>
+          <button class="btn_flot"><i class="mdi mdi-arrow-top-right"></i></button>
+        </div>
+        <div class="wd_100">
+          <canvas id="chartDossierRecu" height="40" width="100%"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card card_brd theme-light mr_5">
+    <div class="card-body mycard">
+      <div class="wd_100">
+        <label class="myright">
+          <label [class]="isDark? 'c-white txt_dash m-b-0' : 'c-black txt_dash m-b-0'">Rendez-vous planifiés</label>
+          <h4 class="nbr_dash">{{nbrPlainteSave<=9? 0 : ''}}{{nbrPlainteSave | number: '': 'fr-FR'}}</h4>
+        </label>
+        <label class="mb-0" mat-icon-button [matMenuTriggerFor]="menu2" style="float: right;">
+          <i class="fa fa-ellipsis-v icon_incuh"></i>
+        </label>
+        <mat-menu #menu2="matMenu">
+          <button mat-menu-item>
+            <img src="assets/images/calendar.png" alt="" class="wd_11 mr-2"><span class="cal_color">Par semaine</span>
+          </button>
+          <button mat-menu-item>
+            <img src="assets/images/calendar.png" alt="" class="wd_11 mr-2"><span class="cal_color">Par mois</span>
+          </button>
+          <button mat-menu-item>
+            <img src="assets/images/calendar.png" alt="" class="wd_11 mr-2"><span class="cal_color">Par années</span>
+          </button>
+        </mat-menu>
+        <div class="wd_100">
+          <label class="lab_content"><i class="mdi mdi-arrow-up ico_arrowup"></i><span class="txt_purcent">40%</span>par rapport au semaine dernier</label>
+          <button class="btn_flot"><i class="mdi mdi-arrow-top-right"></i></button>
+        </div>
+        <div class="wd_100">
+          <canvas id="chartPlainteSave" height="40" width="100%"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card card_brd theme-light">
+    <div class="card-body mycard">
+      <div class="wd_100">
+        <label class="myright">
+          <label [class]="isDark? 'c-white txt_dash m-b-0' : 'c-black txt_dash m-b-0'">Rendez-vous terminés</label>
+          <h4 class="nbr_dash">{{nbrRequisitionIntro<=9? 0 : ''}}{{nbrRequisitionIntro | number: '': 'fr-FR'}}</h4>
+        </label>
+        <label class="mb-0" mat-icon-button [matMenuTriggerFor]="menu3" style="float: right;">
+          <i class="fa fa-ellipsis-v icon_incuh"></i>
+        </label>
+        <mat-menu #menu3="matMenu">
+          <button mat-menu-item>
+            <img src="assets/images/calendar.png" alt="" class="wd_11 mr-2"><span class="cal_color">Par semaine</span>
+          </button>
+          <button mat-menu-item>
+            <img src="assets/images/calendar.png" alt="" class="wd_11 mr-2"><span class="cal_color">Par mois</span>
+          </button>
+          <button mat-menu-item>
+            <img src="assets/images/calendar.png" alt="" class="wd_11 mr-2"><span class="cal_color">Par années</span>
+          </button>
+        </mat-menu>
+        <div class="wd_100">
+          <label class="lab_content"><i class="mdi mdi-arrow-up ico_arrowup"></i><span class="txt_purcent">40%</span>par rapport au semaine dernier</label>
+          <button class="btn_flot"><i class="mdi mdi-arrow-top-right"></i></button>
+        </div>
+        <div class="wd_100">
+          <canvas id="chartRequiIntro" height="40" width="100%"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card-deck mb-l-20 mt-2">
+  <div class="card card_brd theme-light mr_5">
+    <div class="card-body mycard">
+      <div class="wd_100">
+        <label class="myright">
+          <label [class]="isDark? 'c-white txt_dash m-b-0' : 'c-black txt_dash m-b-0'">Rendez-vous en attentes</label>
+          <h4 class="nbr_dash">{{nbrDossierRecu<=9? 0 : ''}}{{nbrDossierRecu | number: '': 'fr-FR'}}</h4>
+        </label>
+        <label class="mb-0" mat-icon-button [matMenuTriggerFor]="menu4" style="float: right;">
+          <i class="fa fa-ellipsis-v icon_incuh"></i>
+        </label>
+        <mat-menu #menu4="matMenu">
+          <button mat-menu-item>
+            <img src="assets/images/calendar.png" alt="" class="wd_11 mr-2"><span class="cal_color">Par semaine</span>
+          </button>
+          <button mat-menu-item>
+            <img src="assets/images/calendar.png" alt="" class="wd_11 mr-2"><span class="cal_color">Par mois</span>
+          </button>
+          <button mat-menu-item>
+            <img src="assets/images/calendar.png" alt="" class="wd_11 mr-2"><span class="cal_color">Par années</span>
+          </button>
+        </mat-menu>
+        <div class="wd_100">
+          <label class="lab_content"><i class="mdi mdi-arrow-up ico_arrowup"></i><span class="txt_purcent">40%</span>par rapport au semaine dernier</label>
+          <button class="btn_flot"><i class="mdi mdi-arrow-top-right"></i></button>
+        </div>
+        <div class="wd_100">
+          <canvas id="chartDosTransmis" height="40" width="100%"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card card_brd theme-light mr_5">
+    <div class="card-body mycard">
+      <div class="wd_100">
+        <label class="myright">
+          <label [class]="isDark? 'c-white txt_dash m-b-0' : 'c-black txt_dash m-b-0'">Rendez-vous réçu</label>
+          <h4 class="nbr_dash">{{nbrPlainteSave<=9? 0 : ''}}{{nbrPlainteSave | number: '': 'fr-FR'}}</h4>
+        </label>
+        <label class="mb-0" mat-icon-button [matMenuTriggerFor]="menu5" style="float: right;">
+          <i class="fa fa-ellipsis-v icon_incuh"></i>
+        </label>
+        <mat-menu #menu5="matMenu">
+          <button mat-menu-item>
+            <img src="assets/images/calendar.png" alt="" class="wd_11 mr-2"><span class="cal_color">Par semaine</span>
+          </button>
+          <button mat-menu-item>
+            <img src="assets/images/calendar.png" alt="" class="wd_11 mr-2"><span class="cal_color">Par mois</span>
+          </button>
+          <button mat-menu-item>
+            <img src="assets/images/calendar.png" alt="" class="wd_11 mr-2"><span class="cal_color">Par années</span>
+          </button>
+        </mat-menu>
+        <div class="wd_100">
+          <label class="lab_content"><i class="mdi mdi-arrow-up ico_arrowup"></i><span class="txt_purcent">40%</span>par rapport au semaine dernier</label>
+          <button class="btn_flot"><i class="mdi mdi-arrow-top-right"></i></button>
+        </div>
+        <div class="wd_100">
+          <canvas id="chartSansSuite" height="40" width="100%"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card card_brd theme-light">
+    <div class="card-body mycard">
+      <div class="wd_100">
+        <label class="myright">
+          <label [class]="isDark? 'c-white txt_dash m-b-0' : 'c-black txt_dash m-b-0'">Nombre de Rendez-vous par Services</label>
+          <h4 class="nbr_dash">{{nbrRequisitionIntro<=9? 0 : ''}}{{nbrRequisitionIntro | number: '': 'fr-FR'}}</h4>
+        </label>
+        <label class="mb-0" mat-icon-button [matMenuTriggerFor]="menu6" style="float: right;">
+          <i class="fa fa-ellipsis-v icon_incuh"></i>
+        </label>
+        <mat-menu #menu6="matMenu">
+          <button mat-menu-item>
+            <img src="assets/images/calendar.png" alt="" class="wd_11 mr-2"><span class="cal_color">Par semaine</span>
+          </button>
+          <button mat-menu-item>
+            <img src="assets/images/calendar.png" alt="" class="wd_11 mr-2"><span class="cal_color">Par mois</span>
+          </button>
+          <button mat-menu-item>
+            <img src="assets/images/calendar.png" alt="" class="wd_11 mr-2"><span class="cal_color">Par années</span>
+          </button>
+        </mat-menu>
+        <div class="wd_100">
+          <label class="lab_content"><i class="mdi mdi-arrow-up ico_arrowup"></i><span class="txt_purcent">40%</span>par rapport au semaine dernier</label>
+          <button class="btn_flot"><i class="mdi mdi-arrow-top-right"></i></button>
+        </div>
+        <div class="wd_100">
+          <canvas id="chartAtteTraite" height="40" width="100%"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="card-deck mb-l-20 mt-2">
+  <div class="card card_brd theme-light">
+    <div class="card-body mycard">
+      <div class="wd_100">
+        <label class="myright">
+          <label [class]="isDark? 'c-white txt_dash m-b-0' : 'c-black txt_dash m-b-0'">Activité par service</label>
+        </label>
+        <label class="mb-0" mat-icon-button [matMenuTriggerFor]="menu7" style="float: right;">
+          <i class="fa fa-ellipsis-v icon_incuh"></i>
+        </label>
+        <mat-menu #menu7="matMenu">
+          <button mat-menu-item>
+            <img src="assets/images/calendar.png" alt="" class="wd_11 mr-2"><span class="cal_color">Par semaine</span>
+          </button>
+          <button mat-menu-item>
+            <img src="assets/images/calendar.png" alt="" class="wd_11 mr-2"><span class="cal_color">Par mois</span>
+          </button>
+          <button mat-menu-item>
+            <img src="assets/images/calendar.png" alt="" class="wd_11 mr-2"><span class="cal_color">Par années</span>
+          </button>
+        </mat-menu>
+        <div class="wd_100">
+          <label class="lab_content"><i class="mdi mdi-arrow-up ico_arrowup"></i><span class="txt_purcent">40%</span>par rapport au semaine dernier</label>
+          <button class="btn_flot"><i class="mdi mdi-arrow-top-right"></i></button>
+        </div>
+        <div class="wd_100">
+          <canvas id="chartDossierRenvoie" height="20" width="100%"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+

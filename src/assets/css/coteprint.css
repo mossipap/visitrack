@@ -1,0 +1,96 @@
+/* Styles go here */
+.page-header, .page-header-space {
+  height: auto;
+  margin-bottom: 3%;
+}
+.page-footer, .page-footer-space {
+  height: 107.8px;
+}
+.page-header {
+  position: fixed;
+  top: 0mm;
+  width: 100%;
+  -webkit-print-color-adjust: exact !important
+}
+.page-footer {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  margin-bottom: -12px;
+  -webkit-print-color-adjust: exact !important
+}
+.foot_center {
+  margin-bottom: -2%;
+  margin-left: 2% !important;
+}
+.my_rp,
+.my_rppaque {
+  height: 25px !important;
+}
+.cisso {
+  margin-top: 0 !important;
+}
+.numero_parquet {
+  margin-left: 0 !important;
+}
+/* fiche inculpé */
+.lesstop {
+  margin-top: -20px !important;
+}
+.phot_emprint {
+  margin-top: 5% !important;
+}
+.head_image {
+  width: 100% !important;
+}
+.legend_incul {
+  margin-left: 7% !important;
+  width: 100% !important;
+}
+/* fiche inventaire inculpe */
+.titre_invent {
+  margin-top: 20px !important;
+  padding-top: 10px !important;
+}
+/* ordonnance */
+.cabinet_name {
+  margin-top: 1.6% !important;
+}
+.list-p {
+  font-weight: 600 !important;
+}
+.my_left {
+  padding-left: 10% !important;
+}
+.signateur {
+  width: 52% !important;
+}
+.ppef {
+  text-align: left !important;
+  margin-left: 20% !important;
+  padding-top: 2% !important;
+}
+.piechartimg {
+  display: flex !important;
+  padding-top: 0px !important;
+}
+.piecanvas {
+  display: none !important;
+}
+.table_r {
+  margin-left: -6% !important;
+}
+.wprint {
+  width: 60% !important;
+}
+.wprint_br {
+  width: 63% !important;
+}
+.table_notice {
+  margin-left: -5% !important;
+  width: 110% !important;
+}
+.segevice {
+  margin-right: -22% !important;
+  margin-top: 3% !important;
+}
