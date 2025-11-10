@@ -67,7 +67,7 @@ button.btn_flot:active {
   font-family: Cambria;
 }
 .txt_dash {
-  font-family: Calibri;
+  font-family: inherit;
   font-weight: 400;
   font-style: Regular;
   font-size: 20px;

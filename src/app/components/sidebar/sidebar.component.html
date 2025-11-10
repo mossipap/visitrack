@@ -34,7 +34,7 @@
     </li>
  
     <!-- Gestion du personnel / services -->
-    <li class="menu-item" [ngClass]="{ active: activeMenu === 'agent' }" (click)="clickLi('agent')">
+    <li *ngIf="false" class="menu-item" [ngClass]="{ active: activeMenu === 'agent' }" (click)="clickLi('agent')">
       <a routerLink="/admin/parametre/agent" class="menu-link">
         <div class="icon-box"><i class="mdi mdi-account-group"></i></div>
         <span class="menu-label">Gestion du personnel</span>

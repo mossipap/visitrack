@@ -86,8 +86,8 @@ button.btn_not_active:active {
     cursor: pointer;
 }
 .acces_active {
-    font-family: Nunito;
-    font-size: 14px;
+    font-family: inherit;
+    font-size: 17px;
     font-weight: 600;
     line-height: 19.1px;
     text-align: left;
@@ -96,8 +96,8 @@ button.btn_not_active:active {
     color: #107C41;
 }
 .acces_block {
-    font-family: Nunito;
-    font-size: 14px;
+    font-family: inherit;
+    font-size: 17px;
     font-weight: 600;
     line-height: 19.1px;
     text-align: left;
@@ -106,7 +106,7 @@ button.btn_not_active:active {
     color: #E0880D;
 }
 .acces_supp {
-    font-family: Nunito;
+    font-family: inherit;
     font-size: 14px;
     font-weight: 600;
     line-height: 19.1px;
@@ -509,19 +509,6 @@ h6 {
 }
 /* ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±± */
 /* ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±± */
-.avatar-abbr {
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  color: white;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-weight: 600;
-  font-size: 15px;
-  text-transform: uppercase;
-  box-shadow: 0 0 6px rgba(0,0,0,0.15);
-}
 
 /* ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±± */
 /* ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±± */

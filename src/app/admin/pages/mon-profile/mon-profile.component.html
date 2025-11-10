@@ -1,81 +1,92 @@
 <ngx-loading [show]="loading" [config]="{ backdropBorderRadius: '5px',fullScreenBackdrop:true }"></ngx-loading>
-<div class="row">
+<div class="row" style=" padding-top: 20px;">
   <div class="col-xl-4">
-      <!-- Profile picture card-->
-      <div class="card mb-4 mb-xl-0">
-        <div [class]="isDark? 'card-header theme-dark c-cab-1' : 'card-header theme-light c-cab-2'">Image de profil</div>
-        <div [class]="isDark? 'card-body text-center theme-dark' : 'card-body text-center theme-light'">
-          <!-- Profile picture image-->
-          <img *ngIf="isChanged" [src]="currentUser.image" alt="Profil change" class="img-account-profile rounded-circle mb-2">
-          <img *ngIf="!currentUser?.image && !isChanged" src="assets/images/profile/avatar1.png" alt="Image par defaut" class="img-account-profile rounded-circle mb-2">
-          <img *ngIf="currentUser?.image && !isChanged" [src]="currentUser?.image" alt="Profil user" class="img-account-profile rounded-circle mb-2">
-          <!-- Profile picture help block-->
-          <div class="small font-italic text-muted mb-4">JPG ou PNG ne dépassant pas 5 Mo</div>
-          <!-- Profile picture upload button-->
-          <button class="btn btn-primary btn-orange" *ngIf="!isChanged" type="button" [disabled]="!roleManager.isDroitChangerPhotoUtilisateur()" (click)="selectFile()">Télécharger une nouvelle image</button>
-          <div class="icon-change-photo" *ngIf="isChanged">
-            <i class="mdi mdi-close" (click)="deletePhoto()" style="font-size: 30px;cursor: pointer;color: #FF0000; margin-right: 5px;"></i>
-            <i class="mdi mdi-check" (click)="UpdateImage()" style="font-size: 30px;cursor: pointer;color: #107c10;"></i>
-          </div>
-        </div>
+  <div class="profile-card shadow-sm">
+    
+    <div class="profile-card-header" [class.dark]="isDark">
+      <i class="mdi mdi-account-circle-outline mr-1"></i>
+      Image de profil
+    </div>
+
+    <div class="profile-card-body" [class.dark]="isDark">
+
+      <!-- Image -->
+      <div class="profile-image-wrapper">
+        <img 
+          *ngIf="isChanged" 
+          [src]="currentUser.image" 
+          alt="Profil change" 
+          class="profile-img"
+        />
+        <img 
+          *ngIf="!currentUser?.image && !isChanged" 
+          src="assets/images/profile/avatar1.png" 
+          alt="Default" 
+          class="profile-img"
+        />
+        <img 
+          *ngIf="currentUser?.image && !isChanged" 
+          [src]="currentUser?.image" 
+          alt="Profil user" 
+          class="profile-img"
+        />
       </div>
-      <div class="card mb-4 mb-xl-0"></div>
-  </div>
-  <div class="col-xl-8">
-      <!-- Account details card-->
-      <div class="card mb-4">
-          <div [class]="isDark? 'card-header theme-dark c-cab-1' : 'card-header theme-light c-cab-2'">Détails du compte</div>
-          <div [class]="isDark? 'card-body theme-dark' : 'card-body theme-light'">
-              <form>
-                  <div class="row gx-3 mb-3">
-                      <div class="col-md-6">
-                        <label [class]="isDark? 'small mb-1 c-cab-1' : 'small mb-1 c-cab-2'" class="" for="profession">Profession</label>
-                        <input [class]="isDark? 'form-control form-control-d' : 'form-control form-control-w'" id="profession" name="profession" type="text" placeholder="Profession" [(ngModel)]="currentUser.profession">
-                      </div>
-                      <div class="col-md-6">
-                        <label [class]="isDark? 'small mb-1 c-cab-1' : 'small mb-1 c-cab-2'" class="" for="fonction">Fonction</label>
-                        <input [class]="isDark? 'form-control form-control-d' : 'form-control form-control-w'" id="fonction" name="fonction" type="text" placeholder="Fonction" [(ngModel)]="currentUser.typeUser.designation">
-                      </div>
-                  </div>
-                  <div class="row gx-3 mb-3">
-                      <div class="col-md-6">
-                          <label [class]="isDark? 'small mb-1 c-cab-1' : 'small mb-1 c-cab-2'" for="inputFirstName">Prénom</label>
-                          <input [class]="isDark? 'form-control form-control-d' : 'form-control form-control-w'" id="inputFirstName" name="firstName" type="text" placeholder="Prénom" [(ngModel)]="currentUser.prenom">
-                      </div>
-                      <div class="col-md-6">
-                          <label [class]="isDark? 'small mb-1 c-cab-1' : 'small mb-1 c-cab-2'" for="inputLastName">Nom de famille</label>
-                          <input [class]="isDark? 'form-control form-control-d' : 'form-control form-control-w'" id="inputLastName" name="lastName" type="text" placeholder="Nom de famille" [(ngModel)]="currentUser.nom">
-                      </div>
-                  </div>
-                  <div class="row gx-3 mb-3">
-                      <div class="col-md-6">
-                          <label [class]="isDark? 'small mb-1 c-cab-1' : 'small mb-1 c-cab-2'" for="inputOrgName">Nom de l'organisation</label>
-                          <input [class]="isDark? 'form-control form-control-d' : 'form-control form-control-w'" id="inputOrgName" name="organisation" type="text" placeholder="Nom de l'organisation" [(ngModel)]="currentUser.organisation">
-                      </div>
-                      <div class="col-md-6">
-                          <label [class]="isDark? 'small mb-1 c-cab-1' : 'small mb-1 c-cab-2'" for="inputLocation">Adresse</label>
-                          <input [class]="isDark? 'form-control form-control-d' : 'form-control form-control-w'" id="inputLocation" name="adresse" type="text" placeholder="Adresse" [(ngModel)]="currentUser.adresse">
-                      </div>
-                  </div>
-                  <div class="mb-3">
-                      <label [class]="isDark? 'small mb-1 c-cab-1' : 'small mb-1 c-cab-2'" for="inputEmailAddress">Adresse e-mail</label>
-                      <input [class]="isDark? 'form-control form-control-d' : 'form-control form-control-w'" id="inputEmailAddress" name="email" type="email" placeholder="Adresse e-mail" [(ngModel)]="currentUser.email">
-                  </div>
-                  <div class="row gx-3 mb-3">
-                      <div class="col-md-6">
-                          <label [class]="isDark? 'small mb-1 c-cab-1' : 'small mb-1 c-cab-2'" for="inputPhone">Numéro de téléphone</label>
-                          <input [class]="isDark? 'form-control form-control-d' : 'form-control form-control-w'" id="inputPhone" name="phoneNumber" type="tel" placeholder="Numéro de téléphone" [(ngModel)]="currentUser.telephone">
-                      </div>
-                      <div class="col-md-6">
-                          <label [class]="isDark? 'small mb-1 c-cab-1' : 'small mb-1 c-cab-2'" for="inputPwd">Mot de passe</label>
-                          <input [class]="isDark? 'form-control form-control-d' : 'form-control form-control-w'" id="inputPwd" type="password" name="password" placeholder="Mot de passe" [(ngModel)]="currentUser.password">
-                      </div>
-                  </div>
-                  <button class="btn btn-primary btn-orange" type="button">Sauvegarder les modifications</button>
-              </form>
-          </div>
+
+      <!-- Info -->
+      <p class="profile-note">Formats autorisés : JPG ou PNG (max 5 Mo)</p>
+
+      <!-- Boutons -->
+      <button 
+        class="btn btn-upload" 
+        *ngIf="!isChanged" 
+        [disabled]="!roleManager.isDroitChangerPhotoUtilisateur()" 
+        (click)="selectFile()">
+        <i class="mdi mdi-upload mr-1"></i> Télécharger une nouvelle image
+      </button>
+
+      <div class="profile-confirm" *ngIf="isChanged">
+        <i class="mdi mdi-close icon-delete" (click)="deletePhoto()"></i>
+        <i class="mdi mdi-check icon-update" (click)="UpdateImage()"></i>
       </div>
+
+    </div>
   </div>
+</div>
+
+<div class="col-xl-8">
+  <div class="card mb-4 shadow-sm border-0 rounded-3">
+
+    <!-- Header -->
+    <div [class]="isDark ? 'card-header theme-dark c-cab-1' : 'card-header theme-light c-cab-2'">
+      <h5 class="mb-0 d-flex align-items-center gap-2 fw-bold">
+        <i class="mdi mdi-account-circle-outline"></i>
+        Détails du compte
+      </h5>
+    </div>
+
+    <!-- Body (Affichage simple) -->
+    <div [class]="isDark ? 'card-body theme-dark' : 'card-body theme-light'">
+      <div class="detail-row" *ngFor="let item of [
+        { icon: 'mdi-school-outline', label: 'Profession', value: currentUser?.profession },
+        { icon: 'mdi-briefcase-outline', label: 'Fonction', value: currentUser?.fonction },
+        { icon: 'mdi-account-outline', label: 'Prénom', value: currentUser?.prenom },
+        { icon: 'mdi-account-outline', label: 'Nom', value: currentUser?.nom },
+        { icon: 'mdi-domain', label: 'Organisation', value: currentUser?.organisation },
+        { icon: 'mdi-map-marker-outline', label: 'Adresse', value: currentUser?.adresse },
+        { icon: 'mdi-email-outline', label: 'Adresse e-mail', value: currentUser?.email },
+        { icon: 'mdi-phone-outline', label: 'Téléphone', value: currentUser?.telephone }
+      ]">
+        <i class="mdi" [ngClass]="item.icon"></i>
+        <span class="label">{{ item.label }} :</span>
+        <span class="value">{{ item.value || '--' }}</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+
 </div>
 
 <!-- Modal Change Pwd Dialog -->

@@ -59,6 +59,7 @@ export class MonProfileComponent implements OnInit {
         labelColor[i].classList.replace('c-cab-1', 'c-cab-2');
       }
     }
+   // console.log("++++++++++++++++++ currente User +++++++++++++++++", this.currentUser)
   }
 
   showChangePwd() {

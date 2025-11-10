@@ -50,13 +50,13 @@
 }
 
 .div_role {
-    font-family: Calibri;
+    font-family: inherit;
     font-size: 14px;
     color: #f7931a;
 }
 .ft_cal {
-    font-family: Calibri;
-    font-size: 15px;
+    font-family: inherit;
+    font-size: 17px;
 }
 .cursor_p {
     cursor: pointer;

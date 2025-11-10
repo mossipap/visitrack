@@ -2,10 +2,10 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MaterialModule } from 'src/app/shared/modules/material.module';
 import { DemandeCompteRoutingModule } from './demande-compte-routing.module';
-import { DemandeCompteComponent } from './demande-compte.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgxLoadingModule, ngxLoadingAnimationTypes } from 'ngx-loading';
 import { FilterPipeModule } from 'ngx-filter-pipe';
+import { DemandeCompteComponent } from './demande-compte.component';
 
 @NgModule({
   declarations: [
