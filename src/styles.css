@@ -339,6 +339,8 @@ body {
 .pagination-wrapper button {
   min-width: 35px;
   transition: 0.2s ease-in-out;
+  font-family: inherit;
+  font-size: 15px;
 }
 
 .pagination-wrapper button:hover:not(:disabled) {

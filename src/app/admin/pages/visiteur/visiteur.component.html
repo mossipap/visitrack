@@ -13,7 +13,7 @@
           <h5 class="fw-bold mb-0 text-dark">
             Liste des visiteurs
           </h5>
-          <span class="badge-count">{{ activeList.length }}</span>
+          <span class="badge-count">{{ paginatedList.length }}</span>
         </div>
         <!-- 🔹 Outils : recherche + boutons -->
         <div class="d-flex align-items-center gap-2 flex-wrap justify-content-end">
@@ -45,7 +45,7 @@
             </div>
 
             <div class="col-auto">
-              <button class="btn_refresh" (click)="initUsers()" title="Rafraichir">
+              <button class="btn_refresh" (click)="search()" title="Rafraichir">
                 <i class="mdi mdi-refresh fs-20"></i>
               </button>
             </div>
@@ -57,7 +57,7 @@
             </div>
           </div>
           <!-- ➕ Bouton ajout -->
-          <button *ngIf="false" class="btn btn-dark d-flex align-items-center gap-1 px-3">
+          <button class="btn btn-dark d-flex align-items-center gap-1 px-3" data-backdrop="static" data-toggle="modal" data-target="#addVisiteurModal" (click)="showAddForm()">
             <i class="mdi mdi-plus"></i>
             <span>Ajouter un Visiteur</span>
           </button>
@@ -85,81 +85,81 @@
                 <th>Pièce d'identité</th>
                 <th>Téléphone</th>
                 <th>Fonction</th>
-                <th>Affecté à</th>
-                <th>Statut</th>
-                <th></th>
+                <th>Date</th>
+                 <th class="text-center action-buttons">Options</th>
               </tr>
             </thead>
 
             <tbody>
-              <tr *ngFor="let demande of paginatedList">
+              <tr *ngFor="let visiteur of paginatedList">
                 <td>
                   <div class="animated-checkbox">
                     <label>
-                      <input type="checkbox" [(ngModel)]="demande.selected" (change)="toggleSelectOne()" />
+                      <input type="checkbox" [(ngModel)]="visiteur.selected" (change)="toggleSelectOne()" />
                       <span class="label-text"></span>
                     </label>
                   </div>
                 </td>
-                <td>{{ demande.id }}</td>
+                <td>{{ visiteur.id }}</td>
                 <td>
                   <div class="d-flex align-items-center">
-                    <div class="avatar-abbr me-2" [style.background-color]="getSexColor(demande.sexe)">
-                      {{ getInitials(demande.nomComplet) }}
+                    <div class="avatar-abbr me-2" [style.background-color]="getSexColor(visiteur.sexe)">
+                      {{ getInitials(visiteur.nomComplet) }}
                     </div>
-                    <span>{{ demande.nomComplet }}</span>
+                    <span>{{ visiteur.nomComplet }}</span>
                   </div>
                 </td>
                 <td>
                   <div class="d-flex align-items-center">
                     <div>
-                      <label class="fw-semibold">{{ demande.typePiece}}</label><br />
-                      <div class="desc-prof text-muted small">{{ demande.numeroPiece }}</div>
+                      <label class="fw-semibold">{{ visiteur.typePiece}}</label><br />
+                      <div class="desc-prof text-muted small">{{ visiteur.numeroPiece }}</div>
                     </div>
                   </div>
                 </td>
                 <td>
-                  <span class="flag">{{ getFlag(demande.numeroTelephone) }}</span>
-                  {{formatPhone(demande.numeroTelephone) }}
+                  <span class="flag">{{ getFlag(visiteur.numeroTelephone) }}</span>
+                  {{formatPhone(visiteur.numeroTelephone) }}
                 </td>
-                <td>{{ demande.fonction }}</td>
-                <td [class]="isDark ? 'td-d' : 'td-w'">
+                <td>{{ visiteur.fonction }}</td>
+              <!--   <td [class]="isDark ? 'td-d' : 'td-w'">
                   <div class="d-flex align-items-center">
-                    <img *ngIf="!demande.image" src="assets/images/profile/avatar.jpeg" alt="Not"
+                    <img *ngIf="!visiteur.image" src="assets/images/profile/avatar.jpeg" alt="Not"
                       class="img-avatar me-2" />
-                    <img *ngIf="demande.image" [src]="demande.image" alt="User" class="img-avatar me-2" />
+                    <img *ngIf="visiteur.image" [src]="visiteur.image" alt="User" class="img-avatar me-2" />
                     <div>
-                      <label class="fw-semibold">{{ demande.typeUser?.prenom }} {{ demande.typeUser?.nom
+                      <label class="fw-semibold">{{ visiteur.typeUser?.prenom }} {{ visiteur.typeUser?.nom
                         }}</label><br />
-                      <div class="desc-prof text-muted small">{{ demande.cabinet?.designation }}</div>
+                      <div class="desc-prof text-muted small">{{ visiteur.cabinet?.designation }}</div>
                     </div>
                   </div>
-                </td>
+                </td> -->
+                 <td>{{ visiteur.created_at | date: 'dd/MM/yyyy'}}</td>
 
-                <td [class]="isDark ? 'td-d' : 'td-w'">
-                  <span [class]="(demande.statut === 'Actif') ? 'acces_active' : 'acces_block'">
+             <!--    <td [class]="isDark ? 'td-d' : 'td-w'">
+                  <span [class]="(visiteur.statut === 'Actif') ? 'acces_active' : 'acces_block'">
                     <i class="mdi"
-                      [ngClass]="(demande.statut === 'Actif') ? 'mdi-check-circle text-success' : 'mdi-timer-sand text-warning'"></i>
-                    {{ (demande.statut === 'Actif') ? 'Actif' : 'Inactif' }}
+                      [ngClass]="(visiteur.statut === 'Actif') ? 'mdi-check-circle text-success' : 'mdi-timer-sand text-warning'"></i>
+                    {{ (visiteur.statut === 'Actif') ? 'Actif' : 'Inactif' }}
                   </span>
 
-                  <div *ngIf="demande?.statut === 'Inactif'" class="mt-1 text-muted small">
+                  <div *ngIf="visiteur?.statut === 'Inactif'" class="mt-1 text-muted small">
                   </div>
-                  <div *ngIf="demande?.statut === 'Terminé'" class="mt-1 text-muted small">
+                  <div *ngIf="visiteur?.statut === 'Terminé'" class="mt-1 text-muted small">
                   </div>
-                </td>
+                </td> -->
                 <td class="text-center action-buttons">
                   <div class="d-flex justify-content-center align-items-center gap-2 flex-wrap">
                     <button class="btn btn-light btn-icon" title="Consulter" data-backdrop="static" data-toggle="modal"
-                      data-target="#detailUserModal" (click)="showDetail(demande)">
+                      data-target="#detailUserModal" (click)="showDetail(visiteur)">
                       <img src="assets/icons/mdi/eye.png" alt="Voir" class="icon-btn" />
                     </button>
                     <button class="btn btn-light btn-icon" title="Modifier" data-backdrop="static" data-toggle="modal"
-                      data-target="#addUserModal" (click)="showEditForm(demande)">
+                      data-target="#addVisiteurModal" (click)="showEditForm(visiteur)">
                       <img src="assets/icons/mdi/edit.png" alt="Modifier" class="icon-btn" />
                     </button>
                     <button class="btn btn-light btn-icon" title="Supprimer" data-backdrop="static" data-toggle="modal"
-                      data-target="#deleteConfirmModal" (click)="showDeleteDialog(demande)">
+                      data-target="#deleteConfirmModal" (click)="showDeleteDialog(visiteur)">
                       <img src="assets/icons/mdi/delete.png" alt="Supprimer" class="icon-btn" />
                     </button>
                     <button class="btn btn-danger btn-sm fw-semibold">Bloquer</button>
@@ -243,7 +243,7 @@
                                     [class]="isDark? 'form-control-label c-cab-1 detail_lab' : 'form-control-label c-cab-2 detail_lab'">Date
                                     du jour</label>
                                   <div [class]="isDark? 'detail_desc c-cab-1' : 'detail_desc c-cab-2'">
-                                    {{demande?.dateDuJour}}</div>
+                                    {{demande?.dateVisite}}</div>
                                 </div>
                               </div>
                               <div class="col-lg-6 p-right-0">
@@ -503,7 +503,7 @@
 
     <!-- add user modal -->
     <div class="container demo" *ngIf="currentView === 'add' || currentView === 'edit'">
-      <div class="modal right fade" id="addUserModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel2">
+      <div class="modal right fade" id="addVisiteurModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel2">
         <div class="modal-dialog" role="document">
           <div class="modal-content" [style]="{'background-color': isDark ? '#1f1f1f' : '#FFFFFF'}">
             <div class="d-flex" style="margin-top: 15px;">
@@ -548,7 +548,7 @@
                                     Date du jour *
                                   </label>
                                   <div class="select select-add">
-                                    <p-calendar [(ngModel)]="demande.dateDuJour" readonly name="dateDuJour"
+                                    <p-calendar [(ngModel)]="demande.dateVisite" readonly name="dateDuJour"
                                       dateFormat="dd/mm/yy" yearRange="1950:2030" placeholder="Choisir la date du jour"
                                       styleClass="wd_100 initialwd">
                                     </p-calendar>
@@ -655,6 +655,16 @@
                                   <textarea
                                     [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'"
                                     id="adresse" name="adresse" type="adresse" [(ngModel)]="demande.adresse"
+                                    required></textarea>
+                                </div>
+                              </div>
+                              <div class="col-lg-12 p-right-0">
+                                <div class="form-group has-success align-left ft-w-b">
+                                  <label [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
+                                    for="raisonVisite">Raison de la Visite *</label>
+                                  <textarea
+                                    [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'"
+                                    id="raisonVisite" name="raisonVisite" type="raisonVisite" [(ngModel)]="demande.raisonVisite"
                                     required></textarea>
                                 </div>
                               </div>

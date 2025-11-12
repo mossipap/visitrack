@@ -115,140 +115,8 @@ earchValue: string = '';
       this.changeBgTheader('rgba(255, 199, 154, 0.5)');
     }
     this.searchParam.dateFin.setDate(this.searchParam.dateFin.getDate() + 1);
-    this.initUsers();
-this.activeList = [
-  {
-    "id": 1,
-    "typeUser_id": 2,
-    "cabinet_id": 1,
-    "nomComplet": "Jean Dupont",
-    "sexe": "M",
-    "heureArrive": "08:30",
-    "typePiece": "CNI",
-    "numeroPiece": "CNI123456",
-    "signature": "JeanDupontSignature",
-    "numeroTelephone": "+22370112233",
-    "fonction": "Comptable",
-    "adresse": "Bamako, Mali",
-    "heureVisite": "09:00",
-    "heureDepart": "10:00",
-    "remarque": "Première visite pour dépôt de dossier",
-    "statut": "Actif",
-    "typeUser": {
-      "id": 2,
-      "nom": "Coulibaly",
-      "prenom": "Diakaria",
-      "designation": "Visiteur"
-    },
-    "cabinet": {
-      "id": 1,
-      "designation": "Cabinet Alpha"
-    },
-    "service_name": "Service Comptabilité",
-    "dateCreation": "2025-09-20T08:15:00Z",
-    "dateModification": "2025-09-20T09:45:00Z"
-  },
-  {
-    "id": 2,
-    "typeUser_id": 3,
-    "cabinet_id": 2,
-    "nomComplet": "Awa Traoré",
-    "sexe": "F",
-    "heureArrive": "10:15",
-    "typePiece": "Passeport",
-    "numeroPiece": "PASS987654",
-    "signature": "AwaTraoreSignature",
-    "numeroTelephone": "+22365123456",
-    "fonction": "Juriste",
-    "adresse": "Koulikoro, Mali",
-    "heureVisite": "10:30",
-    "heureDepart": "11:30",
-    "remarque": "Consultation juridique",
-    "statut": "Actif",
-    "typeUser": {
-      "id": 3,
-      "nom": "Samake",
-      "prenom": "Aboudramane",
-      "designation": "Consultant"
-    },
-    "cabinet": {
-      "id": 2,
-      "designation": "Cabinet JurisPlus"
-    },
-    "service_name": "Service Juridique",
-    "dateCreation": "2025-09-21T09:00:00Z",
-    "dateModification": "2025-09-21T09:00:00Z"
-  },
-  {
-    "id": 3,
-    "typeUser_id": 1,
-    "cabinet_id": 3,
-    "nomComplet": "Moussa Konaté",
-    "sexe": "M",
-    "heureArrive": "14:00",
-    "typePiece": "Permis de conduire",
-    "numeroPiece": "PERM445566",
-    "signature": "MoussaKonateSignature",
-    "numeroTelephone": "+22374124567",
-    "fonction": "Technicien",
-    "adresse": "Sikasso, Mali",
-    "heureVisite": "14:15",
-    "heureDepart": "15:00",
-    "remarque": "Réclamation sur un dossier",
-    "statut": "Actif",
-    "typeUser": {
-      "id": 1,
-      "nom": "Diarra",
-      "prenom": "Oumar",
-      "designation": "Employé"
-    },
-    "cabinet": {
-      "id": 3,
-      "designation": "Cabinet Expert Conseil"
-    },
-    "service_name": "Service Clientèle",
-    "dateCreation": "2025-09-18T14:00:00Z",
-    "dateModification": "2025-09-19T08:30:00Z"
-  },
-  {
-    "id": 4,
-    "typeUser_id": 4,
-    "cabinet_id": 1,
-    "nomComplet": "Fatoumata Diarra",
-    "sexe": "F",
-    "heureArrive": "16:20",
-    "typePiece": "CNI",
-    "numeroPiece": "CNI998877",
-    "signature": "FatouDiarraSignature",
-    "numeroTelephone": "+22378112233",
-    "fonction": "Secrétaire",
-    "adresse": "Kayes, Mali",
-    "heureVisite": "16:30",
-    "heureDepart": "17:30",
-    "remarque": "Rendez-vous pour entretien",
-    "statut": "Actif",
-    "typeUser": {
-      "id": 4,
-      "nom": "Coulibaly",
-      "prenom": "Diakaria",
-      "designation": "Partenaire"
-    },
-    "cabinet": {
-      "id": 1,
-      "designation": "Cabinet Alpha"
-    },
-    "service_name": "Service Ressources Humaines",
-    "dateCreation": "2025-09-22T16:00:00Z",
-    "dateModification": "2025-09-22T16:45:00Z"
-  }
-  
-]
-this.activeList = this.activeList.map(item => ({
-    ...item,
-    selected: false
-  }));
+    this.search();
 
-this.totalPages = Math.ceil(this.activeList.length / this.itemsPerPage);
     this.updatePaginatedList();
      this.loadIndicatifs();
   }
@@ -445,78 +313,61 @@ toggleSelectOne() {
     this.deleteConfirmDialog.nativeElement.click();
   }
 
-  initUsers() {
-    this.loading = true;
-    this.demandeService.findAll().subscribe((ret) => {
+search() {
+  this.loading = true;
+  this.demandeService.findAllVisiteur().subscribe(
+    (ret) => {
       if (ret['code'] == 200) {
-        const users = ret['data'];
-        users.forEach((user: any) => {
-          user.nomComplet = user.prenom + ' ' + user.nom;
-        });
-        if(this.currentUser.service_name === 'siege') {
-          this.demandes = users.filter((u: any) => {return u.service_name === 'siege'});
-        } else {
-          this.demandes = users.filter((u: any) => {return u.service_name === 'parquet'});
-        }
-        const actiList = [];
-        const blocList = [];
-        const deleList = [];
-        this.demandes.forEach(user => {
-          switch(user.statut) {
-            case 'Activé':
-              actiList.push(user);
-              break;
-            case 'Bloqué':
-              blocList.push(user);
-              break;
-            case 'Supprimé':
-              deleList.push(user);
-              break;
-          }
-          switch(user.user_agent_id) {
-            /* siege */
-            case 2:
-              this.nombreAssistante++;
-              break;
-            case 3:
-              this.nombreJuge++;
-              break;
-            case 4:
-              this.nombreGreffier++;
-              break;
-            /* parquet */
-            case 7:
-              this.nombreAssistante++;
-              break;
-            case 8:
-              this.nombreJuge++;
-              break;
-            case 9:
-              this.nombreGreffier++;
-              break;
-            default:
-                break;
-          }
-        });
-        this.activeList = actiList;
-        this.bloqueList = blocList;
-        this.suppriList = deleList;
-        this.loading = false;
-        this.toast.info(this.demandes.length+" demande(s) trouvé(s)");
+
+        // ✅ Liste paginée venant de ton backend
+        this.demandes = ret['data']['data'];
+
+        this.totalPages = Math.ceil(this.demandes.length / this.itemsPerPage);
+        this.updatePaginatedList();
+
+        this.toast.info(`${this.demandes.length} demande(s) trouvée(s)`);
+
       } else {
         this.toast.error(ret['message']);
-        this.loading = false;
       }
-      },
-      () => {
-        this.toast.error(environment.erreur_connexion_message);
-        this.loading = false;
-      }
-    );
+
+      this.loading = false;
+    },
+    () => {
+      this.toast.error(environment.erreur_connexion_message);
+      this.loading = false;
+    }
+  );
+}
+
+
+updatePaginatedList() {
+  this.totalPages = Math.ceil(this.demandes.length / this.itemsPerPage);
+  
+  const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+  const endIndex = startIndex + this.itemsPerPage;
+
+  this.paginatedList = this.demandes.slice(startIndex, endIndex);
+
+  console.log("+++++ paginatedList reçues +++++", this.paginatedList);
+}
+
+
+  nextPage() {
+    if (this.currentPage < this.totalPages) {
+      this.currentPage++;
+      this.updatePaginatedList();
+    }
+  }
+
+  previousPage() {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+      this.updatePaginatedList();
+    }
   }
 
   Save() {
-    this.demande.statut = "Activé";
     this.currentUser.service_name;
    // this.demande.image = null;
     this.loading = true;
@@ -527,7 +378,7 @@ toggleSelectOne() {
         this.closeAddElementDialog.nativeElement.click();
         this.toast.success("Demande ajouté avec succès");
         this.loading = false;
-        this.initUsers();
+        this.search();
         this.showList();
       } else {
         this.loading = false;
@@ -556,7 +407,7 @@ toggleSelectOne() {
         this.toast.success("Demande modifié avec succès");
         this.loading = false;
         this.showList();
-        this.initUsers();
+        this.search();
       } else {
         this.toast.error(ret['message']);
         this.loading = false;
@@ -737,25 +588,6 @@ UpdateStatut(statut: string) {
     alert('Signature enregistrée avec succès ✅');
   }
 
- updatePaginatedList() {
-    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
-    const endIndex = startIndex + this.itemsPerPage;
-    this.paginatedList = this.activeList.slice(startIndex, endIndex);
-  }
-
-  nextPage() {
-    if (this.currentPage < this.totalPages) {
-      this.currentPage++;
-      this.updatePaginatedList();
-    }
-  }
-
-  previousPage() {
-    if (this.currentPage > 1) {
-      this.currentPage--;
-      this.updatePaginatedList();
-    }
-  }
  
 formatPhone(numero: string): string {
   if (!numero) return '';

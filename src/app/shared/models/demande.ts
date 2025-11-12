@@ -9,7 +9,8 @@ export class Demande implements Deserializable<Demande> {
   public id!: number;
   public user_agent_id: number;
   public service_id: number;
-  public user_personnel_id: number= 1;
+  public visiteur_id: number;
+  public user_id: number;
   public nomComplet!: string;
    public sexe: string = 'Homme';
   public heureArrive!: string;
@@ -26,8 +27,12 @@ export class Demande implements Deserializable<Demande> {
   public typeUser: TypeUser;
   public cabinet: Cabinet;
   public service_name: string;
+  public raisonVisite:string;
+  public objet_saisie : string;
+  public objet_retirer : string;
   public dateCreation!: Date;
-  public dateDuJour: Date = new Date();
+  public created_at!: Date;
+  public dateVisite: Date = new Date();
   public dateModification!: Date;
   deserialize(input: any): Demande {
     Object.assign(this, input);

@@ -5,7 +5,7 @@
 export const environment = {
   production: false,
   apiUrl: 'https://vitrack.legipen.net/api/v1',
-  appRoot: 'http://localhost:4200',
+  appRoot: 'https://visitrack.ci',
  // apiUrl: 'http://localhost:4200',
   /* apiUrl: 'http://10.100.11.4:8081/api/v1',
   apiBiostar: 'https://10.100.10.22/api',

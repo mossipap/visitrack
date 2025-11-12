@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { AppUtil } from 'src/app/shared/utils/App-util';
 import { Demande } from '../models/demande';
+import { SearchParam } from '../utils/search-param';
 
 @Injectable({
   providedIn: 'root'
@@ -16,9 +17,15 @@ export class DemandeService {
   }
 
   public findAll() {
-    return this.http.get(this.serviceURL + '/Demandes', this.httpOptions);
+    return this.http.get(this.serviceURL + '/Demande?Demande=available', this.httpOptions);
+  }
+  public findAllVisiteur() {
+    return this.http.get(this.serviceURL + '/Visiteur?Visiteur=available', this.httpOptions);
   }
 
+  public findByNumero(search: SearchParam) {
+    return this.http.get(this.serviceURL + '/VisiteurByNumero/'+ search.query, this.httpOptions);
+  }
   public findById(userId: any) {
     return this.http.get(this.serviceURL + '/Demande/'+ userId, this.httpOptions);
   }

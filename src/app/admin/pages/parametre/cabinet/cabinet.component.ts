@@ -194,7 +194,6 @@ toggleSelectOne() {
     this.cabinetService.findAll().subscribe(ret => {
       if (ret['code'] === 200) {
         this.cabinets = ret['data'];
-        console.log("cabinets===>", this.cabinets);
         this.loading = false;
         this.toast.info(this.cabinets.length+ " cabinet(s) trouvé(s)");
       } else {
@@ -233,9 +232,10 @@ toggleSelectOne() {
     this.cabinetService.update(this.cabinet).subscribe(ret => {
       if (ret['code'] === 200) {
         this.cabinet = ret['data'];
-        this.cabinets.push(this.cabinet);
+        //this.cabinets.push(this.cabinet);
         this.cabinets.forEach(cab => {
           if (cab.id === this.cabinet.id) {
+             this.Search();
             cab = this.cabinet;
           }
         });
@@ -297,6 +297,7 @@ toggleSelectOne() {
   
     showDeleteDialog(cabinet: Cabinet): void {
        this.cabinet = cabinet;
+        //console.log("=++++++++++++++++ cabinet.id ++++++++++++", this.cabinet)
       if (this.deleteModal) {
         this.deleteModal.show();
       } else {
@@ -307,6 +308,7 @@ toggleSelectOne() {
       this.deleteModal?.hide();
     }
      onDeleted(): void {
+     // console.log("=++++++++++++++++ cabinet.id ++++++++++++", this.cabinet)
      this.loading = true;
      this.cabinetService.delete(this.cabinet).subscribe((ret:any) => {
       if (ret['code'] == 200) {
