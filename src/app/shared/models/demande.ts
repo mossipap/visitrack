@@ -1,13 +1,14 @@
 import { Deserializable } from './deserializable';
 import { Injectable } from '@angular/core';
-import { TypeUser } from './type-user';
+import { Service } from './service';
 import { Cabinet } from './cabinet';
+import { Visiteur } from './visiteur';
 
 @Injectable()
 export class Demande implements Deserializable<Demande> {
 
   public id!: number;
-  public user_agent_id: number;
+  public cabinet_id: number;
   public service_id: number;
   public visiteur_id: number;
   public user_id: number;
@@ -24,8 +25,9 @@ export class Demande implements Deserializable<Demande> {
   public heureDepart!: string;
   public remarque!: string;
   public statut!: string;
-  public typeUser: TypeUser;
+  public service: Service;
   public cabinet: Cabinet;
+  public visiteur: Visiteur;
   public service_name: string;
   public raisonVisite:string;
   public objet_saisie : string;
@@ -34,6 +36,8 @@ export class Demande implements Deserializable<Demande> {
   public created_at!: Date;
   public dateVisite: Date = new Date();
   public dateModification!: Date;
+  commentaire: string
+  public selected?: boolean; // facultatif avec ?
   deserialize(input: any): Demande {
     Object.assign(this, input);
     return this;

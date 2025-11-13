@@ -1,18 +1,20 @@
-import { Component, ElementRef, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, Output, ViewChild } from '@angular/core';
 import { AppToastService } from 'src/app/shared/utils/AppToast.service';
 import { environment } from 'src/environments/environment';
 import { AppConfig } from 'src/app/shared/utils/app-config';
 import * as SecureLS from 'secure-ls';
 import { Cabinet } from 'src/app/shared/models/cabinet';
 import { Profil } from 'src/app/shared/models/profil';
-import { TypeUser} from 'src/app/shared/models/type-user';
 import { CabinetService } from 'src/app/shared/services/cabinet.service';
 import { RoleManager } from 'src/app/shared/utils/role-manager';
 import { SearchParam } from 'src/app/shared/utils/search-param';
 import { Demande } from 'src/app/shared/models/demande';
 import { DemandeService } from 'src/app/shared/services/demande.service';
-import { TypeUserService } from 'src/app/shared/services/typeuser.service';
 import { HttpClient } from '@angular/common/http';
+import { Service } from 'src/app/shared/models/service';
+import { ServiceService } from 'src/app/shared/services/service.service';
+import { Modal } from 'bootstrap';
+declare var bootstrap: any;
 @Component({
   selector: 'app-rendezvous',
   templateUrl: './rendezvous.component.html',
@@ -20,6 +22,7 @@ import { HttpClient } from '@angular/common/http';
 })
 export class RendezvousComponent implements OnInit {
  public demandes: Demande[] = [];
+  public allList: any[] = [];
   public activeList: any[] = [];
   public bloqueList: Demande[] = [];
   public suppriList: Demande[] = [];
@@ -28,8 +31,8 @@ export class RendezvousComponent implements OnInit {
   public visiteur: Demande = new Demande();
   public cabinets: Cabinet[] = [];
   public cabinetFilter = { designation: '' };
-  public typeUsers: TypeUser[] = [];
-  public typeUserFilter = { designation: '' };
+  public services: Service[] = [];
+  public serviceFilter = { designation: '' };
   public profiles: Profil[] = [];
   public profileFilter = { nom: '' };
   public roleManager: RoleManager;
@@ -57,7 +60,7 @@ export class RendezvousComponent implements OnInit {
   @ViewChild('deleteConfirmDialog') deleteConfirmDialog: any;
   @ViewChild('closeAddElementDialog') closeAddElementDialog: any;
   @ViewChild('fileInputUpload', { static: false }) fileInputUpload: ElementRef;
-@ViewChild('canvas', { static: false }) canvas!: ElementRef<HTMLCanvasElement>;
+  @ViewChild('canvas', { static: false }) canvas!: ElementRef<HTMLCanvasElement>;
   private ctx!: CanvasRenderingContext2D;
   private drawing = false;
   signatureImage: string | null = null;
@@ -68,11 +71,15 @@ export class RendezvousComponent implements OnInit {
   public currentView = 'list';
   public currentPage = 1; 
   indicatifs: any = {};
+  public isNumberPhone: boolean ;
+  public deleteModal?: Modal;
+
+modalInstance: any;
   
   constructor(
     private demandeService: DemandeService,
     private cabinetService: CabinetService,
-    private typeUserService: TypeUserService,
+    private serviceService: ServiceService,
     private toast: AppToastService,
     private appConfig: AppConfig,
     private http: HttpClient
@@ -84,40 +91,6 @@ export class RendezvousComponent implements OnInit {
 
   ngOnInit(): void {
     const ls = new SecureLS({ encodingType: 'aes', encryptionSecret: 'MyAdminApp' });
-    if (ls.get('current_theme')) {//dark
-      this.isDark = true;
-      const headerLeft = document.getElementsByClassName("theme-light");
-      for(var i = headerLeft.length - 1; i >= 0; --i) {
-        headerLeft[i].classList.replace('theme-light', 'theme-dark');
-      }
-      this.changeRowPad('rgb(21 21 21 / 100%)');
-      this.changeStepLabel('#FFFFFF');
-      this.changeBgsearchbar('rgb(28, 28, 28)');
-      this.changePaginationBg('#000000');
-      this.changePaginationFg('#ffffff');
-      this.changePrimeTbBg('#000000');
-      this.changeTrHover('#1c1c1c');
-      this.changePrimeTbHead('#000000');
-      this.changePaginatorLight('#252116');
-      this.changeBtnDivBg('#252117');
-    } else {//white
-      this.isDark = false;
-      const headerLeft = document.getElementsByClassName("theme-dark");
-      for(var i = headerLeft.length - 1; i >= 0; --i) {
-        headerLeft[i].classList.replace('theme-dark', 'theme-light');
-      }
-      this.changeRowPad('rgb(255 255 255 / 100%)');
-      this.changeStepLabel('#7f56d9');
-      this.changeBgsearchbar('rgba(255, 255, 255, 0.8)');
-      this.changePaginationBg('#ffffff');
-      this.changePaginationFg('#000000');
-      this.changePrimeTbBg('none');
-      this.changeTrHover('rgba(0, 0, 0, 0.3)');
-      this.changePrimeTbHead('#f8f9fa');
-      this.changePaginatorLight('#ecf5ee');
-      this.changeBtnDivBg('#faf4f3');
-      this.changeBgTheader('rgba(255, 199, 154, 0.5)');
-    }
     this.searchParam.dateFin.setDate(this.searchParam.dateFin.getDate() + 1);
     this.search();
 
@@ -212,70 +185,6 @@ toggleSelectOne() {
   changeBgTheader(newValue: string): void {
     document.documentElement.style.setProperty('--theaderbg', newValue);
   }
-  activeFiltres () {
-    if (!this.searchFilterText) return this.activeList
-    const search = this.searchFilterText.toLowerCase()
-    return this.activeList.filter(item => {
-      const text = (item.nomComplet + ' ' + item.nomComplet + ' ' + item.numeroTelephone+ ' '+ item.cabinet?.numerocabinet).toLowerCase();
-      return text.indexOf(search) > -1
-    })
-  }
-  bloqueFiltres () {
-    if (!this.searchFilterText) return this.bloqueList
-    const search = this.searchFilterText.toLowerCase()
-    return this.bloqueList.filter(item => {
-      const text = (item.nomComplet + ' ' + item.nomComplet + ' ' + item.numeroTelephone).toLowerCase();
-      return text.indexOf(search) > -1
-    })
-  }
-  supprimeFiltres () {
-    if (!this.searchFilterText) return this.suppriList
-    const search = this.searchFilterText.toLowerCase()
-    return this.suppriList.filter(item => {
-      const text = (item.nomComplet + ' ' + item.nomComplet + ' ' + item.numeroTelephone).toLowerCase();
-      return text.indexOf(search) > -1
-    })
-  }
-
-  onChangeCode(index) {
-    if(index === 1) {//active
-      let btnUserActive = document.getElementById("user_active");
-      let btnUserBlock = document.getElementById("user_block");
-      let btnUserDelete = document.getElementById("user_delete");
-
-      btnUserActive.classList.add("btn_active");
-      btnUserActive.classList.remove("btn_not_active");
-      btnUserBlock.classList.add("btn_not_active");
-      btnUserBlock.classList.remove("btn_active");
-      btnUserDelete.classList.add("btn_not_active");
-      btnUserDelete.classList.remove("btn_active");
-      this.currentIndex = index;
-    } else if(index === 2) {//block
-      let btnUserBlock = document.getElementById("user_block");
-      let btnUserActive = document.getElementById("user_active");
-      let btnUserDelete = document.getElementById("user_delete");
-
-      btnUserBlock.classList.add("btn_active");
-      btnUserBlock.classList.remove("btn_not_active");
-      btnUserActive.classList.add("btn_not_active");
-      btnUserActive.classList.remove("btn_active");
-      btnUserDelete.classList.add("btn_not_active");
-      btnUserDelete.classList.remove("btn_active");
-      this.currentIndex = index;
-    } else {//delete
-      let btnUserDelete = document.getElementById("user_delete");
-      let btnUserActive = document.getElementById("user_active");
-      let btnUserBlock = document.getElementById("user_block");
-
-      btnUserDelete.classList.add("btn_active");
-      btnUserDelete.classList.remove("btn_not_active");
-      btnUserBlock.classList.add("btn_not_active");
-      btnUserBlock.classList.remove("btn_active");
-      btnUserActive.classList.add("btn_not_active");
-      btnUserActive.classList.remove("btn_active");
-      this.currentIndex = index;
-    }
-  }
 
   showList() {
     this.currentView = 'list';
@@ -284,7 +193,7 @@ toggleSelectOne() {
   showAddForm() {
     this.demande = new Demande();
     this.findCabinets();
-    this.findTypeUsers();
+    this.findServices();
     this.currentView = 'add';
     this.pageTitle = 'Nouveau demande';
     this.searchParam.query = ""
@@ -293,7 +202,7 @@ toggleSelectOne() {
   showEditForm(user: Demande) {
     this.demande = user;
     this.findCabinets();
-    this.findTypeUsers();
+    this.findServices();
     this.currentView = 'edit';
     this.pageTitle = 'Modification d\'demande';
   }
@@ -314,52 +223,44 @@ toggleSelectOne() {
     this.openConfirmDialog.nativeElement.click();
   }
 
-  showDeleteDialog(demande: Demande): void {
-    this.demande = demande;
-    this.deleteConfirmDialog.nativeElement.click();
-  }
+  // 🔹 Ouvrir la modale
 
+
+ showDeleteDialog(demande: Demande): void {
+    this.demande = demande;
+    if (this.deleteModal) {
+      this.deleteModal.show();
+    } else {
+      console.warn("⚠️ Le modal n’a pas été initialisé.");
+    }
+  }
+  closeDeleteDialog(): void {
+    this.deleteModal?.hide();
+  }
 search() {
   this.loading = true;
   this.demandeService.findAll().subscribe(
     (ret) => {
+      this.loading = false;
       if (ret['code'] == 200) {
-
-        // ✅ Récupération correcte de la liste
         this.demandes = ret['data']['data'];
 
-        const actiList = [];
-        const blocList = [];
-        const deleList = [];
+        // Séparer les listes
+        this.activeList = this.demandes.filter(d => d.statut === 'En cours');
+        this.bloqueList = this.demandes.filter(d => d.statut === 'Terminée');
+        this.suppriList = this.demandes.filter(d => d.statut === 'Supprimé');
 
-        this.demandes.forEach(dem => {
-          switch (dem.statut) {
-            case 'En cours':
-              actiList.push(dem);
-              break;
-            case 'Bloqué':
-              blocList.push(dem);
-              break;
-            case 'Supprimé':
-              deleList.push(dem);
-              break;
-          }
-        });
+        // ✅ Tout afficher par défaut
+        this.allList = [...this.demandes];
 
-        this.activeList = actiList;
-        this.bloqueList = blocList;
-        this.suppriList = deleList;
-
-        this.totalPages = Math.ceil(this.activeList.length / this.itemsPerPage);
+        // Calcul pagination
+        this.totalPages = Math.ceil(this.allList.length / this.itemsPerPage);
         this.updatePaginatedList();
 
         this.toast.info(`${this.demandes.length} demande(s) trouvée(s)`);
-
       } else {
         this.toast.error(ret['message']);
       }
-
-      this.loading = false;
     },
     () => {
       this.toast.error(environment.erreur_connexion_message);
@@ -369,22 +270,92 @@ search() {
 }
 
 updatePaginatedList() {
-  let sourceList = [];
+  let sourceList: any[] = [];
 
-  if (this.currentIndex === 1) {
-    sourceList = this.activeList;
-  } else if (this.currentIndex === 2) {
-    sourceList = this.bloqueList;
-  } else {
-    sourceList = this.suppriList;
+  // 🟢 Choisir la liste selon le filtre actif
+  switch (this.currentIndex) {
+    case 1:
+      sourceList = this.activeFiltres();
+      break;
+    case 2:
+      sourceList = this.bloqueFiltres();
+      break;
+    case 3:
+      sourceList = this.supprimeFiltres();
+      break;
+    default:
+      sourceList = this.allFiltres(); // ✅ Tous par défaut
+      break;
   }
-  // recalcul du total des pages ici
+
+  // Pagination
   this.totalPages = Math.ceil(sourceList.length / this.itemsPerPage);
   const startIndex = (this.currentPage - 1) * this.itemsPerPage;
   this.paginatedList = sourceList.slice(startIndex, startIndex + this.itemsPerPage);
-  console.log("+++++ paginatedList reçues +++++", this.paginatedList);
+
+  console.log("+++++ paginatedList affichée +++++", this.paginatedList);
 }
 
+// ✅ Filtres pour chaque catégorie + "Tous"
+allFiltres() {
+  if (!this.searchFilterText) return this.allList;
+  const search = this.searchFilterText.toLowerCase();
+  return this.allList.filter(item =>
+    (item.visiteur.nomComplet + ' ' + item.numeroTelephone + ' ' + item.cabinet?.numerocabinet)
+      .toLowerCase()
+      .includes(search)
+  );
+}
+
+activeFiltres() {
+  if (!this.searchFilterText) return this.activeList;
+  const search = this.searchFilterText.toLowerCase();
+  return this.activeList.filter(item =>
+    (item.nomComplet + ' ' + item.numeroTelephone + ' ' + item.cabinet?.numerocabinet)
+      .toLowerCase()
+      .includes(search)
+  );
+}
+
+bloqueFiltres() {
+  if (!this.searchFilterText) return this.bloqueList;
+  const search = this.searchFilterText.toLowerCase();
+  return this.bloqueList.filter(item =>
+    (item.nomComplet + ' ' + item.numeroTelephone).toLowerCase().includes(search)
+  );
+}
+
+supprimeFiltres() {
+  if (!this.searchFilterText) return this.suppriList;
+  const search = this.searchFilterText.toLowerCase();
+  return this.suppriList.filter(item =>
+    (item.nomComplet + ' ' + item.numeroTelephone).toLowerCase().includes(search)
+  );
+}
+
+onChangeCode(index: number) {
+  this.currentIndex = index;
+  this.currentPage = 1;
+  this.updatePaginatedList();
+
+  // Gérer les boutons actifs
+  ['user_active', 'user_block', 'user_delete', 'user_all'].forEach(id => {
+    const btn = document.getElementById(id);
+    if (btn) {
+      btn.classList.toggle('btn_active', id === this.getButtonIdByIndex(index));
+      btn.classList.toggle('btn_not_active', id !== this.getButtonIdByIndex(index));
+    }
+  });
+}
+
+getButtonIdByIndex(index: number): string {
+  switch (index) {
+    case 1: return 'user_active';
+    case 2: return 'user_block';
+    case 3: return 'user_delete';
+    default: return 'user_all'; // ✅ nouveau bouton "Tous"
+  }
+}
   nextPage() {
     if (this.currentPage < this.totalPages) {
       this.currentPage++;
@@ -437,8 +408,9 @@ updatePaginatedList() {
   Update() {
     this.loading = true;
     /* this.demande.cabinet_id = this.demande.cabinet.id;
-    this.demande.typeUser_id = this.demande.typeUser.id;
+    this.demande.service_id = this.demande.service.id;
     this.demande.profil_id = this.demande.profil.id; */
+    this.demande.statut = 'Terminée'
     this.demandeService.update(this.demande).subscribe(ret => {
       if (ret['code'] === 200) {
         this.demande = ret['data'];
@@ -462,71 +434,28 @@ updatePaginatedList() {
     });
   }
 
-UpdateStatut(statut: string) {
-  this.loading = true;
-  this.demande.statut = statut;
-
-  this.demandeService.updateStatut(this.demande).subscribe(
-    ret => {
-      if (ret['code'] === 200) {
-        this.demande = ret['data'];
-
-        // MAJ dans la liste locale
-        this.demandes.forEach(user => {
-          if (user.id === this.demande.id) {
-            user.statut = this.demande.statut;
-          }
-        });
-
-        // ✅ Fermer la modale Bootstrap via jQuery
-        (('#userConfirmModal') as any).modal('hide');
-
-        // Toast de succès
-        this.toast.success("Statut mis à jour avec succès.");
-
-        this.showList();
-      } else {
-        this.toast.error(ret['message']);
-      }
-      this.loading = false;
-    },
-    error => {
-      this.toast.error(environment.erreur_connexion_message);
-      this.loading = false;
-    }
-  );
-}
-
-
-  checkCabinetUser(cabinetId: number, typeUserId: number) {
-    if(typeUserId !== 3) {
-      return;
-    }
-    if (!cabinetId) {
-      this.toast.error("Veuillez selectionner un cabinet, SVP ..");
-      this.demande.typeUser = null;
-      return
-    }
-    const objetCheck = {
-      cabinet_id: cabinetId,
-      typeUser_id: typeUserId
-    }
-    this.demandeService.verifyJugeOfCabinet(objetCheck).subscribe(ret => {
-      if (ret['code'] === 200) {
-      } else {
-        this.toast.error(ret['message']);
+  deleteDemande(): void {
+    if (this.demande) {
+      console.log(`Suppression de ${this.demande.visiteur.nomComplet}`);
+       this.loading = true;
+      this.demandeService.delete(this.demande).subscribe((ret:any) => {
+       if (ret['code'] == 200) {
+         this.demande = ret['data'];
+         this.closeDeleteDialog();
+          this.search();
+          this.loading = false;
+          this.toast.success(ret['message']);
+        } else {
+          this.loading = false;
+          this.toast.error(ret['message']);
+        }
+      }, error => {
+        console.log("error====>", error);
         this.loading = false;
-        this.demande.cabinet = null;
-        this.demande.typeUser = null;
-      }
-    }, error => {
-      console.log("error===", error);
-      this.toast.error(environment.erreur_connexion_message);
-      this.loading = false;
-    });
+        this.toast.error('Une erreur est survenue lors de l\'opération');
+      });
+    }
   }
-
-
   findCabinets() {
     this.cabinetService.findAll().subscribe(ret => {
       if (ret['code'] === 200) {
@@ -546,12 +475,12 @@ UpdateStatut(statut: string) {
     });
   }
 
-  findTypeUsers() {
-    this.typeUserService.findAll().subscribe(ret => {
+  findServices() {
+    this.serviceService.findAll().subscribe(ret => {
       if (ret['code'] === 200) {
-        this.typeUsers = ret['data'];
-        if (this.currentView === 'edit' || this.currentView === 'detail' && this.demande.user_agent_id && this.typeUsers.length > 0) {
-          this.demande.typeUser = this.typeUsers.find(p => p.id === this.demande.user_agent_id)
+        this.services = ret['data'];
+        if (this.currentView === 'edit' || this.currentView === 'detail' && this.demande.service_id && this.services.length > 0) {
+          this.demande.service = this.services.find(p => p.id === this.demande.service_id)
         }
         this.loading = false;
       } else {
@@ -565,43 +494,40 @@ UpdateStatut(statut: string) {
     });
   }
   
-    searchVisiteurByNumber3(){
-    this.demandeService.findByNumero(this.searchParam).subscribe(ret => {
-      if (ret['code'] === 200 && (ret['data']==null))   {
-        this.demande = ret['data'];
-        this.currentView === 'add';
-        this.loading = false;
-      } else if(ret['code'] === 200)  {
-        this.demande = ret['data'];
-        this.currentView = 'add';
-        this.loading = false;
-      }
-      else {
-        this.toast.error(ret['message']);
-        this.loading = false;
-      }
-    }, error => {
-      this.toast.error(environment.erreur_connexion_message);
+
+ searchVisiteurByNumber(numberPhone: string) {
+  console.log("query ===>", numberPhone);
+  this.loading = true;
+
+  this.demandeService.findByNumero(this.searchParam).subscribe({
+    next: (ret) => {
       this.loading = false;
-    });
-  }
-    searchVisiteurByNumber(numberPhone: string) {
-       console.log("query===>", numberPhone);
-    this.loading = true;
-    this.demandeService.findByNumero(this.searchParam).subscribe(ret => {
       if (ret['code'] === 200) {
+        // ✅ Numéro trouvé → on remplit le formulaire
         this.demande = ret['data'];
-        this.toast.success("Visiteur Trouvé avec succès");
-        this.loading = false;
-      } else {
-        this.toast.error(ret['message']);
-        this.loading = false;
+        this.toast.success("Visiteur trouvé avec succès");
+        this.isNumberPhone = true; // On affiche le formulaire pré-rempli
+      } 
+      else if (ret['code'] === 404) {
+        // ⚠️ Numéro non trouvé → on affiche le formulaire vide
+        this.toast.warning("Aucun visiteur trouvé. Vous pouvez remplir le formulaire.");
+        this.isNumberPhone = true; // On affiche quand même le formulaire
+         //this.demande = new Demande(); // Formulaire vide avec numéro déjà saisi
+         this.showAddForm();
+      } 
+      else {
+        this.toast.error(ret['message'] || "Erreur inconnue");
+        this.isNumberPhone = false;
       }
-    }, error => {
+    },
+    error: () => {
       this.toast.error(environment.erreur_connexion_message);
       this.loading = false;
-    });
-  }
+      this.isNumberPhone = false;
+    }
+  });
+}
+
 
 
   /* *********************Upload Photo************** */

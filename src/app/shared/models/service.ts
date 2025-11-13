@@ -1,7 +1,7 @@
 import { Deserializable } from './deserializable';
 import { Injectable } from '@angular/core';
 @Injectable()
-export class TypeUser implements Deserializable<TypeUser> {
+export class Service implements Deserializable<Service> {
   id: number;
   designation: string;
   description: string;
@@ -10,7 +10,7 @@ export class TypeUser implements Deserializable<TypeUser> {
   updated_at: Date;
   user: any[] = [];
   selected?: boolean;
-  deserialize(input: any): TypeUser {
+  deserialize(input: any): Service {
     Object.assign(this, input);
     return this;
   }

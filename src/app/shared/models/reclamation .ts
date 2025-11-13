@@ -1,3 +1,4 @@
+import { Demande } from './demande';
 import { Deserializable } from './deserializable';
 import { Injectable } from '@angular/core';
 
@@ -7,6 +8,8 @@ export class Reclamation implements Deserializable<Reclamation> {
   public demande_id: number =0;
   public user_agent_id: number =0;
   public user_personnel_id: number =0;
+  public visiteur_id: number;
+  public visiteur: Demande;
   public texte!: string;
   public statut: string;
   public dateCreation!: Date;

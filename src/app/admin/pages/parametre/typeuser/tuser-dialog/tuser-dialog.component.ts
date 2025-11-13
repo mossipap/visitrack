@@ -2,8 +2,8 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 
 import * as SecureLS from 'secure-ls';
-import { TypeUser } from 'src/app/shared/models/type-user';
-import { TypeUserService } from 'src/app/shared/services/typeuser.service';
+import { Service } from 'src/app/shared/models/service';
+import { ServiceService } from 'src/app/shared/services/service.service';
 
 @Component({
   selector: 'app-tuser-dialog',
@@ -12,14 +12,14 @@ import { TypeUserService } from 'src/app/shared/services/typeuser.service';
 })
 export class TuserDialogComponent implements OnInit {
 
-  public typeuser: TypeUser;
+  public typeuser: Service;
   public isDark: boolean;
   public loading: boolean;
 
   constructor(
     public dialogRef: MatDialogRef<TuserDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
-    private typeUserService: TypeUserService
+    private serviceService: ServiceService
   ) { }
 
   ngOnInit(): void {

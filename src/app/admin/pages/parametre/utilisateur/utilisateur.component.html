@@ -122,7 +122,7 @@
                     <img *ngIf="user.image" [src]="user.image" alt="User" class="img-avatar" />
                     <div class="text-start">
                       <label class="fw-bold">{{user.prenom}} {{user.nom}}</label><br />
-                      <small class="desc-prof text-muted">{{user.typeUser?.designation}}</small>
+                      <small class="desc-prof text-muted">{{user.service?.designation}}</small>
                     </div>
                   </div>
                 </td> -->
@@ -342,9 +342,9 @@
                                 <div class="form-group has-success align-left">
                                   <label
                                     [class]="isDark? 'form-control-label c-cab-1 detail_lab' : 'form-control-label c-cab-2 detail_lab'"
-                                    for="typeUser">{{'parametre.typeAgent' | translate}}</label>
+                                    for="service">{{'parametre.typeAgent' | translate}}</label>
                                   <div [class]="isDark? 'detail_desc c-cab-1' : 'detail_desc c-cab-2'">
-                                    {{utilisateur?.typeUser?.designation}}</div>
+                                    {{utilisateur?.service?.designation}}</div>
                                 </div>
                               </div>
                             </div>
@@ -493,7 +493,7 @@
           <div class="modal-body">
             <span class="txt_confirm">
               Bonjour, vous vous appretez à {{(dialogAction=== 'bloqued')? 'bloquer' : 'activer'}} le profil
-              de monsieur {{utilisateur?.prenom}} {{utilisateur?.nom}} ({{utilisateur?.typeUser?.designation}})
+              de monsieur {{utilisateur?.prenom}} {{utilisateur?.nom}} ({{utilisateur?.service?.designation}})
             </span><br />
             <span class="desc_confirm">etes vous sûr {{(dialogAction=== 'bloqued')? 'de bloquer' : 'd\'activer'}} ce
               profil ?</span> <br>
@@ -534,7 +534,7 @@
           <div class="modal-body">
             <span class="txt_confirm">
               Bonjour, vous vous appretez à supprimer le profil
-              de monsieur {{utilisateur?.prenom}} {{utilisateur?.nom}} ({{utilisateur?.typeUser?.designation}})
+              de monsieur {{utilisateur?.prenom}} {{utilisateur?.nom}} ({{utilisateur?.service?.designation}})
             </span><br />
             <span class="desc_confirm">etes vous sûr de supprimer ce profil ?</span> <br>
 
@@ -723,13 +723,13 @@
                               <div class="col-lg-6 p-right-0 mb-3">
                                 <div class="form-group has-success align-left ft-w-b">
                                   <label [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
-                                    for="typeUser">{{'parametre.typeAgent' | translate}}</label>
+                                    for="service">{{'parametre.typeAgent' | translate}}</label>
                                   <div class="select select-add">
-                                    <p-dropdown [options]="typeUsers" [(ngModel)]="utilisateur.type_user_id"
-                                      [showClear]="true" [filter]="true" name="typeUser" filterBy="designation"
+                                    <p-dropdown [options]="services" [(ngModel)]="utilisateur.service_id"
+                                      [showClear]="true" [filter]="true" name="service" filterBy="designation"
                                       optionLabel="designation" optionValue="id" placeholder="Choisir un type"
                                       styleClass="wd_100 initialwd"
-                                      (onChange)="checkCabinetUser(utilisateur.service_id, utilisateur.type_user_id)" />
+                                      (onChange)="checkCabinetUser(utilisateur.service_id, utilisateur.service_id)" />
                                     <div class="arrow" [class]="isDark? 'option-select-d' : 'option-select-w'"></div>
                                   </div>
                                 </div>

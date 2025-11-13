@@ -29,7 +29,7 @@ export class LoginComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-   const session = localStorage.getItem('current_session_novus');
+   const session = localStorage.getItem('current_session_visitrack');
 if (session) {
   // Si déjà connecté, on reste dans l’espace admin sans forcer dashboard
   this.router.navigate(['/admin']);
@@ -63,7 +63,7 @@ connecter() {
           const userconnect = ret['data'];
 
           ls.set('current_theme', this.isWhite);
-          ls.set('current_session_novus', JSON.stringify({ user: userconnect, droits: ret['droit_user'] }));
+          ls.set('current_session_visitrack', JSON.stringify({ user: userconnect, droits: ret['droit_user'] }));
 
           // ✅ Redirection vers le tableau de bord après login
           this.router.navigate(['/dashboard']);

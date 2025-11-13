@@ -82,38 +82,7 @@
   border: 1px solid #D0D5DD !important;
   box-shadow: 0px 4px 8px -2px #00000014 !important;
 }
-/* table */
-.table {
-  width: 99% !important;
-  margin-left: 5px;
-  margin-right: 5px;
-}
-.table tr {
-  box-shadow: inset 0 -3em 3em var(--bg-trtable),
-              0.1em 1em 0.5em rgb(0 0 0 / 5%),
-              0.1em 0.5em 0.5em rgb(0 0 0 / 12%);
-  border-radius: 15px;
-}
-.table .td-w, .table .td-d {
-  padding-top: 20px;
-}
-.tr_boxnone {
-  box-shadow: 0 0 0 0 var(--bg-trtable) !important;
-  border-radius: none !important;
-}
-.th_brnone {
-  border-bottom: none !important;
-}
-/*  */
-.img-avatar {
-  width: 27px;
-  border-radius: 50%;
-  margin-right: 6px;
-}
-.avatar_av {
-  width: 20px;
-  height: 20px;
-}
+
 .cust_row {
   border-radius: 10px;
   background: #fafafa;

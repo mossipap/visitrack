@@ -225,7 +225,7 @@ export class HeaderComponent implements OnInit {
   }
 
   public logout() {
-    localStorage.removeItem('current_session_novus');
+    localStorage.removeItem('current_session_visitrack');
     localStorage.removeItem('current_theme');
     this.openLogoutDialog.nativeElement.click();
     this.router.navigate(['/login']);
@@ -252,7 +252,7 @@ export class HeaderComponent implements OnInit {
     this.loading = true;
     this.authService.changePassword(this.authUser).subscribe(ret => {
       if (ret['code'] === 200) {
-        localStorage.removeItem('current_session_novus');
+        localStorage.removeItem('current_session_visitrack');
         localStorage.removeItem('current_theme');
         this.router.navigate(['/login']);
         this.toast.success(ret['message']);

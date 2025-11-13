@@ -8,7 +8,7 @@ export class AppToastService {
   private appName: string;
 
   constructor(public toastr: ToastrService) {
-    this.appName = 'NOVUS';
+    this.appName = 'VISITRACK';
   }
 
   success(message) {

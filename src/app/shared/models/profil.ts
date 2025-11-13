@@ -10,7 +10,7 @@ export class Profil implements Deserializable<Profil> {
   public otherDroits: Droit[];
   public statut: string = 'Activé';
  // public enabled!: Boolean;
-
+ selected?: boolean; // facultatif avec ?
   deserialize(input: any): Profil {
     Object.assign(this, input);
     return this;

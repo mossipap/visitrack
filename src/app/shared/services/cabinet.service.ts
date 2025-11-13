@@ -17,25 +17,25 @@ export class CabinetService {
     }
 
     public findAll() {
-      return this.http.get(this.serviceURL + '/Service' , this.httpOptions);
+      return this.http.get(this.serviceURL + '/Cabinet?Cabinet=available' , this.httpOptions);
     }
     public findById(cabinetId: number) {
-        return this.http.get(this.serviceURL + '/Service/'+cabinetId , this.httpOptions);
+        return this.http.get(this.serviceURL + '/Cabinet/'+cabinetId , this.httpOptions);
     }
 
     public save(cabinet: Cabinet) {
-        return this.http.post(this.serviceURL + '/Service', cabinet, this.httpOptions);
+        return this.http.post(this.serviceURL + '/Cabinet', cabinet, this.httpOptions);
     }
 
     public update(cabinet: Cabinet) {
-        return this.http.put(this.serviceURL + '/Service/'+cabinet.id, cabinet, this.httpOptions);
+        return this.http.put(this.serviceURL + '/Cabinet/'+cabinet.id, cabinet, this.httpOptions);
     }
 
     public updateStatut(cabinet: Cabinet) {
-        return this.http.put(this.serviceURL + '/Servicestatut/'+cabinet.id, cabinet, this.httpOptions);
+        return this.http.put(this.serviceURL + '/Cabinetstatut/'+cabinet.id, cabinet, this.httpOptions);
     }
 
     public delete(cabinet: Cabinet) {
-        return this.http.delete(this.serviceURL + '/Service/'+cabinet.id, this.httpOptions);
+        return this.http.delete(this.serviceURL + '/Cabinet/'+cabinet.id, this.httpOptions);
     }
 }

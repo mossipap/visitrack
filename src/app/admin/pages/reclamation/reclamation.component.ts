@@ -9,6 +9,8 @@ import { SearchParam } from 'src/app/shared/utils/search-param';
 import { Reclamation } from 'src/app/shared/models/reclamation ';
 import { ReclamationService } from 'src/app/shared/services/reclamation.service';
 import { Utilisateur } from 'src/app/shared/models/utilisateur';
+import { Demande } from 'src/app/shared/models/demande';
+import { DemandeService } from 'src/app/shared/services/demande.service';
 
 @Component({
   selector: 'app-reclamation',
@@ -19,7 +21,8 @@ export class ReclamationComponent implements OnInit {
   public reclamation: Reclamation;
   public reclamations: any[] = [];
   public selectedReclamations: Reclamation[]
-  public droits: Droit[] = [];
+  public visiteurs: Demande[] = [];
+
   public droitFilter: any = { nom: '' }
   public roleManager: RoleManager;
   public searchParam: SearchParam;
@@ -45,6 +48,7 @@ export class ReclamationComponent implements OnInit {
   public currentPage = 1; 
   constructor(
     private reclamationService: ReclamationService,
+    private visiteurService: DemandeService,
     private toast: AppToastService,
     private appConfig: AppConfig
   ) {
@@ -233,11 +237,13 @@ toggleSelectOne() {
   showAddForm() {
     this.reclamation = new Reclamation();
     this.currentView = 'add';
+    this.findVisiteurs()
   }
 
   showEditForm(reclamation: Reclamation) {
     this.reclamation = reclamation;
     this.currentView = 'add';
+    this.findVisiteurs()
     this.reclamationService.update(this.reclamation).subscribe(ret => {
       if (ret['code'] === 200) {
         this.reclamation = ret['data'];
@@ -265,7 +271,25 @@ toggleSelectOne() {
     this.reclamation = reclamation;
     this.deleteConfirmDialog.nativeElement.click();
   }
-
+ findVisiteurs() {
+    this.visiteurService.findAllVisiteur().subscribe(ret => {
+      if (ret['code'] === 200) {
+        this.visiteurs = ret['data']['data'];
+        console.log("visiteurs===>", this.visiteurs);
+        if (this.currentView === 'add' || this.currentView === 'detail' && this.reclamation.visiteur && this.visiteurs.length > 0) {
+          this.reclamation.visiteur = this.visiteurs.find(p => p.id === this.reclamation.visiteur.id)
+        }
+        this.loading = false;
+      } else {
+        this.loading = false;
+        this.toast.error(ret['message']);
+      }
+    }, error => {
+      console.log("error===>", error);
+      this.toast.error(environment.erreur_connexion_message);
+      this.loading = false;
+    });
+  }
   Search() {
     this.loading = true;
     this.reclamationService.findAll().subscribe(ret => {

@@ -82,7 +82,7 @@ export class MonProfileComponent implements OnInit {
     this.loading = true;
     this.authService.changePassword(this.authUser).subscribe(ret => {
       if (ret['code'] === 200) {
-        localStorage.removeItem('current_session_novus');
+        localStorage.removeItem('current_session_visitrack');
         this.router.navigate(['/login']);
         this.toast.success(ret['message']);
       } else {
@@ -99,7 +99,7 @@ export class MonProfileComponent implements OnInit {
     this.userService.updateImage(this.currentUser).subscribe(ret => {
       if (ret['code'] === 200) {
         this.currentUser = ret['data'];
-        localStorage.removeItem('current_session_novus');
+        localStorage.removeItem('current_session_visitrack');
         localStorage.removeItem('current_theme');
         this.router.navigate(['/login']);
         this.loading = false;
@@ -119,7 +119,7 @@ export class MonProfileComponent implements OnInit {
     this.userService.update(this.currentUser).subscribe(ret => {
       if (ret['code'] === 200) {
         this.currentUser = ret['data'];
-        localStorage.removeItem('current_session_novus');
+        localStorage.removeItem('current_session_visitrack');
         localStorage.removeItem('current_theme');
         this.router.navigate(['/login']);
         this.loading = false;

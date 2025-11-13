@@ -12,7 +12,7 @@
           <h5 class="fw-bold mb-0 text-dark">
             Liste des personnels
           </h5>
-          <span class="badge-count">{{typeuserFiltres().length}}</span>
+          <span class="badge-count">{{serviceFiltres().length}}</span>
         </div>
         <!-- 🔹 Outils : recherche + boutons -->
         <div class="d-flex align-items-center gap-2 flex-wrap justify-content-end">
@@ -56,7 +56,7 @@
             </div>
           </div>
           <!-- ➕ Bouton ajout -->
-          <button *ngIf="true" class="btn btn-dark d-flex align-items-center gap-1 px-3"(click)="showAddForm()" type="button" data-backdrop="static" data-toggle="modal" data-target="#addTypeUserModal">
+          <button *ngIf="true" class="btn btn-dark d-flex align-items-center gap-1 px-3"(click)="showAddForm()" type="button" data-backdrop="static" data-toggle="modal" data-target="#addServiceModal">
             <i class="mdi mdi-plus"></i>
             <span>{{'cabinet.addcabinet' | translate}}</span>
           </button>
@@ -84,7 +84,7 @@
             </thead>
 
             <tbody>
-              <tr *ngFor="let type of typeuserFiltres()">
+              <tr *ngFor="let type of serviceFiltres()">
                 <td>
                   <div class="animated-checkbox">
                     <label>
@@ -100,7 +100,7 @@
                 
                 <td class="text-center action-buttons">
                   <div class="d-flex justify-content-center align-items-center gap-2 flex-wrap">
-                    <button class="btn btn-light btn-icon" title="Modifier" (click)="showEditForm(type)" type="button" data-backdrop="static" data-toggle="modal" data-target="#addTypeUserModal">
+                    <button class="btn btn-light btn-icon" title="Modifier" (click)="showEditForm(type)" type="button" data-backdrop="static" data-toggle="modal" data-target="#addServiceModal">
                       <img src="assets/icons/mdi/edit.png" alt="Modifier" class="icon-btn" />
                     </button>
 
@@ -152,7 +152,7 @@
 
     <!-- add typeUser modal -->
     <div class="container demo" *ngIf="currentView === 'add'">
-      <div class="modal right fade" id="addTypeUserModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel2">
+      <div class="modal right fade" id="addServiceModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel2">
         <div class="modal-dialog" role="document">
           <div class="modal-content" [style]="{'background-color': isDark ? '#1f1f1f' : '#FFFFFF'}">
             <div class="d-flex" style="margin-top: 15px;">
@@ -177,13 +177,13 @@
                             <div class="col-lg-12 p-right-0">
                               <div class="form-group has-success align-left ft-w-500">
                                 <label [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'" for="designation">{{'typeUser.designation' | translate}}</label>
-                                <input [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'" id="designation" name="designation" type="text" [(ngModel)]="typeuser.designation" required>
+                                <input [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'" id="designation" name="designation" type="text" [(ngModel)]="service.designation" required>
                               </div>
                             </div>
                             <div class="col-lg-12 p-right-0">
                               <div class="form-group has-success align-left ft-w-500">
                                 <label [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'" for="description">{{'typeUser.description' | translate}}</label>
-                                <textarea [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'" placeholder="Taper la description ici ..." id="description" name="description" type="text" [(ngModel)]="typeuser.description" rows="10" required></textarea>
+                                <textarea [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'" placeholder="Taper la description ici ..." id="description" name="description" type="text" [(ngModel)]="service.description" rows="10" required></textarea>
                               </div>
                             </div>
                           </div>
@@ -195,13 +195,13 @@
                   </div>
                   <div class="row">
                     <div class="col-md-12">
-                      <button class="btn btn-login btn-block btnn_save" (click)="typeuser.id?Update():Save()">
+                      <button class="btn btn-login btn-block btnn_save" (click)="service.id?Update():Save()">
                         <img src="assets/images/save.png" alt="" class="icon_save">{{'parametre.save' | translate}}
                       </button>
                     </div>
                     <div class="col-md-12 ta-center">
-                      <label class="lab_reset" *ngIf="!typeuser.id" (click)="showAddForm()">Réinitialiser</label>
-                      <label class="lab_reset" *ngIf="typeuser.id" data-dismiss="modal" aria-label="Close">Fermer</label>
+                      <label class="lab_reset" *ngIf="!service.id" (click)="showAddForm()">Réinitialiser</label>
+                      <label class="lab_reset" *ngIf="service.id" data-dismiss="modal" aria-label="Close">Fermer</label>
                     </div>
                   </div>
                 </div>
@@ -212,7 +212,7 @@
         </div>
       </div>
     </div>
-    <!-- /add typeuser modal -->
+    <!-- /add service modal -->
     <!-- Modal confim delete -->
 
   </div>
@@ -233,7 +233,7 @@
           </div>
           <div class="modal-body">
             <label class="txt_confirm">
-              Bonjour, vous vous appretez à bloquer le {{typeuser?.designation}}
+              Bonjour, vous vous appretez à bloquer le {{service?.designation}}
             </label><br/>
             <label class="desc_confirm">etes vous sûr de bloquer ce Service ?</label> <br>
 
@@ -276,13 +276,13 @@
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fermer"></button>
       </div>
       <div class="modal-body text-center">
-        <p>Voulez-vous vraiment supprimer ce type <strong>{{ typeuser?.designation }}</strong> ?</p>
+        <p>Voulez-vous vraiment supprimer ce type <strong>{{ service?.designation }}</strong> ?</p>
       </div>
       <div class="modal-footer justify-content-center">
         <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">
           <i class="mdi mdi-close"></i> Annuler
         </button>
-        <button type="button" class="btn btn-danger px-4" (click)="deleteTypeUser()">
+        <button type="button" class="btn btn-danger px-4" (click)="deleteService()">
           <i class="mdi mdi-delete"></i> Supprimer
         </button>
       </div>

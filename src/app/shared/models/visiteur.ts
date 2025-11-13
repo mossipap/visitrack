@@ -1,7 +1,7 @@
 import { Deserializable } from './deserializable';
 import { Injectable } from '@angular/core';
-import { TypeUser } from './type-user';
 import { Cabinet } from './cabinet';
+import { Service } from './service';
 
 @Injectable()
 export class Visiteur implements Deserializable<Visiteur> {
@@ -13,6 +13,7 @@ export class Visiteur implements Deserializable<Visiteur> {
    public heureArrive!: string;
    public typePiece!: string;
    public numeroPiece!: string;
+   public sexe: string = 'Homme';
    public signature!: string;
    public numeroTelephone!: string;
    public fonction!: string;
@@ -21,12 +22,14 @@ export class Visiteur implements Deserializable<Visiteur> {
    public heureDepart!: string;
    public remarque!: string;
    public statut!: string;
-   public typeUser: TypeUser;
+   public service: Service;
    public cabinet: Cabinet;
    public service_name: string;
    public dateCreation!: Date;
    public dateDuJour: Date = new Date();
    public dateModification!: Date;
+   public selected?: boolean; // facultatif avec ?
+
   deserialize(input: any): Visiteur {
     Object.assign(this, input);
     return this;

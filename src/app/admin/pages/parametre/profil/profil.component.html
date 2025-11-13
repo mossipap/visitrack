@@ -1,145 +1,150 @@
 <ngx-loading [show]="loading" [config]="{ backdropBorderRadius: '5px',fullScreenBackdrop:true }"></ngx-loading>
 <div class="row">
   <div class="col-md-12">
-    <!-- list -->
-    <div [class]="isDark ? 'tile theme-dark' : 'tile theme-light'">
-      <!-- En-tête -->
-      <div class="row">
-        <div class="col-md-6">
-          <div class="toolbar-btn">
-            <b [class]="isDark ? 'c-white ff_calibre' : 'c-black ff_calibre ml-2'">
-              {{ 'profile.profils' | translate }}
-            </b>
-          </div>
+       <!-- list -->
+    <div [class]="isDark? 'tile theme-dark' : 'tile theme-light'">
+      <!-- ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±± -->
+      <!-- ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±± -->
+
+      <!-- 🔹 HEADER -->
+      <div class="user-header d-flex justify-content-between align-items-center p-3 shadow-sm rounded-3">
+        <!-- 🔹 Titre -->
+        <div class="d-flex align-items-center gap-2">
+          <h5 class="fw-bold mb-0 text-dark">
+            Liste des Profiles
+          </h5>
+          <span class="badge-count">{{ paginatedList.length }}</span>
         </div>
-        <div class="col-md-6 ta-right">
-          <div class="toolbar-btn">
-            <button
-              [class]="isDark ? 'btn btn-admin-d btn-sm mr-2' : 'btn btn-admin-w btn-sm mr-2'"
-              (click)="showAddForm()"
-              type="button"
-              data-backdrop="static"
-              data-toggle="modal"
-              data-target="#addProfilModal">
-              <i class="mdi mdi-plus"></i>
-              <span>{{ 'profile.addprofil' | translate }}</span>
-            </button>
+        <!-- 🔹 Outils : recherche + boutons -->
+        <div class="d-flex align-items-center gap-2 flex-wrap justify-content-end">
+          <!-- 🔍 Barre de recherche -->
+          <div class="search-wrapper d-flex align-items-center">
+            <i class="mdi mdi-magnify search-icon"></i>
+            <input type="text" [(ngModel)]="searchFilterText" placeholder="Rechercher un profil..." (input)="profilFiltres()"class="search-input" />
           </div>
+          <!-- 🧩 Bouton filtre -->
+        
+          <div class="row gx-1 align-items-center" style="margin-right: 5px;">
+            <div class="col-auto">
+              <button class="btn_refresh" (click)="Search()" title="Rafraichir">
+                <i class="mdi mdi-refresh fs-20"></i>
+              </button>
+            </div>
+          </div>
+          <!-- ➕ Bouton ajout -->
+          <button  class="btn btn-dark d-flex align-items-center gap-1 px-3" data-backdrop="static" data-toggle="modal" data-target="#addProfilModal" (click)="showAddForm()">
+            <i class="mdi mdi-plus"></i>
+            <span>Ajouter un Profile</span>
+          </button>
         </div>
       </div>
 
-      <!-- Table liste profils -->
-      <div class="table-responsive mailbox-messages">
-        <p-table
-          [value]="profilFiltres()"
-          dataKey="id"
-          responsiveLayout="scroll"
-          class="table table-hover"
-          [(selection)]="selectedProfils"
-          [paginator]="true"
-          [rowHover]="true"
-          [rows]="15"
-          [showCurrentPageReport]="true"
-          currentPageReportTemplate="Affichant {first} à {last} sur {totalRecords} profils">
 
-          <!-- Header -->
-          <ng-template pTemplate="header">
-            <tr class="tr_boxnone">
-              <th></th>
-              <th [class]="isDark ? 'th-d th_brnone' : 'th-w th_brnone'">{{ 'profile.numprofil' | translate }}</th>
+
+      <!-- 🔹 TABLEAU -->
+      <div class="table-card">
+        <div class="table-responsive">
+          <table class="table align-middle table-hover table-striped">
+            <thead class="table-light">
+              <tr>
+                <th>
+                 <!--  <div class="animated-checkbox">
+                    <label>
+                      <input type="checkbox" [(ngModel)]="selectAll" (change)="toggleSelectAll()" />
+                      <span class="label-text"></span>
+                    </label>
+                  </div> -->
+                </th>
+              <th [class]="isDark ? 'th-d th_brnone' : 'th-w th_brnone'">N°</th>
               <th [class]="isDark ? 'th-d th_brnone' : 'th-w th_brnone'">{{ 'profile.nom' | translate }}</th>
               <th [class]="isDark ? 'th-d th_brnone' : 'th-w th_brnone'">{{ 'profile.description' | translate }}</th>
               <th [class]="isDark ? 'th-d th_brnone' : 'th-w th_brnone'">{{ 'profile.statut' | translate }}</th>
-              <th [class]="isDark ? 'th-d th_brnone' : 'th-w th_brnone'">{{ 'profile.bloqued' | translate }}</th>
-              <th [class]="isDark ? 'th-d th_brnone' : 'th-w th_brnone'">{{ 'profile.operation' | translate }}</th>
-            </tr>
-          </ng-template>
-
-          <!-- Body -->
-          <ng-template pTemplate="body" let-profil>
-            <tr *ngIf="profil">
-              <td [class]="isDark ? 'td-d' : 'td-w'">
-                <div class="animated-checkbox ml-chec-3">
-                  <label>
-                    <input type="checkbox" />
-                    <span class="label-text"></span>
-                  </label>
-                </div>
-              </td>
-              <td [class]="isDark ? 'td-d' : 'td-w'">{{ profil?.id }}</td>
-              <td [class]="isDark ? 'td-d' : 'td-w'">{{ profil?.nom }}</td>
-              <td [class]="isDark ? 'td-d' : 'td-w'">{{ profil?.description }}</td>
-              <td [class]="isDark ? 'td-d' : 'td-w'">
+              <th class="text-center action-buttons">Bloquer/débloquer</th>
+              <th class="text-center action-buttons">Options</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let profil of paginatedList">
+                <td>
+                  <div class="animated-checkbox">
+                    <label>
+                      <input type="checkbox" [(ngModel)]="profil.selected" (change)="toggleSelectOne()" />
+                      <span class="label-text"></span>
+                    </label>
+                  </div>
+                </td>
+                <td>{{ profil.id }}</td>
+              <td>{{ profil?.nom }}</td>
+              <td>{{ profil?.description }}</td>
+              <td>
                 <span [class]="profil?.statut === 'Activ\u00e9' ? 'text-c-green ft-w-500' : 'text-c-red ft-w-500'">
                   {{ profil?.statut }}
                 </span>
               </td>
-              <td [class]="isDark ? 'td-d' : 'td-w'">
-                <span class="ml-5">
-                  <img
-                    *ngIf="profil?.statut === 'Activ\u00e9'"
-                    title="Bloquer"
-                    src="assets/images/switch_on.png"
-                    alt="On"
-                    style="cursor: pointer; width: 20px"
-                    (click)="showConfirmDialog(profil, 'Désactivé')" />
-                  <img
-                    *ngIf="profil?.statut !== 'Activ\u00e9'"
-                    title="Débloquer"
-                    src="assets/images/switch_off.png"
-                    alt="Off"
-                    style="cursor: pointer; width: 30px"
-                    (click)="showConfirmDialog(profil, 'Activ\u00e9')" />
-                </span>
+              <td class="text-center action-buttons">
+                 <button class="btn btn-primary btn-sm fw-semibold" *ngIf="profil?.statut === 'Activ\u00e9'"
+                    title="Bloquer" (click)="showConfirmDialog(profil, 'Désactivé')">Bloquer</button>
+                    <button class="btn btn-danger btn-sm fw-semibold" *ngIf="profil?.statut !== 'Activ\u00e9'"
+                    title="Débloquer" (click)="showConfirmDialog(profil, 'Activ\u00e9')">Débloquer</button>
               </td>
-              <td [class]="isDark ? 'td-d' : 'td-w'">
-                <div class="d-flex ml-5">
-                  <a title="Modifier"
-                     *ngIf="profil"
+           
+                <td class="text-center action-buttons">
+                  <div class="d-flex justify-content-center align-items-center gap-2 flex-wrap">
+                   
+                    <button class="btn btn-light btn-icon" title="Modifier" *ngIf="profil"
                      (click)="showEditForm(profil)"
                      data-toggle="modal"
                      data-target="#addProfilModal">
-                    <div [class]="isDark ? 'opt-edit-d' : 'opt-edit-w'">
-                      <i class="mdi mdi-pencil-lock" style="color: #ffd56b; cursor: pointer"></i>
-                    </div>
-                  </a>
-                  <a title="Supprimer"
+                      <img src="assets/icons/mdi/edit.png" alt="Modifier" class="icon-btn" />
+                    </button>
+                    <button class="btn btn-light btn-icon" title="Supprimer"
                      *ngIf="profil"
                      (click)="showDeleteDialog(profil)"
                      data-toggle="modal"
                      data-target="#deleteConfirmModal">
-                    <div [class]="isDark ? 'opt-delete-d' : 'opt-delete-w'">
-                      <i class="mdi mdi-delete" style="color: #e32131; cursor: pointer"></i>
-                    </div>
-                  </a>
-                </div>
-              </td>
-            </tr>
-          </ng-template>
+                      <img src="assets/icons/mdi/delete.png" alt="Supprimer" class="icon-btn" />
+                    </button>
+                   
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
 
-          <!-- Ligne des droits -->
-          <ng-template pTemplate="rowexpansion" let-lineDroit>
-            <tr *ngIf="lineDroit">
-              <td colspan="7">
-                <div class="p-1" style="margin-left: 2%; width: 98%">
-                  <p-table [value]="lineDroit?.droits || []" dataKey="id">
-                    <ng-template pTemplate="body" let-droit>
-                      <tr *ngIf="droit">
-                        <td [class]="isDark ? 'td-d' : 'td-w'">{{ droit?.id }}</td>
-                        <td [class]="isDark ? 'td-d' : 'td-w'">{{ droit?.nom }}</td>
-                        <td [class]="isDark ? 'td-d' : 'td-w'">{{ droit?.description }}</td>
-                        <td [class]="isDark ? 'td-d' : 'td-w'">{{ droit?.status }}</td>
-                      </tr>
-                    </ng-template>
-                  </p-table>
-                </div>
-              </td>
-            </tr>
-          </ng-template>
-        </p-table>
+        <!-- 🔹 PAGINATION -->
+        <!-- 🔹 PAGINATION DYNAMIQUE -->
+        <div class="pagination-wrapper d-flex justify-content-between align-items-center mt-3 p-2 border-top">
+          <div class="d-flex align-items-center gap-2">
+            <button class="btn btn-outline-secondary btn-sm" [disabled]="currentPage === 1" (click)="previousPage()">
+              <i class="mdi mdi-chevron-left"></i> Précédent
+            </button>
+
+            <ng-container *ngFor="let page of [].constructor(totalPages); let i = index">
+              <button class="btn btn-sm"
+                [ngClass]="currentPage === i + 1 ? 'btn-primary text-white' : 'btn-outline-secondary'"
+                (click)="currentPage = i + 1; updatePaginatedList()">
+                {{ i + 1 }}
+              </button>
+            </ng-container>
+
+            <button class="btn btn-outline-secondary btn-sm" [disabled]="currentPage === totalPages"
+              (click)="nextPage()">
+              Suivant <i class="mdi mdi-chevron-right"></i>
+            </button>
+          </div>
+
+          <div class="text-muted small">
+            Page {{ currentPage }} sur {{ totalPages }}
+          </div>
+        </div>
       </div>
-    </div>
 
+      <!-- ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±± -->
+      <!-- ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±± -->
+
+    </div>
+  
     <!-- add profil modal -->
     <div class="container demo" *ngIf="currentPage === 'add' && profil">
       <div class="modal right fade" id="addProfilModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel2">

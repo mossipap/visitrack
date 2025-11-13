@@ -30,7 +30,7 @@ const routes: Routes = [
         component: CabinetComponent
       },
       {
-        path: 'agent',
+        path: 'service',
         component: TypeuserComponent
       },
   

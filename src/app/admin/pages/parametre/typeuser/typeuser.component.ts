@@ -5,8 +5,8 @@ import { RoleManager } from 'src/app/shared/utils/role-manager';
 import { SearchParam } from 'src/app/shared/utils/search-param';
 import * as SecureLS from 'secure-ls';
 import { Utilisateur } from 'src/app/shared/models/utilisateur';
-import { TypeUser } from 'src/app/shared/models/type-user';
-import { TypeUserService } from 'src/app/shared/services/typeuser.service';
+import { Service } from 'src/app/shared/models/service';
+import { ServiceService } from 'src/app/shared/services/service.service';
 import { environment } from 'src/environments/environment';
 import { Modal } from 'bootstrap';
 
@@ -16,9 +16,9 @@ import { Modal } from 'bootstrap';
   styleUrls: ['./typeuser.component.css']
 })
 export class TypeuserComponent implements OnInit {
- public typeuser: TypeUser;
-   public typeusers: TypeUser[] = [];
-   public selectedTypeUsers: TypeUser[]
+ public service: Service;
+   public services: Service[] = [];
+   public selectedServices: Service[]
    public utilisateurs: Utilisateur[] = [];
    public userFilter = { prenom: '' };
    public roleManager: RoleManager;
@@ -44,7 +44,7 @@ export class TypeuserComponent implements OnInit {
   public currentView = 'list';
   public currentPage = 1; 
    constructor(
-     private typeuserService: TypeUserService,
+     private serviceService: ServiceService,
      private toast: AppToastService,
      private appConfig: AppConfig
    ) {
@@ -90,18 +90,18 @@ export class TypeuserComponent implements OnInit {
      }
      this.searchParam.dateFin.setDate(this.searchParam.dateFin.getDate() + 1);
      this.Search();
-   this.typeuserFiltres().map(item => ({
+   this.serviceFiltres().map(item => ({
     ...item,
     selected: false
   }));
 
-this.totalPages = Math.ceil(this.typeuserFiltres().length / this.itemsPerPage);
+this.totalPages = Math.ceil(this.serviceFiltres().length / this.itemsPerPage);
     this.updatePaginatedList();
   }
  updatePaginatedList() {
     const startIndex = (this.currentPage - 1) * this.itemsPerPage;
     const endIndex = startIndex + this.itemsPerPage;
-    this.paginatedList = this.typeuserFiltres();
+    this.paginatedList = this.serviceFiltres();
   }
 
   nextPage() {
@@ -119,12 +119,12 @@ this.totalPages = Math.ceil(this.typeuserFiltres().length / this.itemsPerPage);
   }
   toggleSelectAll() {
   this.selectAll = !this.selectAll;
-  this.typeuserFiltres().forEach(item => item.selected = this.selectAll);
+  this.serviceFiltres().forEach(item => item.selected = this.selectAll);
 }
 
 toggleSelectOne() {
   // si tous sont cochés, selectAll = true sinon false
-  this.selectAll = this.typeuserFiltres().every(item => item.selected);
+  this.selectAll = this.serviceFiltres().every(item => item.selected);
 }
    changeTrHover(newValue: string): void {
      document.documentElement.style.setProperty('--tr-hover', newValue);
@@ -156,10 +156,10 @@ toggleSelectOne() {
    changeBgTheader(newValue: string): void {
      document.documentElement.style.setProperty('--theaderbg', newValue);
    }
-   typeuserFiltres () {
-     if (!this.searchFilterText) return this.typeusers
+   serviceFiltres () {
+     if (!this.searchFilterText) return this.services
      const search = this.searchFilterText.toLowerCase()
-     return this.typeusers.filter(item => {
+     return this.services.filter(item => {
        const text = (item.id + ' ' + item.designation).toLowerCase()
        return text.indexOf(search) > -1
      })
@@ -168,15 +168,15 @@ toggleSelectOne() {
       this.currentView = 'list';
     }
    showAddForm() {
-     this.typeuser = new TypeUser();
+     this.service = new Service();
      this.currentView = 'add';
    }
-   showEditForm(typeuser: TypeUser) {
-     this.typeuser = typeuser;
+   showEditForm(service: Service) {
+     this.service = service;
      this.currentView = 'add';
    }
-   showConfirmDialog(typeuser: TypeUser): void {
-     this.typeuser = typeuser;
+   showConfirmDialog(service: Service): void {
+     this.service = service;
      this.openConfirmDialog.nativeElement.click();
    }
 ngAfterViewInit(): void {
@@ -189,8 +189,8 @@ ngAfterViewInit(): void {
     }
   }
 
-  showDeleteDialog(typeuser: TypeUser): void {
-    this.typeuser = typeuser;
+  showDeleteDialog(service: Service): void {
+    this.service = service;
     if (this.deleteModal) {
       this.deleteModal.show();
     } else {
@@ -200,13 +200,13 @@ ngAfterViewInit(): void {
   closeDeleteDialog(): void {
     this.deleteModal?.hide();
   }
-  deleteTypeUser(): void {
-    if (this.typeuser) {
-      console.log(`Suppression de ${this.typeuser.designation}`);
+  deleteService(): void {
+    if (this.service) {
+      console.log(`Suppression de ${this.service.designation}`);
        this.loading = true;
-      this.typeuserService.delete(this.typeuser).subscribe((ret:any) => {
+      this.serviceService.delete(this.service).subscribe((ret:any) => {
        if (ret['code'] == 200) {
-         this.typeuser = ret['data'];
+         this.service = ret['data'];
          // this.openConfirmDialog.nativeElement.click();
          this.closeDeleteDialog();
           this.Search();
@@ -225,11 +225,11 @@ ngAfterViewInit(): void {
   }
    Search() {
      this.loading = true;
-     this.typeuserService.findAll().subscribe(ret => {
+     this.serviceService.findAll().subscribe(ret => {
        if (ret['code'] === 200) {
-         this.typeusers = ret['data'];
+         this.services = ret['data'];
          this.loading = false;
-         this.toast.info(this.typeusers.length+ " typeuser(s) trouvé(s)");
+         this.toast.info(this.services.length+ " service(s) trouvé(s)");
        } else {
          this.loading = false;
          this.toast.error(ret['message']);
@@ -241,16 +241,16 @@ ngAfterViewInit(): void {
      });
    }
    Save() {
-     this.typeuser.statut = "Activé";
-    // this.typeuser.nombregreffier = 0;
+     this.service.statut = "Activé";
+    // this.service.nombregreffier = 0;
      this.loading = true;
-     this.typeuserService.save(this.typeuser).subscribe(ret => {
+     this.serviceService.save(this.service).subscribe(ret => {
        if (ret['code'] === 200) {
-         this.typeuser = ret['data'];
-         this.typeusers.push(this.typeuser)
+         this.service = ret['data'];
+         this.services.push(this.service)
          this.loading = false;
          this.closeAddElementDialog.nativeElement.click();
-         this.toast.success("TypeUser enregistré avec succès");
+         this.toast.success("Service enregistré avec succès");
        } else {
          this.loading = false;
          this.toast.error(ret['message']);
@@ -263,10 +263,10 @@ ngAfterViewInit(): void {
    }
      Update() {
     this.loading = true;
-    this.typeuserService.update(this.typeuser).subscribe(
+    this.serviceService.update(this.service).subscribe(
       (ret:any) => {
        if (ret['code'] == 200) {
-        this.typeuser = ret['data'];
+        this.service = ret['data'];
            this.closeAddElementDialog.nativeElement.click();
          this.toast.success("Type User modifié avec succès");
           this.loading = false;
@@ -285,13 +285,13 @@ ngAfterViewInit(): void {
   }
    UpdateStatut(statut: string) {
      this.loading = true;
-     this.typeuser.statut = statut;
-     this.typeuserService.updateStatut(this.typeuser).subscribe(ret => {
+     this.service.statut = statut;
+     this.serviceService.updateStatut(this.service).subscribe(ret => {
        if (ret['code'] === 200) {
-         this.typeuser = ret['data'];
-         this.typeusers.forEach(user => {
-           if(user.id === this.typeuser.id){
-             user.statut = this.typeuser.statut;
+         this.service = ret['data'];
+         this.services.forEach(user => {
+           if(user.id === this.service.id){
+             user.statut = this.service.statut;
            }
          });
          if(statut === 'Bloqué') {
@@ -312,9 +312,9 @@ ngAfterViewInit(): void {
    }
       onDeleted(): void {
       this.loading = true;
-      this.typeuserService.delete(this.typeuser).subscribe((ret:any) => {
+      this.serviceService.delete(this.service).subscribe((ret:any) => {
        if (ret['code'] == 200) {
-         this.typeuser = ret['data'];
+         this.service = ret['data'];
           this.openConfirmDialog.nativeElement.click();
           this.Search();
           this.loading = false;

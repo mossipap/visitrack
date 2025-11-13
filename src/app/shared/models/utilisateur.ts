@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Deserializable } from './deserializable';
 import { Cabinet } from './cabinet';
 import { Profil } from './profil';
-import { TypeUser } from './type-user';
+import { Service } from './service';
 
 @Injectable()
 export class Utilisateur implements Deserializable<Utilisateur> {
@@ -38,7 +38,7 @@ export class Utilisateur implements Deserializable<Utilisateur> {
   public link_image: string;
   public service_name: string;
   public profil: Profil;
-  public typeUser: TypeUser;
+  public service: Service;
   public cabinet: Cabinet;
   public checked: boolean = true;
   public isConnected: boolean = true;

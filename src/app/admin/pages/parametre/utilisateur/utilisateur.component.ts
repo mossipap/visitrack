@@ -10,8 +10,8 @@ import { Cabinet } from 'src/app/shared/models/cabinet';
 import { Profil } from 'src/app/shared/models/profil';
 import { ProfileService } from 'src/app/shared/services/profil.service';
 import * as SecureLS from 'secure-ls';
-import { TypeUser } from 'src/app/shared/models/type-user';
-import { TypeUserService } from 'src/app/shared/services/typeuser.service';
+import { Service } from 'src/app/shared/models/service';
+import { ServiceService } from 'src/app/shared/services/service.service';
 import { Utilisateur } from 'src/app/shared/models/utilisateur';
 import { Modal } from 'bootstrap';
 @Component({
@@ -28,8 +28,8 @@ export class UtilisateurComponent implements OnInit {
   public utilisateur: Utilisateur = new Utilisateur();
   public cabinets: Cabinet[] = [];
   public cabinetFilter = { designation: '' };
-  public typeUsers: TypeUser[] = [];
-  public typeUserFilter = { designation: '' };
+  public services: Service[] = [];
+  public serviceFilter = { designation: '' };
   public profiles: Profil[] = [];
   public profileFilter = { nom: '' };
   public roleManager: RoleManager;
@@ -72,7 +72,7 @@ private deleteModal?: Modal;
   constructor(
     private utilisateurService: UtilisateurService,
     private cabinetService: CabinetService,
-    private typeUserService: TypeUserService,
+    private serviceService: ServiceService,
     private profileService: ProfileService,
     private toast: AppToastService,
     private appConfig: AppConfig
@@ -288,7 +288,7 @@ toggleSelectOne() {
   showAddForm() {
     this.utilisateur = new Utilisateur();
     this.findCabinets();
-    this.findTypeusers();
+    this.findSevices();
     this.findProfiles();
     this.currentView = 'add';
     this.pageTitle = 'Nouveau utilisateur';
@@ -297,7 +297,7 @@ toggleSelectOne() {
   showEditForm(user: Utilisateur) {
     this.utilisateur = user;
     this.findCabinets();
-    this.findTypeusers();
+    this.findSevices();
     this.findProfiles();
     this.currentView = 'edit';
     this.pageTitle = 'Modification d\'utilisateur';
@@ -411,7 +411,7 @@ initUsers() {
   Update() {
     this.loading = true;
     /* this.utilisateur.cabinet_id = this.utilisateur.cabinet.id;
-    this.utilisateur.typeUser_id = this.utilisateur.typeUser.id;
+    this.utilisateur.service_id = this.utilisateur.service.id;
     this.utilisateur.profil_id = this.utilisateur.profil.id; */
     this.utilisateurService.update(this.utilisateur).subscribe(ret => {
       if (ret['code'] === 200) {
@@ -466,18 +466,18 @@ initUsers() {
     });
   }
 
-  checkCabinetUser(cabinetId: number, typeUserId: number) {
-    if(typeUserId !== 3) {
+  checkCabinetUser(cabinetId: number, serviceId: number) {
+    if(serviceId !== 3) {
       return;
     }
     if (!cabinetId) {
       this.toast.error("Veuillez selectionner un cabinet, SVP ..");
-      this.utilisateur.typeUser = null;
+      this.utilisateur.service = null;
       return
     }
     const objetCheck = {
       cabinet_id: cabinetId,
-      typeUser_id: typeUserId
+      service_id: serviceId
     }
     this.utilisateurService.verifyJugeOfCabinet(objetCheck).subscribe(ret => {
       if (ret['code'] === 200) {
@@ -485,7 +485,7 @@ initUsers() {
         this.toast.error(ret['message']);
         this.loading = false;
         this.utilisateur.cabinet = null;
-        this.utilisateur.typeUser = null;
+        this.utilisateur.service = null;
       }
     }, error => {
       console.log("error===", error);
@@ -542,12 +542,12 @@ initUsers() {
     });
   }
 
-  findTypeusers() {
-    this.typeUserService.findAll().subscribe(ret => {
+  findSevices() {
+    this.serviceService.findAll().subscribe(ret => {
       if (ret['code'] === 200) {
-        this.typeUsers = ret['data'];
-        if (this.currentView === 'edit' || this.currentView === 'detail' && this.utilisateur.type_user_id && this.typeUsers.length > 0) {
-          this.utilisateur.typeUser = this.typeUsers.find(p => p.id === this.utilisateur.type_user_id)
+        this.services = ret['data'];
+        if (this.currentView === 'edit' || this.currentView === 'detail' && this.utilisateur.type_user_id && this.services.length > 0) {
+          this.utilisateur.service = this.services.find(p => p.id === this.utilisateur.type_user_id)
         }
         this.loading = false;
       } else {

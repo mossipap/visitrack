@@ -7,43 +7,36 @@
     <img *ngIf="!isDark" src="assets/images/logo.png" alt="" class="left_logo" />
   </a>
   <!-- Navbar Right Menu-->
-  <ul class="app-nav" style="font-size: 20px;">
+  <ul class="app-nav" style="font-size: 17px;">
      <li class=" d-flex align-items-center" style="color: aliceblue;">
       <b [class]="isDark? 'c-white':'c-black'">{{menuTitle}}</b>
     </li>
   </ul>
- <ul class="app-nav time-wrapper">
+<!--  <ul class="app-nav time-wrapper">
   <li class="time-display d-flex align-items-center">
     <i class="mdi mdi-clock-outline"></i>
     <span>{{heure}}:{{minute}}:{{seconde}}</span>
   </li>
-</ul>
+</ul> -->
 
   
   <ul class="app-nav">
-    <li class="dropdown mr-2" >
+   <!--  <li class="dropdown mr-2" >
       <button class="btn btn_statistics" ><img src="assets/icons/mdi/telephone.png" alt="Voir" class="icon-btn" /> Numéro de telephone</button>
     </li>
     <li class="dropdown mr-2" >
       <button class="btn btn_statistics" ><img src="assets/icons/mdi/mise_a_jour.png" alt="Voir" class="icon-btn" />Mettre à jour</button>
     </li>
-   
+    -->
 
-    <!-- Thème -->
-  <!--   <li class="cursor-pointer mr-3" (click)="onChangeTheme()">
-      <i class="mdi mdi-theme-light-dark mdi-24px"></i>
-    </li> -->
+  
 
     <!-- Paramètres -->
-     <li class="dropdown mr-2" >
+   <!--   <li class="dropdown mr-2" >
       <button class="btn btn_statistics" routerLink="/admin/parametre/utilisateur" ><img src="assets/icons/mdi/parametre.png" alt="Voir" class="icon-btn" /></button>
-    </li>
+    </li> -->
       <!-- Notifications -->
     <li class="dropdown mr-3">
-     <!--  <a class="app-nav__item position-relative" href="#" data-toggle="dropdown" aria-label="Show notifications">
-        <img src="assets/icons/mdi/noti.png" alt="Voir" class="icon-btn" />
-        <span class="count badge badge-danger">{{notifications.length}}</span>
-      </a> -->
       <button class="btn btn_statistics " data-toggle="dropdown" aria-label="Show notifications">
         <img src="assets/icons/mdi/noti.png" alt="Voir" class="icon-btn" />
         <span class="count badge badge-danger">{{notifications.length}}</span>

@@ -17,11 +17,11 @@ export class AppConfig {
 
   initSession() {
     const ls = new SecureLS({ encodingType: 'aes', encryptionSecret: 'MyAdminApp' });
-    if (ls.get('current_session_novus')) {
-      const config: SessionData = JSON.parse(ls.get('current_session_novus'));
+    if (ls.get('current_session_visitrack')) {
+      const config: SessionData = JSON.parse(ls.get('current_session_visitrack'));
       this.dateExpiration = config.dateExpiration;
-      this.currentUser = JSON.parse(ls.get('current_session_novus')).user;
-      this.currentUser.profil.droits = JSON.parse(ls.get('current_session_novus')).droits;
+      this.currentUser = JSON.parse(ls.get('current_session_visitrack')).user;
+      this.currentUser.profil.droits = JSON.parse(ls.get('current_session_visitrack')).droits;
       this.droits = this.currentUser?.profil ? this.currentUser?.profil?.droits : [];
     }
   }

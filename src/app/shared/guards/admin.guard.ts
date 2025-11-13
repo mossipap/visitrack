@@ -10,7 +10,7 @@ export class AdminGuard implements CanActivate {
   constructor(private router: Router){}
  canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot){
     //localStorage.setItem('current_demande_link_app', JSON.stringify(state.url));
-    if (localStorage.getItem('current_session_novus')) {
+    if (localStorage.getItem('current_session_visitrack')) {
       return true;
     }else{
       this.router.navigate(['/login']);
@@ -19,10 +19,10 @@ export class AdminGuard implements CanActivate {
   }
  canActivate2(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
     // Sauvegarde du lien actuel
-    localStorage.setItem('current_link_novus', JSON.stringify(state.url));
+    localStorage.setItem('current_link_visitrack', JSON.stringify(state.url));
 
     // Vérifie si l'utilisateur a une session active
-    const session = localStorage.getItem('current_session_novus');
+    const session = localStorage.getItem('current_session_visitrack');
     
     if (session) {
       return true; // accès autorisé

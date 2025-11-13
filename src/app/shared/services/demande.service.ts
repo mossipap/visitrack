@@ -3,6 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { AppUtil } from 'src/app/shared/utils/App-util';
 import { Demande } from '../models/demande';
 import { SearchParam } from '../utils/search-param';
+import { Visiteur } from '../models/visiteur';
 
 @Injectable({
   providedIn: 'root'
@@ -57,12 +58,10 @@ export class DemandeService {
   public updateStatut(demande: Demande) {
     return this.http.put(this.serviceURL + '/Demandestatut/'+demande.id, demande, this.httpOptions);
   }
-
-  public verifyJugeOfCabinet(objetCheck: any) {
-    return this.http.post(this.serviceURL + '/VerifyJugeOfCabinet', objetCheck, this.httpOptions);
-  }
-
   public delete(demande: Demande) {
     return this.http.delete(this.serviceURL + '/Demande/'+demande.id, this.httpOptions);
+  }
+  public deleteVisiteur(v: Visiteur) {
+    return this.http.delete(this.serviceURL + '/Visiteur/'+v.id, this.httpOptions);
   }
 }

@@ -4,33 +4,31 @@ import { environment } from 'src/environments/environment';
 import { AppConfig } from 'src/app/shared/utils/app-config';
 import * as SecureLS from 'secure-ls';
 import { Cabinet } from 'src/app/shared/models/cabinet';
-import { Profil } from 'src/app/shared/models/profil';
-import { TypeUser} from 'src/app/shared/models/type-user';
+import { Visiteur } from 'src/app/shared/models/visiteur';
 import { CabinetService } from 'src/app/shared/services/cabinet.service';
 import { RoleManager } from 'src/app/shared/utils/role-manager';
 import { SearchParam } from 'src/app/shared/utils/search-param';
+import { ServiceService } from 'src/app/shared/services/service.service';
+import { HttpClient } from '@angular/common/http';
 import { Demande } from 'src/app/shared/models/demande';
 import { DemandeService } from 'src/app/shared/services/demande.service';
-import { TypeUserService } from 'src/app/shared/services/typeuser.service';
-import { HttpClient } from '@angular/common/http';
+import { Service } from 'src/app/shared/models/service';
+import { Modal } from 'bootstrap';
 @Component({
   selector: 'app-visiteur',
   templateUrl: './visiteur.component.html',
   styleUrls: ['./visiteur.component.css']
 })
 export class VisiteurComponent implements OnInit {
- public demandes: Demande[] = [];
-  public activeList: any[] = [];
-  public bloqueList: Demande[] = [];
-  public suppriList: Demande[] = [];
-  public selectedUsers: Demande[] [];
-  public demande: Demande = new Demande();
+  public visiteurs: Visiteur[] = [];
+  public selectedUsers: Demande[][];
+  public visiteur: Demande = new Demande();
   public cabinets: Cabinet[] = [];
   public cabinetFilter = { designation: '' };
-  public typeUsers: TypeUser[] = [];
+  public services: Service[] = [];
   public typeUserFilter = { designation: '' };
-  public profiles: Profil[] = [];
-  public profileFilter = { nom: '' };
+  public visiteures: Visiteur[] = [];
+  public visiteureFilter = { nom: '' };
   public roleManager: RoleManager;
   public searchParam: SearchParam;
   public isSearch: boolean = false;
@@ -38,9 +36,9 @@ export class VisiteurComponent implements OnInit {
   public loading: boolean;
   public isDark: boolean;
   public pageTitle = 'Liste';
- // public currentPage = 'list';
+  // public currentPage = 'list';
   public currentView = 'list';
-public currentPage = 1; 
+  public currentPage = 1;
   public searchFilterText: string = '';
   public dialogAction: string;
   public confirmPassword: string;
@@ -58,17 +56,19 @@ public currentPage = 1;
   @ViewChild('deleteConfirmDialog') deleteConfirmDialog: any;
   @ViewChild('closeAddElementDialog') closeAddElementDialog: any;
   @ViewChild('fileInputUpload', { static: false }) fileInputUpload: ElementRef;
-earchValue: string = '';
   searchValue: any;
   paginatedList: any[] = []; // la portion affichée
+  filteredVisiteurs: any[] = []; // la portion affichée
   itemsPerPage = 10; // nombre d’éléments par page
   totalPages = 0;
   selectAll: boolean = false;
   indicatifs: any = {};
+  public deleteModal?: Modal;
+
   constructor(
-    private demandeService: DemandeService,
+    private visiteurService: DemandeService,
     private cabinetService: CabinetService,
-    private typeUserService: TypeUserService,
+    private typeUserService: ServiceService,
     private toast: AppToastService,
     private appConfig: AppConfig,
     private http: HttpClient
@@ -80,47 +80,10 @@ earchValue: string = '';
 
   ngOnInit(): void {
     const ls = new SecureLS({ encodingType: 'aes', encryptionSecret: 'MyAdminApp' });
-    if (ls.get('current_theme')) {//dark
-      this.isDark = true;
-      const headerLeft = document.getElementsByClassName("theme-light");
-      for(var i = headerLeft.length - 1; i >= 0; --i) {
-        headerLeft[i].classList.replace('theme-light', 'theme-dark');
-      }
-      this.changeRowPad('rgb(21 21 21 / 100%)');
-      this.changeStepLabel('#FFFFFF');
-      this.changeBgsearchbar('rgb(28, 28, 28)');
-      this.changePaginationBg('#000000');
-      this.changePaginationFg('#ffffff');
-      this.changePrimeTbBg('#000000');
-      this.changeTrHover('#1c1c1c');
-      this.changePrimeTbHead('#000000');
-      this.changePaginatorLight('#252116');
-      this.changeBtnDivBg('#252117');
-    } else {//white
-      this.isDark = false;
-      const headerLeft = document.getElementsByClassName("theme-dark");
-      for(var i = headerLeft.length - 1; i >= 0; --i) {
-        headerLeft[i].classList.replace('theme-dark', 'theme-light');
-      }
-      this.changeRowPad('rgb(255 255 255 / 100%)');
-      this.changeStepLabel('#7f56d9');
-      this.changeBgsearchbar('rgba(255, 255, 255, 0.8)');
-      this.changePaginationBg('#ffffff');
-      this.changePaginationFg('#000000');
-      this.changePrimeTbBg('none');
-      this.changeTrHover('rgba(0, 0, 0, 0.3)');
-      this.changePrimeTbHead('#f8f9fa');
-      this.changePaginatorLight('#ecf5ee');
-      this.changeBtnDivBg('#faf4f3');
-      this.changeBgTheader('rgba(255, 199, 154, 0.5)');
-    }
     this.searchParam.dateFin.setDate(this.searchParam.dateFin.getDate() + 1);
     this.search();
-
-    this.updatePaginatedList();
-     this.loadIndicatifs();
+    this.loadIndicatifs();
   }
-
   loadIndicatifs() {
     this.http.get('assets/indicatifs.json').subscribe(
       (data) => {
@@ -131,7 +94,6 @@ earchValue: string = '';
       }
     );
   }
-
   getFlag(numero: string): string {
     if (!numero) return '';
     const code = Object.keys(this.indicatifs).find((prefix) =>
@@ -139,220 +101,155 @@ earchValue: string = '';
     );
     return code ? this.indicatifs[code] : '🌍';
   }
-getInitials(fullName: string): string {
-  if (!fullName) return '';
-  return fullName
-    .split(' ')
-    .map(p => p.charAt(0).toUpperCase())
-    .join('')
-    .slice(0, 3);
-}
-
-getSexColor(sexe: string): string {
-  if (!sexe) return '#999';
-
-  // Normalisation
-  sexe = sexe.toLowerCase();
-
-  // Homme
-  if (sexe === 'm' || sexe === 'masculin' || sexe === 'male') {
-    return '#2196F3'; // Bleu
+  getInitials(fullName: string): string {
+    if (!fullName) return '';
+    return fullName
+      .split(' ')
+      .map(p => p.charAt(0).toUpperCase())
+      .join('')
+      .slice(0, 3);
   }
 
-  // Femme
-  if (sexe === 'f' || sexe === 'feminin' || sexe === 'female') {
-    return '#f45187ff'; // Rose doux
-  }
-
-  return '#666'; // Valeur neutre si non défini
-}
-toggleSelectAll() {
-  this.selectAll = !this.selectAll;
-  this.activeList.forEach(item => item.selected = this.selectAll);
-}
-
-toggleSelectOne() {
-  // si tous sont cochés, selectAll = true sinon false
-  this.selectAll = this.activeList.every(item => item.selected);
-}
-  changeRowPad(newValue: string): void {
-    document.documentElement.style.setProperty('--bg-trtable', newValue);
-  }
-  changeTrHover(newValue: string): void {
-    document.documentElement.style.setProperty('--tr-hover', newValue);
-  }
-  changePaginationBg(newValue: string): void {
-    document.documentElement.style.setProperty('--bgpaginator', newValue);
-  }
-  changePaginationFg(newValue: string): void {
-    document.documentElement.style.setProperty('--fgpaginator', newValue);
-  }
-  changePrimeTbBg(newValue: string): void {
-    document.documentElement.style.setProperty('--bgprimetb', newValue);
-  }
-  changePrimeTbHead(newValue: string): void {
-    document.documentElement.style.setProperty('--bgprimetbhead', newValue);
-  }
-  changePaginatorLight(newValue: string): void {
-    document.documentElement.style.setProperty('--paginatorlight', newValue);
-  }
-  changeBgsearchbar(newValue: string): void {
-    document.documentElement.style.setProperty('--bg-searchbar', newValue);
-  }
-  changeStepLabel(newValue: string): void {
-    document.documentElement.style.setProperty('--step-label', newValue);
-  }
-  changeBtnDivBg(newValue: string): void {
-    document.documentElement.style.setProperty('--btndiv', newValue);
-  }
-  changeBgTheader(newValue: string): void {
-    document.documentElement.style.setProperty('--theaderbg', newValue);
-  }
-  activeFiltres () {
-    if (!this.searchFilterText) return this.activeList
-    const search = this.searchFilterText.toLowerCase()
-    return this.activeList.filter(item => {
-      const text = (item.nomComplet + ' ' + item.nomComplet + ' ' + item.numeroTelephone+ ' '+ item.cabinet?.numerocabinet).toLowerCase();
-      return text.indexOf(search) > -1
-    })
-  }
-  bloqueFiltres () {
-    if (!this.searchFilterText) return this.bloqueList
-    const search = this.searchFilterText.toLowerCase()
-    return this.bloqueList.filter(item => {
-      const text = (item.nomComplet + ' ' + item.nomComplet + ' ' + item.numeroTelephone).toLowerCase();
-      return text.indexOf(search) > -1
-    })
-  }
-  supprimeFiltres () {
-    if (!this.searchFilterText) return this.suppriList
-    const search = this.searchFilterText.toLowerCase()
-    return this.suppriList.filter(item => {
-      const text = (item.nomComplet + ' ' + item.nomComplet + ' ' + item.numeroTelephone).toLowerCase();
-      return text.indexOf(search) > -1
-    })
-  }
-
-  onChangeCode(index) {
-    if(index === 1) {//active
-      let btnUserActive = document.getElementById("user_active");
-      let btnUserBlock = document.getElementById("user_block");
-      let btnUserDelete = document.getElementById("user_delete");
-
-      btnUserActive.classList.add("btn_active");
-      btnUserActive.classList.remove("btn_not_active");
-      btnUserBlock.classList.add("btn_not_active");
-      btnUserBlock.classList.remove("btn_active");
-      btnUserDelete.classList.add("btn_not_active");
-      btnUserDelete.classList.remove("btn_active");
-      this.currentIndex = index;
-    } else if(index === 2) {//block
-      let btnUserBlock = document.getElementById("user_block");
-      let btnUserActive = document.getElementById("user_active");
-      let btnUserDelete = document.getElementById("user_delete");
-
-      btnUserBlock.classList.add("btn_active");
-      btnUserBlock.classList.remove("btn_not_active");
-      btnUserActive.classList.add("btn_not_active");
-      btnUserActive.classList.remove("btn_active");
-      btnUserDelete.classList.add("btn_not_active");
-      btnUserDelete.classList.remove("btn_active");
-      this.currentIndex = index;
-    } else {//delete
-      let btnUserDelete = document.getElementById("user_delete");
-      let btnUserActive = document.getElementById("user_active");
-      let btnUserBlock = document.getElementById("user_block");
-
-      btnUserDelete.classList.add("btn_active");
-      btnUserDelete.classList.remove("btn_not_active");
-      btnUserBlock.classList.add("btn_not_active");
-      btnUserBlock.classList.remove("btn_active");
-      btnUserActive.classList.add("btn_not_active");
-      btnUserActive.classList.remove("btn_active");
-      this.currentIndex = index;
+  getSexColor(): string {
+    // Homme
+    if (this.visiteur.sexe === 'Homme') {
+      return '#2196F3'; // gris par défaut
     }
+    // Femme
+    if (this.visiteur.sexe === 'Femme') {
+      return '#f45187'; // gris par défaut
+    }
+    // Autre ou indéfini
+    return '#666';
   }
+
   showList() {
     this.currentView = 'list';
     this.pageTitle = 'Liste'
   }
   showAddForm() {
-    this.demande = new Demande();
+    this.visiteur = new Demande();
     this.findCabinets();
-    this.findTypeUsers();
+    this.findServices();
     this.currentView = 'add';
-    this.pageTitle = 'Nouveau demande';
+    this.pageTitle = 'Nouveau visiteur';
   }
 
   showEditForm(user: Demande) {
-    this.demande = user;
+    this.visiteur = user;
     this.findCabinets();
-    this.findTypeUsers();
+    this.findServices();
     this.currentView = 'edit';
-    this.pageTitle = 'Modification d\'demande';
+    this.pageTitle = 'Modification d\'visiteur';
   }
 
   showDetail(user: Demande) {
-    this.demande = user;
+    this.visiteur = user;
     //this.currentPage = 'detail';
     this.pageTitle = 'Détails user'
   }
 
-  showResetDialog(demande: Demande): void {
-    this.demande = demande;
+  showResetDialog(visiteur: Demande): void {
+    this.visiteur = visiteur;
   }
 
-  showConfirmDialog(demande: Demande): void {
-   // this.dialogAction = action;
-    this.demande = demande;
+  showConfirmDialog(visiteur: Demande): void {
+    // this.dialogAction = action;
+    this.visiteur = visiteur;
     this.openConfirmDialog.nativeElement.click();
   }
-
-  showDeleteDialog(demande: Demande): void {
-    this.demande = demande;
-    this.deleteConfirmDialog.nativeElement.click();
+  showDeleteDialog(visiteur: Demande): void {
+    this.visiteur = visiteur;
+    if (this.deleteModal) {
+      this.deleteModal.show();
+    } else {
+      console.warn("⚠️ Le modal n’a pas été initialisé.");
+    }
+  }
+  closeDeleteDialog(): void {
+    this.deleteModal?.hide();
   }
 
+  deleteVisiteur(): void {
+    if (this.visiteur) {
+      this.loading = true;
+      this.visiteurService.delete(this.visiteur).subscribe((ret: any) => {
+        if (ret['code'] == 200) {
+          this.visiteur = ret['data'];
+          this.closeDeleteDialog();
+          this.search();
+          this.loading = false;
+          this.toast.success(ret['message']);
+        } else {
+          this.loading = false;
+          this.toast.error(ret['message']);
+        }
+      }, error => {
+        console.log("error====>", error);
+        this.loading = false;
+        this.toast.error('Une erreur est survenue lors de l\'opération');
+      });
+    }
+  }
+
+  // 🔍 Recherche texte
+filterVisiteurs(event: any) {
+  const query = event.target.value.toLowerCase();
+  this.filteredVisiteurs = this.visiteurs.filter(v =>
+    v.nomComplet.toLowerCase().includes(query) ||
+    v.numeroTelephone.toLowerCase().includes(query) ||
+    v.fonction.toLowerCase().includes(query) ||
+    v.adresse.toLowerCase().includes(query)||
+    v.typePiece.toLowerCase().includes(query)||
+    v.numeroPiece.toLowerCase().includes(query)
+  );
+
+  this.totalPages = Math.ceil(this.filteredVisiteurs.length / this.itemsPerPage);
+  this.currentPage = 1;
+  this.updatePaginatedList();
+}
+  // 🔹 Charger tous les visiteurs
 search() {
   this.loading = true;
-  this.demandeService.findAllVisiteur().subscribe(
-    (ret) => {
-      if (ret['code'] == 200) {
-
-        // ✅ Liste paginée venant de ton backend
-        this.demandes = ret['data']['data'];
-
-        this.totalPages = Math.ceil(this.demandes.length / this.itemsPerPage);
-        this.updatePaginatedList();
-
-        this.toast.info(`${this.demandes.length} demande(s) trouvée(s)`);
-
-      } else {
-        this.toast.error(ret['message']);
-      }
-
+  this.visiteurService.findAllVisiteur().subscribe({
+    next: (ret) => {
       this.loading = false;
+      if (ret['code'] === 200 && ret['data'] && Array.isArray(ret['data'].data)) {
+        // ✅ Récupération correcte de la liste paginée
+        const visiteursList = ret['data'].data;
+        // ✅ Ajout du champ "selected" pour la sélection
+        this.visiteurs = visiteursList.map((p: any) => ({ ...p, selected: false }));
+        // ✅ Copie pour le filtrage et l’affichage initial
+        this.filteredVisiteurs = [...this.visiteurs];
+        // ✅ Pagination
+        this.totalPages = Math.ceil(this.filteredVisiteurs.length / this.itemsPerPage);
+        this.currentPage = 1;
+        this.updatePaginatedList();
+      } else {
+        this.toast.error(ret['message'] || "Données invalides reçues");
+      }
     },
-    () => {
+    error: () => {
       this.toast.error(environment.erreur_connexion_message);
       this.loading = false;
     }
-  );
+  });
 }
 
+  // 🔹 Mettre à jour la liste paginée à partir de filteredVisiteurs
+  updatePaginatedList() {
+    if (!this.filteredVisiteurs || this.filteredVisiteurs.length === 0) {
+      this.paginatedList = [];
+      this.totalPages = 0;
+      return;
+    }
 
-updatePaginatedList() {
-  this.totalPages = Math.ceil(this.demandes.length / this.itemsPerPage);
-  
-  const startIndex = (this.currentPage - 1) * this.itemsPerPage;
-  const endIndex = startIndex + this.itemsPerPage;
-
-  this.paginatedList = this.demandes.slice(startIndex, endIndex);
-
-  console.log("+++++ paginatedList reçues +++++", this.paginatedList);
-}
-
-
+    this.totalPages = Math.ceil(this.filteredVisiteurs.length / this.itemsPerPage);
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    const endIndex = startIndex + this.itemsPerPage;
+    this.paginatedList = this.filteredVisiteurs.slice(startIndex, endIndex);
+    //console.log("+++++ paginatedList reçues +++++", this.paginatedList);
+  }
   nextPage() {
     if (this.currentPage < this.totalPages) {
       this.currentPage++;
@@ -367,14 +264,22 @@ updatePaginatedList() {
     }
   }
 
+  toggleSelectAll() {
+    this.selectAll = !this.selectAll;
+    this.visiteurs.forEach(item => item.selected = this.selectAll);
+  }
+
+  toggleSelectOne() {
+    // si tous sont cochés, selectAll = true sinon false
+    this.selectAll = this.visiteurs.every(item => item.selected);
+  }
   Save() {
     this.currentUser.service_name;
-   // this.demande.image = null;
+    // this.visiteur.image = null;
     this.loading = true;
-    this.demandeService.save(this.demande).subscribe(ret => {
+    this.visiteurService.save(this.visiteur).subscribe(ret => {
       if (ret['code'] === 200) {
-        this.demande = ret['data'];
-        this.demandes.push(this.demande);
+        this.visiteur = ret['data'];
         this.closeAddElementDialog.nativeElement.click();
         this.toast.success("Demande ajouté avec succès");
         this.loading = false;
@@ -392,17 +297,13 @@ updatePaginatedList() {
 
   Update() {
     this.loading = true;
-    /* this.demande.cabinet_id = this.demande.cabinet.id;
-    this.demande.typeUser_id = this.demande.typeUser.id;
-    this.demande.profil_id = this.demande.profil.id; */
-    this.demandeService.update(this.demande).subscribe(ret => {
+    /* this.visiteur.cabinet_id = this.visiteur.cabinet.id;
+    this.visiteur.typeUser_id = this.visiteur.typeUser.id;
+    this.visiteur.visiteur_id = this.visiteur.visiteur.id; */
+    this.visiteurService.update(this.visiteur).subscribe(ret => {
       if (ret['code'] === 200) {
-        this.demande = ret['data'];
-        this.demandes.forEach(user => {
-          if(user.id === this.demande.id) {
-            user = this.demande;
-          }
-        });
+        this.visiteur = ret['data'];
+
         this.closeAddElementDialog.nativeElement.click();
         this.toast.success("Demande modifié avec succès");
         this.loading = false;
@@ -418,68 +319,39 @@ updatePaginatedList() {
     });
   }
 
-UpdateStatut(statut: string) {
-  this.loading = true;
-  this.demande.statut = statut;
+  UpdateStatut(statut: string) {
+    this.loading = true;
+    this.visiteur.statut = statut;
 
-  this.demandeService.updateStatut(this.demande).subscribe(
-    ret => {
-      if (ret['code'] === 200) {
-        this.demande = ret['data'];
+    this.visiteurService.updateStatut(this.visiteur).subscribe(
+      ret => {
+        if (ret['code'] === 200) {
+          this.visiteur = ret['data'];
 
-        // MAJ dans la liste locale
-        this.demandes.forEach(user => {
-          if (user.id === this.demande.id) {
-            user.statut = this.demande.statut;
-          }
-        });
+          // MAJ dans la liste locale
+          this.visiteurs.forEach(user => {
+            if (user.id === this.visiteur.id) {
+              user.statut = this.visiteur.statut;
+            }
+          });
 
-        // ✅ Fermer la modale Bootstrap via jQuery
-        (('#userConfirmModal') as any).modal('hide');
+          // ✅ Fermer la modale Bootstrap via jQuery
+          (('#userConfirmModal') as any).modal('hide');
 
-        // Toast de succès
-        this.toast.success("Statut mis à jour avec succès.");
+          // Toast de succès
+          this.toast.success("Statut mis à jour avec succès.");
 
-        this.showList();
-      } else {
-        this.toast.error(ret['message']);
-      }
-      this.loading = false;
-    },
-    error => {
-      this.toast.error(environment.erreur_connexion_message);
-      this.loading = false;
-    }
-  );
-}
-
-
-  checkCabinetUser(cabinetId: number, typeUserId: number) {
-    if(typeUserId !== 3) {
-      return;
-    }
-    if (!cabinetId) {
-      this.toast.error("Veuillez selectionner un cabinet, SVP ..");
-      this.demande.typeUser = null;
-      return
-    }
-    const objetCheck = {
-      cabinet_id: cabinetId,
-      typeUser_id: typeUserId
-    }
-    this.demandeService.verifyJugeOfCabinet(objetCheck).subscribe(ret => {
-      if (ret['code'] === 200) {
-      } else {
-        this.toast.error(ret['message']);
+          this.showList();
+        } else {
+          this.toast.error(ret['message']);
+        }
         this.loading = false;
-        this.demande.cabinet = null;
-        this.demande.typeUser = null;
+      },
+      error => {
+        this.toast.error(environment.erreur_connexion_message);
+        this.loading = false;
       }
-    }, error => {
-      console.log("error===", error);
-      this.toast.error(environment.erreur_connexion_message);
-      this.loading = false;
-    });
+    );
   }
 
 
@@ -487,8 +359,8 @@ UpdateStatut(statut: string) {
     this.cabinetService.findAll().subscribe(ret => {
       if (ret['code'] === 200) {
         this.cabinets = ret['data'];
-        if (this.currentView === 'edit' || this.currentView === 'detail' && this.demande.cabinet && this.cabinets.length > 0) {
-          this.demande.cabinet = this.cabinets.find(p => p.id === this.demande.cabinet.id)
+        if (this.currentView === 'edit' || this.currentView === 'detail' && this.visiteur.cabinet && this.cabinets.length > 0) {
+          this.visiteur.cabinet = this.cabinets.find(p => p.id === this.visiteur.cabinet.id)
         }
         this.loading = false;
       } else {
@@ -502,12 +374,12 @@ UpdateStatut(statut: string) {
     });
   }
 
-  findTypeUsers() {
+  findServices() {
     this.typeUserService.findAll().subscribe(ret => {
       if (ret['code'] === 200) {
-        this.typeUsers = ret['data'];
-        if (this.currentView === 'edit' || this.currentView === 'detail' && this.demande.user_agent_id && this.typeUsers.length > 0) {
-          this.demande.typeUser = this.typeUsers.find(p => p.id === this.demande.user_agent_id)
+        this.services = ret['data'];
+        if (this.currentView === 'edit' || this.currentView === 'detail' && this.visiteur.service_id && this.services.length > 0) {
+          this.visiteur.service = this.services.find(p => p.id === this.visiteur.service_id)
         }
         this.loading = false;
       } else {
@@ -526,7 +398,7 @@ UpdateStatut(statut: string) {
   selectPicture() {
     this.fileInputUpload.nativeElement.click();
   }
-  deleteImageProfile() {
+  deleteImageVisiteure() {
   }
   onFileUploadChange(event) {
     if (event.target.files.length <= 0) {
@@ -543,13 +415,13 @@ UpdateStatut(statut: string) {
     }
     let reader = new FileReader();
     reader.onload = readerEvent => {
-      //this.imageProfile = (readerEvent.target as any).result;
+      //this.imageVisiteure = (readerEvent.target as any).result;
     };
     reader.readAsDataURL(event.target.files[0]);
   }
 
   /* +++++++++++++++++++++++++ new code for signature++++++++++++++++++ */
-   @ViewChild('canvas', { static: true }) canvasRef!: ElementRef<HTMLCanvasElement>;
+  @ViewChild('canvas', { static: true }) canvasRef!: ElementRef<HTMLCanvasElement>;
   private ctx!: CanvasRenderingContext2D;
   private drawing = false;
 
@@ -588,13 +460,13 @@ UpdateStatut(statut: string) {
     alert('Signature enregistrée avec succès ✅');
   }
 
- 
-formatPhone(numero: string): string {
-  if (!numero) return '';
-  // Exemple simple pour Mali
-  if (numero.startsWith('+223')) {
-    return numero.replace(/(\+223)(\d{2})(\d{2})(\d{2})(\d{2})/, '$1 $2 $3 $4 $5');
+
+  formatPhone(numero: string): string {
+    if (!numero) return '';
+    // Exemple simple pour Mali
+    if (numero.startsWith('+223')) {
+      return numero.replace(/(\+223)(\d{2})(\d{2})(\d{2})(\d{2})/, '$1 $2 $3 $4 $5');
+    }
+    return numero;
   }
-  return numero;
-}
 }

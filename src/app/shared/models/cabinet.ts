@@ -11,7 +11,7 @@ export class Cabinet implements Deserializable<Cabinet> {
     created_at: Date;
     updated_at: Date;
     personnels: Utilisateur[]=[];
-     selected?: boolean;
+    selected?: boolean;
     deserialize(input: any): Cabinet {
         Object.assign(this, input);
         return this;

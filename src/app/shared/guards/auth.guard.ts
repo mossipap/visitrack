@@ -9,7 +9,7 @@ export class AuthGuard implements CanActivate {
   constructor(private router: Router){}
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot){
-    if (!localStorage.getItem('current_session_novus')) {
+    if (!localStorage.getItem('current_session_visitrack')) {
       return true;
     }else{
       this.router.navigate(['/admin']);

@@ -39,6 +39,12 @@ export class ProfilComponent implements OnInit {
   @ViewChild('openConfirmDialog') openConfirmDialog: any;
   @ViewChild('openDeleteDialog') openDeleteDialog: ElementRef;
   private deleteModal?: Modal;
+  searchValue: any;
+  paginatedList: any[] = []; // la portion affichée
+  itemsPerPage = 10; // nombre d’éléments par page
+  totalPages = 0;
+  selectAll: boolean = false;
+  filteredProfils: any[] = [];
   constructor(
     private profilService: ProfileService,
     private toast: AppToastService,
@@ -87,6 +93,7 @@ export class ProfilComponent implements OnInit {
     this.searchParam.dateFin.setDate(this.searchParam.dateFin.getDate() + 1);
     this.Search();
   }
+  
   changeTrHover(newValue: string): void {
     document.documentElement.style.setProperty('--tr-hover', newValue);
   }
@@ -117,7 +124,7 @@ export class ProfilComponent implements OnInit {
   changeBgTheader(newValue: string): void {
     document.documentElement.style.setProperty('--theaderbg', newValue);
   }
-  profilFiltres () {
+  profilFiltres2() {
     if (!this.searchFilterText) return this.profils
     const search = this.searchFilterText.toLowerCase()
     return this.profils.filter(item => {
@@ -125,7 +132,7 @@ export class ProfilComponent implements OnInit {
       return text.indexOf(search) > -1
     })
   }
-
+ 
   showAddForm() {
     this.profil = new Profil();
     this.initDroits();
@@ -202,23 +209,90 @@ DeleteProfile() {
       this.loading = false;
     });
 }
-  Search() {
-    this.loading = true;
-    this.profilService.findAll().subscribe(ret => {
-      if (ret['code'] === 200) {
-        this.profils = ret['data'];
-        this.loading = false;
-      } else {
-        this.loading = false;
-        this.toast.error(ret['message']);
-      }
-    }, error => {
-      console.log("error===>", error);
-      this.toast.error(environment.erreur_connexion_message);
-      this.loading = false;
-    });
+// 🔎 Filtrer les profils selon le texte
+// 🔍 Recherche texte
+profilFiltres() {
+  const term = this.searchFilterText.toLowerCase().trim();
+  // Si le champ est vide => on réinitialise
+  if (!term) {
+    this.filteredProfils = [...this.profils];
+  } else {
+    this.filteredProfils = this.profils.filter(p =>
+      p.nom?.toLowerCase().includes(term) ||
+      p.description?.toLowerCase().includes(term)
+    );
   }
 
+  this.currentPage = 1; // retour page 1
+  this.updatePaginatedList();
+}
+
+// 🔹 Charger tous les profils
+Search() {
+  this.loading = true;
+  this.profilService.findAll().subscribe({
+    next: (ret) => {
+      this.loading = false;
+      if (ret['code'] === 200) {
+        // Ajouter selected et initialiser filteredProfils
+        this.profils = ret['data'].map((p: any) => ({ ...p, selected: false }));
+        this.filteredProfils = [...this.profils]; // ✅ important
+
+        this.totalPages = Math.ceil(this.filteredProfils.length / this.itemsPerPage);
+        this.currentPage = 1;
+        this.updatePaginatedList();
+      } else {
+        this.toast.error(ret['message']);
+      }
+    },
+    error: () => {
+      this.toast.error(environment.erreur_connexion_message);
+      this.loading = false;
+    }
+  });
+}
+
+// 🔹 Mettre à jour la liste paginée à partir de filteredProfils
+updatePaginatedList() {
+  if (!this.filteredProfils || this.filteredProfils.length === 0) {
+    this.paginatedList = [];
+    this.totalPages = 0;
+    return;
+  }
+
+  this.totalPages = Math.ceil(this.filteredProfils.length / this.itemsPerPage);
+  const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+  const endIndex = startIndex + this.itemsPerPage;
+  this.paginatedList = this.filteredProfils.slice(startIndex, endIndex);
+  console.log("+++++ paginatedList reçues +++++", this.paginatedList);
+}
+
+
+
+
+  nextPage() {
+    if (this.currentPage < this.totalPages) {
+      this.currentPage++;
+      this.updatePaginatedList();
+    }
+  }
+
+  previousPage() {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+      this.updatePaginatedList();
+    }
+  }
+
+toggleSelectAll() {
+  this.selectAll = !this.selectAll;
+  this.profils.forEach(item => item.selected = this.selectAll);
+}
+
+toggleSelectOne() {
+  // si tous sont cochés, selectAll = true sinon false
+  this.selectAll = this.profils.every(item => item.selected);
+}
   Save() {
     if (this.droits) {
       this.profil.droits = []
