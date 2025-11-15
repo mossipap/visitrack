@@ -39,18 +39,7 @@
           <button id="user_block" class="btn btn_not_active" (click)="onChangeCode(2)">Terminées</button>
           <button id="user_delete" class="btn btn_not_active" (click)="onChangeCode(3)">Supprimées</button>
         </div>
-        <div class="change_btndiv ml-3" *ngIf="">
-          <button class="btn_inculpe btn_physique btn_active" id="user_all" type="button" (click)="onChangeCode(0)"
-            [ngClass]="{ 'btn_active': currentIndex === 0, 'btn_not_active': currentIndex !== 0 }">En cours</button>
-          <button class="btn_inculpe btn_physique btn_active" id="user_active" type="button" (click)="onChangeCode(1)"
-            [ngClass]="{ 'btn_active': currentIndex === 1, 'btn_not_active': currentIndex !== 1 }">En cours</button>
-          <button class="btn_inculpe btn_physique btn_not_active" id="user_block" type="button"
-            (click)="onChangeCode(2)"
-            [ngClass]="{ 'btn_active': currentIndex === 2, 'btn_not_active': currentIndex !== 2 }">Terminés</button>
-          <button class="btn_inculpe btn_physique btn_not_active" id="user_delete" type="button"
-            (click)="onChangeCode(3)"
-            [ngClass]="{ 'btn_active': currentIndex === 2, 'btn_not_active': currentIndex !== 2 }">Supprimés</button>
-        </div>
+     
         <!-- 🔹 Outils : recherche + boutons -->
         <div class="d-flex align-items-center gap-2 flex-wrap justify-content-end">
           <!-- 🔍 Barre de recherche -->
@@ -242,7 +231,7 @@
           <div class="modal-content" [style]="{'background-color': isDark ? '#1f1f1f' : '#FFFFFF'}">
             <div class="d-flex" style="margin-top: 15px;">
               <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="margin-left: 10px;"
-                #closeDetailElementDialog>
+                (click)="closeDeleteDialog()">
                 <label [class]="isDark? 'txt-title-d ml-2': 'ml-1'" style="font-size: 14px;">
                   <i class="fa fa-chevron-left mr-2"></i> Détail de demande du Cabinet N°
                   {{demande?.cabinet?.designation}}
@@ -432,72 +421,6 @@
     </div>
     <!-- /detail -->
 
-    <!-- Modal confim bloque -->
-    <div *ngIf="currentView === 'list'" class="modal fade text-xs-left" id="demandeConfirmModal" tabindex="-1"
-      role="dialog" aria-labelledby="myModalLabel2" aria-hidden="true">
-      <div class="modal-sm modal-dialog" role="document">
-        <div class="modal-content" style="width: 440px;">
-          <!-- Header -->
-          <div class="modal-header d-flex justify-content-between align-items-center">
-            <h4 class="modal-title" id="myModalLabel2">
-              <i class="mdi mdi-alert-circle-outline text-warning mr-2"></i>
-              Passer à la signature
-            </h4>
-            <i class="mdi mdi-close-circle cursor-pointer text-danger" data-dismiss="modal"></i>
-          </div>
-          <!-- Body -->
-          <div class="modal-body">
-            <div class="col-lg-12 p-right-0">
-              <div class="form-group has-success align-left ft-w-b">
-                <label [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
-                  for="objet_retirer">Objet Retiré *</label>
-                <textarea
-                  [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'"
-                  id="objet_retirer" name="objet_retirer" type="objet_retirer" [(ngModel)]="demande.objet_retirer"
-                  required></textarea>
-              </div>
-            </div>
-            <div class="step-form fade-in">
-              <div [class]="isDark ? 'card cust_card_d' : 'card cust_card_w'">
-                <div class="card-block p-4 text-center">
-                  <h4 class="mb-4 fw-bold" style="text-align: center;color: rgb(44, 44, 184);">
-                    <i class="mdi mdi-gesture-tap me-2"></i> Signature du visiteur
-                  </h4>
-                  <img src="assets/images/signature.png" alt="Signature preview" class="signature-preview shadow-sm" />
-                  <!-- Aperçu -->
-                  <div [class]="isDark ? 'card cust_card_d' : 'card cust_card_w'">
-                    <div class="card-block p-4 text-center">
-                      <!-- Aperçu -->
-                      <div *ngIf="signatureImage" class="mt-3">
-                        <h6 class="text-muted mb-2">Aperçu de la signature :</h6>
-                        <img src="assets/images/signature.png" alt="Signature preview"
-                          class="signature-preview shadow-sm" />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Footer -->
-          <div class="modal-footer">
-            <div class="w-100 d-flex justify-content-between">
-              <button class="btn btn-success btn-sm d-flex align-items-center">
-                <i class="mdi mdi-check-circle mr-1"></i> Valider
-              </button>
-
-              <button class="btn btn-secondary btn-sm d-flex align-items-center" data-dismiss="modal">
-                <i class="mdi mdi-close-circle mr-1"></i> Annuler
-              </button>
-            </div>
-          </div>
-
-        </div>
-      </div>
-    </div>
-
-
     <!-- 🔹 Modal de suppression -->
     <div class="modal fade text-xs-left" id="deleteConfirmModal" tabindex="-1" role="dialog"
       aria-labelledby="myModalLabel2" aria-hidden="true">
@@ -516,10 +439,10 @@
           <!-- 🔹 BODY -->
           <div class="modal-body text-center">
             <p class="txt_confirm">
-              Bonjour, vous vous apprêtez à bloquer le {{demande?.visiteur?.nomComplet}}
+              Vous êtes sur le point de supprimer {{demande?.visiteur?.nomComplet}}
             </p>
             <p class="desc_confirm">
-              Êtes-vous sûr de supprimer cette demande ?
+              Confirmez-vous la suppression ?
             </p>
 
             <!--  <div class="form-group mt-3 text-left">
@@ -545,7 +468,178 @@
     </div>
 
 
+    <!-- detail -->
+    <div class="container demo" *ngIf="currentView === 'detail'">
+      <div class="container-detail" style="background-color: #fff;padding-bottom: 20px;">
+        <a style="float: right; margin-top: 15px; margin-right: 50px; color: red; font-size: 20px; cursor: pointer;"
+          (click)="showList()"><i class="fa fa-times"></i></a>
+        <!-- A4 PRINT ZONE -->
+        <div id="print-section" class="a4-sheet a4-container watermark-page">
 
+          <!-- HEADER CENTRÉ -->
+          <div class="a4-header">
+            <img src="assets/images/v1.png" class="logo-left">
+            <div class="header-text">
+              <h2 class="company-name">CABINET / ENTREPRISE</h2>
+              <p class="sheet-title">FICHE DE RENSEIGNEMENT DU VISITEUR</p>
+            </div>
+            <img src="assets/images/ppef.png" class="logo-right">
+          </div>
+
+          <hr class="separator">
+
+          <div class="row mt-3 three-blocks">
+            <!-- VISITEUR -->
+            <div class="col-md-6">
+              <div class="info-card">
+                <h3 class="section-title">
+                  <i class="mdi mdi-account-badge-outline"></i> Informations du visiteur
+                </h3>
+
+                <div class="info-row"><span class="label">Nom complet</span> <span class="value">{{
+                    demande?.visiteur?.nomComplet }}</span></div>
+                <div class="info-row"><span class="label">Sexe</span> <span class="value">{{ demande?.visiteur?.sexe
+                    }}</span></div>
+                <div class="info-row"><span class="label">Type de pièce</span> <span class="value">{{
+                    demande?.visiteur?.typePiece }}</span></div>
+                <div class="info-row"><span class="label">N° de pièce</span> <span class="value">{{
+                    demande?.visiteur?.numeroPiece }}</span></div>
+                <div class="info-row"><span class="label">Téléphone</span> <span class="value">{{
+                    demande?.visiteur?.numeroTelephone }}</span></div>
+                <div class="info-row"><span class="label">Adresse</span> <span class="value">{{
+                    demande?.visiteur?.adresse }}</span></div>
+                <div class="info-row"><span class="label">Fonction</span> <span class="value">{{demande?.visiteur?.fonction }}</span></div>
+                <div class="info-row"><span class="label">Objet saisi</span> <span class="value">{{demande?.objet_saisie }}</span></div>
+                <div class="info-row"><span class="label">Objet retiré</span> <span class="value">{{demande?.objet_retirer }}</span></div>
+                <div class="info-row"><span class="label">Pièce d'indentité</span> <span class="value">
+                   <button class="btn btn-info btn-sm me-1" (click)="openPreview(demande.pieceUrl)">
+                    <i class="mdi mdi-eye"></i>
+                  </button>
+                  <button class="btn btn-success btn-sm" (click)="downloadPiece(demande.pieceUrl)">
+                    <i class="mdi mdi-download"></i>
+                  </button>
+                </span></div>
+                <div class="info-row"><span class="label">Signature du visiteur</span> <span class="value">
+                  <div class="sign">
+                <img src="assets/images/signature.png" alt="Signature preview" class="signature-preview shadow-sm"
+                  width="200px" height="100px" />
+              </div>
+                </span></div>
+              </div>
+            </div>
+
+            <!-- SERVICE -->
+            <div class="col-md-6">
+              <div class="info-card"  style="margin-right: 20px !important;">
+                <h3 class="section-title">
+                  <i class="mdi mdi-domain"></i> Service: <span class="value">{{demande?.service?.designation }}</span>
+                </h3>
+                <h3 class="section-title">
+                  <i class="mdi mdi-office-building-outline"></i> Cabinet: <span class="value">{{demande?.cabinet?.designation }}</span>
+                </h3>
+              </div>
+              <!-- CABINET -->
+              <div class="info-card"  style="margin-right: 20px !important;">
+                <h3 class="section-title"><i class="mdi mdi-file-document-outline"></i> Informations détaillées du rendez-vous</h3>
+                <div class="info-row"><span class="label">Date</span> <span class="value">{{ demande.dateVisite | date: 'dd/MM/yyyy' }}</span></div>
+                <div class="info-row"><span class="label">Motif de la visite</span> <span class="value">{{ demande?.raisonVisite }}</span></div>
+                <div class="info-row"><span class="label">Heure arrivée</span> <span class="value">{{demande?.heureArrive }}</span></div>
+                <div class="info-row"><span class="label">Heure visite</span> <span class="value">{{demande?.heureVisite }}</span></div>
+                <div class="info-row"><span class="label">Heure départ</span> <span class="value">{{demande?.heureDepart }}</span></div>
+                <div class="info-row"><span class="label">Statut</span> <span class="value" *ngIf="demande.statut === 'En cours'">En cours</span></div>
+                <div class="info-row"><span class="label">Statut</span> <span class="value" *ngIf="demande.statut === 'Terminée'">Terminée</span></div>
+              </div>
+            </div>
+
+          </div>
+
+
+          <!-- DEMANDE -->
+          <h3 class="section-title mt-4"*ngIf="false">
+            <i class="mdi mdi-file-document-outline"></i> Détails de la demande
+          </h3>
+          <table class="demande-table" *ngIf="false">
+            <thead>
+              <tr>
+                <th>Motif</th>
+                <th>Date</th>
+                <th>Heure arrivée</th>
+                <th>Heure visite</th>
+                <th>Heure départ</th>
+                <th>Objet retiré</th>
+                <th>Objet saisi</th>
+                <th>Statut</th>
+                <th>Pièce</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr>
+                <td>{{ demande.raisonVisite }}</td>
+                <td>{{ demande.dateVisite | date: 'dd/MM/yyyy' }}</td>
+                <td>{{ demande.heureArrive }}</td>
+                <td>{{ demande.heureVisite }}</td>
+                <td>{{ demande.heureDepart }}</td>
+                <td>{{ demande.objet_retirer }}</td>
+                <td>{{ demande.objet_saisie }}</td>
+
+                <td>
+                  <span class="badge bg-warning" *ngIf="demande.statut === 'En cours'">En cours</span>
+                  <span class="badge bg-success" *ngIf="demande.statut === 'Terminée'">Validé</span>
+                </td>
+
+                <td>
+                  <button class="btn btn-info btn-sm me-1" (click)="openPreview(demande.pieceUrl)">
+                    <i class="mdi mdi-eye"></i>
+                  </button>
+                  <button class="btn btn-success btn-sm" (click)="downloadPiece(demande.pieceUrl)">
+                    <i class="mdi mdi-download"></i>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Boutons centrés -->
+        <div class="d-flex justify-content-center mt-4">
+          <button class="btn btn-primary me-3" (click)="printPage()" style="margin-right: 10px;">
+            <i class="mdi mdi-printer me-1"></i> Imprimer
+          </button>
+
+          <button class="btn btn-danger" (click)="showList()">
+            <i class="mdi mdi-close-circle-outline me-1"></i> Fermer
+          </button>
+        </div>
+      </div>
+
+    </div>
+    <!-- /detail -->
+    <!-- ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±± -->
+    <!-- Aperçu pièce -->
+    <div class="modal fade" id="previewModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Aperçu de la pièce d'identité</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body text-center">
+
+            <iframe [src]="visiteur.pieceUrl" width="100%" height="500px"
+              style="border: 1px solid #ccc; border-radius: 8px;"></iframe>
+
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-success" (click)="downloadPiece(visiteur.pieceUrl)">
+              <i class="mdi mdi-download me-1"></i> Télécharger
+            </button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±± -->
     <!-- add user modal -->
     <div class="container demo" *ngIf="currentView === 'edit'">
       <div class="modal right fade" id="addUserModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel2">

@@ -1,27 +1,33 @@
 <header class="app-header header-right-w">
 
- 
+
   <!-- Sidebar toggle button-->
-<a class="app-header__logo header-left-w" href="javascript:void(0);">
+  <a class="app-header__logo header-left-w" href="javascript:void(0);">
     <img *ngIf="isDark" src="assets/images/logo.png" alt="" class="left_logo" />
     <img *ngIf="!isDark" src="assets/images/logo.png" alt="" class="left_logo" />
   </a>
   <!-- Navbar Right Menu-->
-  <ul class="app-nav" style="font-size: 17px;">
-     <li class=" d-flex align-items-center" style="color: aliceblue;">
+<!--   <ul class="app-nav" style="font-size: 17px;">
+    <li class=" d-flex align-items-center" style="color: aliceblue;">
       <b [class]="isDark? 'c-white':'c-black'">{{menuTitle}}</b>
     </li>
+  </ul> -->
+  <ul class="app-nav time-wrapper">
+    <li class="time-display d-flex align-items-center">
+      <i class="mdi mdi-menu"></i>
+      <span>{{menuTitle}}</span>
+    </li>
   </ul>
-<!--  <ul class="app-nav time-wrapper">
+  <!--  <ul class="app-nav time-wrapper">
   <li class="time-display d-flex align-items-center">
     <i class="mdi mdi-clock-outline"></i>
     <span>{{heure}}:{{minute}}:{{seconde}}</span>
   </li>
 </ul> -->
 
-  
+
   <ul class="app-nav">
-   <!--  <li class="dropdown mr-2" >
+    <!--  <li class="dropdown mr-2" >
       <button class="btn btn_statistics" ><img src="assets/icons/mdi/telephone.png" alt="Voir" class="icon-btn" /> Numéro de telephone</button>
     </li>
     <li class="dropdown mr-2" >
@@ -29,30 +35,31 @@
     </li>
     -->
 
-  
+
 
     <!-- Paramètres -->
-   <!--   <li class="dropdown mr-2" >
+    <!--   <li class="dropdown mr-2" >
       <button class="btn btn_statistics" routerLink="/admin/parametre/utilisateur" ><img src="assets/icons/mdi/parametre.png" alt="Voir" class="icon-btn" /></button>
     </li> -->
-      <!-- Notifications -->
+    <!-- Notifications -->
     <li class="dropdown mr-3">
       <button class="btn btn_statistics " data-toggle="dropdown" aria-label="Show notifications">
         <img src="assets/icons/mdi/noti.png" alt="Voir" class="icon-btn" />
         <span class="count badge badge-danger">{{notifications.length}}</span>
       </button>
-      
+
       <ul class="app-notification dropdown-menu dropdown-menu-right" style="min-width: 345px;">
         <li class="app-notification__title">
           Vous avez {{notifications.length}} notification(s)
         </li>
         <div class="app-notification__content">
-          <li *ngFor="let notify of notifications; let i=index" 
-              (click)="notify.statut === 'Vue'? '' : setNotifyVue(notify)">
+          <li *ngFor="let notify of notifications; let i=index"
+            (click)="notify.statut === 'Vue'? '' : setNotifyVue(notify)">
             <a class="app-notification__item" href="javascript:void(0);">
               <i class="mdi mdi-bell-circle text-primary mr-2"></i>
               <div>
-                <p [class]="notify.statut=== 'Vue'? 'app-notification__message' : 'app-notification__message font-weight-bold'">
+                <p
+                  [class]="notify.statut=== 'Vue'? 'app-notification__message' : 'app-notification__message font-weight-bold'">
                   {{notify?.titre}}
                 </p>
                 <p class="app-notification__meta">{{notify.created_at | timeago}}</p>
@@ -65,64 +72,55 @@
         </li>
       </ul>
     </li>
-   
+
     <!-- User Menu-->
-<li class="dropdown ml-5" style="margin-right: -20px;">
-  <a class="app-nav__item lib-date-d cursor_p" data-toggle="dropdown" aria-label="Open Profile Menu">
-    <div class="user_text d-flex align-items-center">
-      <!-- 🟢 Conteneur de l'avatar avec badge -->
-      <div class="position-relative me-2">
-        <img 
-          *ngIf="!currentUser.image" 
-          class="user-avatar" 
-          [src]="(currentUser.service_name === 'siege') ? 'assets/images/presidente.png' : 'assets/images/procureur.png'" 
-          alt="User">
-        <img 
-          *ngIf="currentUser.image" 
-          class="user-avatar" 
-          [src]="currentUser.image" 
-          alt="User">
-        
-        <!-- ✅ Petit point vert si connecté -->
-        <span class="status-indicator pulse" ></span>
-      </div>
+    <li class="dropdown ml-5" style="margin-right: -20px;">
+      <a class="app-nav__item lib-date-d cursor_p" data-toggle="dropdown" aria-label="Open Profile Menu">
+        <div class="user_text d-flex align-items-center">
+          <!-- 🟢 Conteneur de l'avatar avec badge -->
+          <div class="position-relative me-2">
+            <img *ngIf="!currentUser.image" class="user-avatar"
+              [src]="(currentUser.service_name === 'siege') ? 'assets/images/presidente.png' : 'assets/images/procureur.png'"
+              alt="User">
+            <img *ngIf="currentUser.image" class="user-avatar" [src]="currentUser.image" alt="User">
 
-      <!-- 🧑‍💼 Infos utilisateur -->
-      <div [class]="isDark ? 'c-white' : 'c-black ft_cal'">
-        {{ currentUser.nom }} {{ currentUser.prenom }}
-        <div class="div_role">{{ currentUser.email }}</div>
-      </div>
-    </div>
-  </a>
+            <!-- ✅ Petit point vert si connecté -->
+            <span class="status-indicator pulse"></span>
+          </div>
 
-  <!-- 🔽 Menu déroulant -->
-  <ul class="dropdown-menu settings-menu dropdown-menu-right minw-12" style="margin-top: -8px;margin-left: 20px !important;">
-    <li>
-      <a class="dropdown-item" routerLink="/admin/mon-profil">
-        <i class="mdi mdi-account-settings fa-lg text-success mr-1"></i>
-        <span [class]="isDark ? 'c-white' : 'c-c-black'">{{ 'header.monProfil' | translate }}</span>
+          <!-- 🧑‍💼 Infos utilisateur -->
+          <div [class]="isDark ? 'c-white' : 'c-black ft_cal'">
+            {{ currentUser.nom }} {{ currentUser.prenom }}
+            <div class="div_role">{{ currentUser.email }}</div>
+          </div>
+        </div>
       </a>
+
+      <!-- 🔽 Menu déroulant -->
+      <ul class="dropdown-menu settings-menu dropdown-menu-right minw-12"
+        style="margin-top: -8px;margin-left: 20px !important;">
+        <li>
+          <a class="dropdown-item" routerLink="/admin/mon-profil">
+            <i class="mdi mdi-account-settings fa-lg text-success mr-1"></i>
+            <span [class]="isDark ? 'c-white' : 'c-c-black'">{{ 'header.monProfil' | translate }}</span>
+          </a>
+        </li>
+        <li>
+          <a [class]="roleManager.isDroitChangerPwdUtilisateur() ? 'dropdown-item' : 'dropdown-item inactiveLink'"
+            href="javascript:void(0);" *ngIf="roleManager.isDroitChangerPwdUtilisateur()" data-toggle="modal"
+            data-target="#modalChangeCenter" (click)="showChangePwd()">
+            <i class="mdi mdi-pencil-lock fa-lg text-info mr-1"></i>
+            <span [class]="isDark ? 'c-white' : 'c-c-black'">{{ 'header.editPwd' | translate }}</span>
+          </a>
+        </li>
+        <li>
+          <a class="dropdown-item" href="javascript:void(0);" (click)="showLogoutDialog()">
+            <i class="mdi mdi-logout fa-lg text-danger mr-1"></i>
+            <span [class]="isDark ? 'c-white' : 'c-c-black'">{{ 'header.disconnect' | translate }}</span>
+          </a>
+        </li>
+      </ul>
     </li>
-    <li>
-      <a 
-        [class]="roleManager.isDroitChangerPwdUtilisateur() ? 'dropdown-item' : 'dropdown-item inactiveLink'" 
-        href="javascript:void(0);" 
-        *ngIf="roleManager.isDroitChangerPwdUtilisateur()" 
-        data-toggle="modal" 
-        data-target="#modalChangeCenter" 
-        (click)="showChangePwd()">
-        <i class="mdi mdi-pencil-lock fa-lg text-info mr-1"></i>
-        <span [class]="isDark ? 'c-white' : 'c-c-black'">{{ 'header.editPwd' | translate }}</span>
-      </a>
-    </li>
-    <li>
-      <a class="dropdown-item" href="javascript:void(0);" (click)="showLogoutDialog()">
-        <i class="mdi mdi-logout fa-lg text-danger mr-1"></i>
-        <span [class]="isDark ? 'c-white' : 'c-c-black'">{{ 'header.disconnect' | translate }}</span>
-      </a>
-    </li>
-  </ul>
-</li>
 
 
   </ul>
@@ -130,11 +128,13 @@
 
 
 <!-- Modal Change Pwd Dialog -->
-<div class="modal fade" id="modalChangeCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+<div class="modal fade" id="modalChangeCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+  aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content" style="width: 330px;">
       <div class="modal-header">
-        <h5 [class]="isDark? 'modal-title c-cab-1' : 'modal-title c-cab-2'" id="modalCenterTitle">Changer votre mot de passe</h5>
+        <h5 [class]="isDark? 'modal-title c-cab-1' : 'modal-title c-cab-2'" id="modalCenterTitle">Changer votre mot de
+          passe</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close" #closeChangePaswDialog>
           <span aria-hidden="true">&times;</span>
         </button>
@@ -143,31 +143,41 @@
         <div class="row">
           <div class="col-xs-12 col-sm-12 col-md-12">
             <div class="form-group has-success">
-              <label [class]="isDark? 'form-control-label input-label c-cab-1' : 'form-control-label input-label c-cab-2'" for="oldPassword">Ancien mot de passe</label>
-              <input [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'" id="oldPassword" name="oldPassword" type="password" [(ngModel)]="authUser.oldPassword">
+              <label
+                [class]="isDark? 'form-control-label input-label c-cab-1' : 'form-control-label input-label c-cab-2'"
+                for="oldPassword">Ancien mot de passe</label>
+              <input [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'"
+                id="oldPassword" name="oldPassword" type="password" [(ngModel)]="authUser.oldPassword">
             </div>
           </div>
         </div>
         <div class="row">
           <div class="col-xs-12 col-sm-12 col-md-12">
             <div class="form-group has-success">
-              <label [class]="isDark? 'form-control-label input-label c-cab-1' : 'form-control-label input-label c-cab-2'" for="newPassword">Nouveau mot de passe</label>
-              <input [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'" id="newPassword" name="newPassword" type="password" [(ngModel)]="authUser.newPassword">
+              <label
+                [class]="isDark? 'form-control-label input-label c-cab-1' : 'form-control-label input-label c-cab-2'"
+                for="newPassword">Nouveau mot de passe</label>
+              <input [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'"
+                id="newPassword" name="newPassword" type="password" [(ngModel)]="authUser.newPassword">
             </div>
           </div>
         </div>
         <div class="row">
           <div class="col-xs-12 col-sm-12 col-md-12">
             <div class="form-group has-success">
-              <label [class]="isDark? 'form-control-label input-label c-cab-1' : 'form-control-label input-label c-cab-2'" for="confirmPassword">Confirmer nouveau mot de passe</label>
-              <input [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'" id="confirmPassword" name="confirmPassword" type="password" [(ngModel)]="authUser.confirmPassword">
+              <label
+                [class]="isDark? 'form-control-label input-label c-cab-1' : 'form-control-label input-label c-cab-2'"
+                for="confirmPassword">Confirmer nouveau mot de passe</label>
+              <input [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'"
+                id="confirmPassword" name="confirmPassword" type="password" [(ngModel)]="authUser.confirmPassword">
             </div>
           </div>
         </div>
       </div>
       <div class="modal-footer">
         <div style="width: 100%; text-align: center;margin: 3% 0;">
-          <button class="btn btn-login btn-block" (click)="changerPwd()" [style]="{'color': isDark? '#1c1c1c' : '#FFFFFF', 'background-color': isDark? '#f78e39' : '#605bff'}">
+          <button class="btn btn-login btn-block" (click)="changerPwd()"
+            [style]="{'color': isDark? '#1c1c1c' : '#FFFFFF', 'background-color': isDark? '#f78e39' : '#605bff'}">
             Changer mot de passe
           </button>
         </div>
@@ -177,23 +187,28 @@
 </div>
 
 <!-- fermeture de la session -->
-<div class="modal fade text-xs-left" id="confirmLogoutModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel2" aria-hidden="true">
+<div class="modal fade text-xs-left" id="confirmLogoutModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel2"
+  aria-hidden="true">
   <div class="modal-sm modal-dialog " role="document">
     <div class="modal-content">
       <div class="modal-header">
-          <button style="display: none;" type="button" #openLogoutDialog class="btn btn-outline-primary block btn-lg" data-toggle="modal" data-target="#confirmLogoutModal" data-backdrop="true">
-          </button>
-          <h4 [class]="isDark? 'modal-title c-cab-1' : 'modal-title c-cab-2'" id="myModalLabel2">Se déconnecter</h4>
+        <button style="display: none;" type="button" #openLogoutDialog class="btn btn-outline-primary block btn-lg"
+          data-toggle="modal" data-target="#confirmLogoutModal" data-backdrop="true">
+        </button>
+        <h4 [class]="isDark? 'modal-title c-cab-1' : 'modal-title c-cab-2'" id="myModalLabel2">Se déconnecter</h4>
       </div>
       <div class="modal-body">
-          <div style="font-weight: bold;font-size: 13px;text-align: center;">
-              <span [class]="isDark? 'text-bold-600 c-cab-1' : 'text-bold-600 c-cab-2'">Voulez vous vraiment vous déconnecter ? </span>
-          </div>
+        <div style="font-weight: bold;font-size: 13px;text-align: center;">
+          <span [class]="isDark? 'text-bold-600 c-cab-1' : 'text-bold-600 c-cab-2'">Voulez vous vraiment vous
+            déconnecter ? </span>
+        </div>
       </div>
       <div class="modal-footer">
         <div style="width: 100%; text-align: center;">
-          <button class="btn btn-secondary btn-nosession btn-sm mr-1" style="width: 45%;" type="button" data-dismiss="modal"> Annuler</button>
-          <button class="btn btn-danger btn-session btn-sm" style="width: 45%;" type="button" (click)="logout()"> Se déconnecter</button>
+          <button class="btn btn-secondary btn-nosession btn-sm mr-1" style="width: 45%;" type="button"
+            data-dismiss="modal"> Annuler</button>
+          <button class="btn btn-danger btn-session btn-sm" style="width: 45%;" type="button" (click)="logout()"> Se
+            déconnecter</button>
         </div>
       </div>
     </div>
@@ -211,7 +226,8 @@
               <label class="lab_static">{{'parametre.static' | translate}}</label>
             </div>
             <div class="col-md-2 col-lg-2">
-              <label class="lab_close" data-dismiss="modal" aria-label="Close" #closeStatisticsModal><img src="assets/images/close_x.png" alt=""></label>
+              <label class="lab_close" data-dismiss="modal" aria-label="Close" #closeStatisticsModal><img
+                  src="assets/images/close_x.png" alt=""></label>
             </div>
           </div>
           <div class="row mb-l-20 mb-10 mt-3">
@@ -219,33 +235,27 @@
               <div [class]="isDark? 'card cust_card_d':'card cust_card_w'">
                 <div class="card-block">
                   <div class="row mb-3">
-                    <div class="col-lg-12 p-right-0"> <label [class]="isDark? 'lab_input clore_w' : 'lab_input clore_n'">Intervale de temps</label></div>
+                    <div class="col-lg-12 p-right-0"> <label
+                        [class]="isDark? 'lab_input clore_w' : 'lab_input clore_n'">Intervale de temps</label></div>
                     <div class="col-lg-6 p-right-0 d-flex">
-                      <label [class]="isDark? 'lab_input clore_w lab_duau mr-1' : 'lab_input clore_n lab_duau mr-1'" >Du</label>
-                      <p-calendar
-                        [(ngModel)]="searchParam.dateDebut"
-                        [showIcon]="true"
-                        inputId="icondisplayd" />
+                      <label
+                        [class]="isDark? 'lab_input clore_w lab_duau mr-1' : 'lab_input clore_n lab_duau mr-1'">Du</label>
+                      <p-calendar [(ngModel)]="searchParam.dateDebut" [showIcon]="true" inputId="icondisplayd" />
                     </div>
                     <div class="col-lg-6 d-flex">
-                      <label [class]="isDark? 'lab_input clore_w lab_duau mr-1' : 'lab_input clore_n lab_duau mr-1'" >Du</label>
-                      <p-calendar
-                        [(ngModel)]="searchParam.dateFin"
-                        [showIcon]="true"
-                        inputId="icondisplayf" />
+                      <label
+                        [class]="isDark? 'lab_input clore_w lab_duau mr-1' : 'lab_input clore_n lab_duau mr-1'">Du</label>
+                      <p-calendar [(ngModel)]="searchParam.dateFin" [showIcon]="true" inputId="icondisplayf" />
                     </div>
                   </div>
 
                   <div class="row">
                     <div class="col-lg-12 p-right-0">
-                      <label [class]="isDark? 'lab_input clore_w lab_duau mr-1' : 'lab_input clore_n lab_duau mr-1'" >Type de statistique</label>
-                      <p-multiSelect
-                        [options]="criteriaList"
-                        [(ngModel)]="typeStatistiques"
-                        optionLabel="name"
-                        optionValue="id"
-                        placeholder="Statistique par"
-                        styleClass="wd_100">
+                      <label
+                        [class]="isDark? 'lab_input clore_w lab_duau mr-1' : 'lab_input clore_n lab_duau mr-1'">Type de
+                        statistique</label>
+                      <p-multiSelect [options]="criteriaList" [(ngModel)]="typeStatistiques" optionLabel="name"
+                        optionValue="id" placeholder="Statistique par" styleClass="wd_100">
 
                         <ng-template let-value pTemplate="selectedItems">
                           <div class="d-flex align-items-center" *ngFor="let option of value">
@@ -263,7 +273,8 @@
                         <ng-template let-country pTemplate="footer">
                           <div class="py-2 px-3">
                             <b> {{ typeStatistiques ? typeStatistiques.length : 0 }} </b>
-                            element{{ (typeStatistiques ? typeStatistiques.length : 0) > 1 ? 's' : '' }} sectionné{{ (typeStatistiques ? typeStatistiques.length : 0) > 1 ? 's' : '' }}.
+                            element{{ (typeStatistiques ? typeStatistiques.length : 0) > 1 ? 's' : '' }} sectionné{{
+                            (typeStatistiques ? typeStatistiques.length : 0) > 1 ? 's' : '' }}.
                           </div>
                         </ng-template>
                       </p-multiSelect>
@@ -273,7 +284,7 @@
               </div>
             </div>
           </div>
-          <br/>
+          <br />
           <div class="row">
             <div class="col-md-12 mb-2" *ngIf="">
               <button class="btn btn_suivant btn-sm">
@@ -295,4 +306,3 @@
   </div>
 </div>
 <!-- /add type infraction modal -->
-

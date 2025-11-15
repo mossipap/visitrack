@@ -1,4 +1,5 @@
 import { Component, OnInit} from '@angular/core';
+import { SearchParam } from 'src/app/shared/utils/search-param';
 @Component({
   selector: 'app-rapport',
   templateUrl: './rapport.component.html',
@@ -6,6 +7,7 @@ import { Component, OnInit} from '@angular/core';
 })
 export class RapportComponent implements OnInit {
   public loading: boolean;
+  public searchParam: SearchParam;
 
   filtre = { dateRange: null, service: null, typePiece: null };
   services = [
@@ -14,19 +16,19 @@ export class RapportComponent implements OnInit {
     { designation: 'Comptabilité' },
     { designation: 'RH' }
   ];
-  typesPieces = [
-    { label: 'CNI', value: 'CNI' },
-    { label: 'Passeport', value: 'Passeport' },
-    { label: 'Permis', value: 'Permis' }
-  ];
+
 
   rapportData: any[] = [];
   resumeServices: any[] = [];
   selectedVisitor: any = null;
   showDetails = false;
  
-constructor() {}
+constructor() {
+  this.searchParam = new SearchParam();
+}
+
   ngOnInit() {
+     this.searchParam.dateFin.setDate(this.searchParam.dateFin.getDate() + 1);
     this.genererDonnees();
  
 

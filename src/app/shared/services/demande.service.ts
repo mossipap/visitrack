@@ -63,5 +63,11 @@ export class DemandeService {
   }
   public deleteVisiteur(v: Visiteur) {
     return this.http.delete(this.serviceURL + '/Visiteur/'+v.id, this.httpOptions);
+  } 
+   public saveVisiteur(visiteur: Visiteur) {
+    return this.http.post(this.serviceURL + '/Visiteur', visiteur, this.httpOptions);
+  }
+    public updateVisiteur(visiteur: Visiteur) {
+    return this.http.put(this.serviceURL + '/Visiteur/'+visiteur.id, visiteur, this.httpOptions);
   }
 }

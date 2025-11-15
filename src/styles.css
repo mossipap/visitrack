@@ -481,3 +481,8 @@ body {
     background: #3f51b5 !important;
     color: #FFFFFF !important;
 }
+.desc_confirm{
+  color: red;
+  font-family: inherit;
+  font-size: 17px;
+}

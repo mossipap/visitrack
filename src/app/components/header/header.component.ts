@@ -93,7 +93,7 @@ export class HeaderComponent implements OnInit {
             this.menuTitle = 'Rapports et statistiques';
           break;
       
-          case 'reclamations':
+          case 'reclamation':
             this.menuTitle = 'Réclamations';
           break;
        

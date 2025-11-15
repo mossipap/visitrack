@@ -14,6 +14,9 @@ import { Demande } from 'src/app/shared/models/demande';
 import { DemandeService } from 'src/app/shared/services/demande.service';
 import { Service } from 'src/app/shared/models/service';
 import { Modal } from 'bootstrap';
+import { DomSanitizer } from '@angular/platform-browser';
+import html2canvas from 'html2canvas';
+declare var bootstrap: any;
 @Component({
   selector: 'app-visiteur',
   templateUrl: './visiteur.component.html',
@@ -22,12 +25,11 @@ import { Modal } from 'bootstrap';
 export class VisiteurComponent implements OnInit {
   public visiteurs: Visiteur[] = [];
   public selectedUsers: Demande[][];
-  public visiteur: Demande = new Demande();
+ public visiteur: Visiteur = new Visiteur();
   public cabinets: Cabinet[] = [];
   public cabinetFilter = { designation: '' };
   public services: Service[] = [];
   public typeUserFilter = { designation: '' };
-  public visiteures: Visiteur[] = [];
   public visiteureFilter = { nom: '' };
   public roleManager: RoleManager;
   public searchParam: SearchParam;
@@ -64,6 +66,8 @@ export class VisiteurComponent implements OnInit {
   selectAll: boolean = false;
   indicatifs: any = {};
   public deleteModal?: Modal;
+  previewUrl: any | null = null;
+
 
   constructor(
     private visiteurService: DemandeService,
@@ -71,7 +75,8 @@ export class VisiteurComponent implements OnInit {
     private typeUserService: ServiceService,
     private toast: AppToastService,
     private appConfig: AppConfig,
-    private http: HttpClient
+    private http: HttpClient,
+    private sanitizer: DomSanitizer
   ) {
     this.currentUser = this.appConfig.currentUser;
     this.roleManager = new RoleManager();
@@ -83,6 +88,7 @@ export class VisiteurComponent implements OnInit {
     this.searchParam.dateFin.setDate(this.searchParam.dateFin.getDate() + 1);
     this.search();
     this.loadIndicatifs();
+    
   }
   loadIndicatifs() {
     this.http.get('assets/indicatifs.json').subscribe(
@@ -126,16 +132,17 @@ export class VisiteurComponent implements OnInit {
   showList() {
     this.currentView = 'list';
     this.pageTitle = 'Liste'
+    this.search();
   }
   showAddForm() {
-    this.visiteur = new Demande();
+    this.visiteur = new Visiteur();
     this.findCabinets();
     this.findServices();
     this.currentView = 'add';
     this.pageTitle = 'Nouveau visiteur';
   }
 
-  showEditForm(user: Demande) {
+  showEditForm(user: Visiteur) {
     this.visiteur = user;
     this.findCabinets();
     this.findServices();
@@ -143,22 +150,84 @@ export class VisiteurComponent implements OnInit {
     this.pageTitle = 'Modification d\'visiteur';
   }
 
-  showDetail(user: Demande) {
-    this.visiteur = user;
-    //this.currentPage = 'detail';
-    this.pageTitle = 'Détails user'
-  }
+ showDetail(v: Visiteur) {
+  this.visiteur = v;
+  // PDF en dur
+  const filePath = "assets/images/piece.pdf";
+  // Sécurisation Angular obligatoire
+  this.visiteur.pieceUrl = this.sanitizer.bypassSecurityTrustResourceUrl(filePath);
+  this.currentView = 'detail';
+}
 
-  showResetDialog(visiteur: Demande): void {
+// Ouvrir le modal d'aperçu
+openPreview(url: string) {
+  this.previewUrl = url;
+  const modalElement = document.getElementById('previewModal');
+  if (modalElement) {
+    const modal = new bootstrap.Modal(modalElement);
+    modal.show();
+  }
+}
+
+// Télécharger le fichier
+downloadPiece(url: string) {
+  if (!url) return;
+
+  // Assurer URL absolue
+  const baseUrl = window.location.origin; // http://localhost:4200
+  const fileUrl = 'http://localhost:4200/assets/images/piece.pdf';
+
+  const link = document.createElement('a');
+  link.href = fileUrl;
+  link.download = `PieceIdentite_${this.visiteur.nomComplet}${fileUrl.substring(fileUrl.lastIndexOf('.'))}`;
+  link.click();
+}
+
+// Impression de la fiche
+printPage() {
+  const element = document.getElementById('print-section');
+  if (!element) return;
+
+  // Capture l'élément en image
+  html2canvas(element, { scale: 2 }).then(canvas => {
+    // Convertir en image
+    const imgData = canvas.toDataURL('image/png');
+
+    // Créer une nouvelle fenêtre pour impression
+    const printWindow = window.open('', '_blank', 'width=900,height=700');
+    if (printWindow) {
+      printWindow.document.write(`
+        <html>
+          <head>
+            <title>Impression</title>
+            <style>
+              body { margin: 0; padding: 20px; text-align: center; }
+              img { max-width: 100%; }
+            </style>
+          </head>
+          <body>
+            <img src="${imgData}" />
+            <script>
+              window.onload = function() { window.print(); window.close(); }
+            </script>
+          </body>
+        </html>
+      `);
+      printWindow.document.close();
+    }
+  });
+}
+
+  showResetDialog(visiteur: Visiteur): void {
     this.visiteur = visiteur;
   }
 
-  showConfirmDialog(visiteur: Demande): void {
+  showConfirmDialog(visiteur: Visiteur): void {
     // this.dialogAction = action;
     this.visiteur = visiteur;
     this.openConfirmDialog.nativeElement.click();
   }
-  showDeleteDialog(visiteur: Demande): void {
+  showDeleteDialog(visiteur: Visiteur): void {
     this.visiteur = visiteur;
     if (this.deleteModal) {
       this.deleteModal.show();
@@ -173,7 +242,7 @@ export class VisiteurComponent implements OnInit {
   deleteVisiteur(): void {
     if (this.visiteur) {
       this.loading = true;
-      this.visiteurService.delete(this.visiteur).subscribe((ret: any) => {
+      this.visiteurService.deleteVisiteur(this.visiteur).subscribe((ret: any) => {
         if (ret['code'] == 200) {
           this.visiteur = ret['data'];
           this.closeDeleteDialog();
@@ -277,7 +346,7 @@ search() {
     this.currentUser.service_name;
     // this.visiteur.image = null;
     this.loading = true;
-    this.visiteurService.save(this.visiteur).subscribe(ret => {
+    this.visiteurService.saveVisiteur(this.visiteur).subscribe(ret => {
       if (ret['code'] === 200) {
         this.visiteur = ret['data'];
         this.closeAddElementDialog.nativeElement.click();
@@ -300,15 +369,14 @@ search() {
     /* this.visiteur.cabinet_id = this.visiteur.cabinet.id;
     this.visiteur.typeUser_id = this.visiteur.typeUser.id;
     this.visiteur.visiteur_id = this.visiteur.visiteur.id; */
-    this.visiteurService.update(this.visiteur).subscribe(ret => {
+    this.visiteurService.updateVisiteur(this.visiteur).subscribe(ret => {
       if (ret['code'] === 200) {
         this.visiteur = ret['data'];
-
-        this.closeAddElementDialog.nativeElement.click();
-        this.toast.success("Demande modifié avec succès");
+       // this.closeAddElementDialog.nativeElement.click();
+        this.toast.success("Visiteur modifié avec succès");
         this.loading = false;
         this.showList();
-        this.search();
+
       } else {
         this.toast.error(ret['message']);
         this.loading = false;
@@ -319,40 +387,6 @@ search() {
     });
   }
 
-  UpdateStatut(statut: string) {
-    this.loading = true;
-    this.visiteur.statut = statut;
-
-    this.visiteurService.updateStatut(this.visiteur).subscribe(
-      ret => {
-        if (ret['code'] === 200) {
-          this.visiteur = ret['data'];
-
-          // MAJ dans la liste locale
-          this.visiteurs.forEach(user => {
-            if (user.id === this.visiteur.id) {
-              user.statut = this.visiteur.statut;
-            }
-          });
-
-          // ✅ Fermer la modale Bootstrap via jQuery
-          (('#userConfirmModal') as any).modal('hide');
-
-          // Toast de succès
-          this.toast.success("Statut mis à jour avec succès.");
-
-          this.showList();
-        } else {
-          this.toast.error(ret['message']);
-        }
-        this.loading = false;
-      },
-      error => {
-        this.toast.error(environment.erreur_connexion_message);
-        this.loading = false;
-      }
-    );
-  }
 
 
   findCabinets() {

@@ -20,7 +20,8 @@
           <!-- 🔍 Barre de recherche -->
           <div class="search-wrapper d-flex align-items-center">
             <i class="mdi mdi-magnify search-icon"></i>
-            <input type="text" [(ngModel)]="searchFilterText" placeholder="Rechercher un profil..." (input)="filterVisiteurs($event)" class="search-input" />
+            <input type="text" [(ngModel)]="searchFilterText" placeholder="Rechercher un profil..."
+              (input)="filterVisiteurs($event)" class="search-input" />
           </div>
           <!-- 🧩 Bouton filtre -->
           <button *ngIf="!isSearch" (click)="isSearch = true"
@@ -57,7 +58,8 @@
             </div>
           </div>
           <!-- ➕ Bouton ajout -->
-          <button *ngIf="false" class="btn btn-dark d-flex align-items-center gap-1 px-3" data-backdrop="static" data-toggle="modal" data-target="#addVisiteurModal" (click)="showAddForm()">
+          <button *ngIf="false" class="btn btn-dark d-flex align-items-center gap-1 px-3" data-backdrop="static"
+            data-toggle="modal" data-target="#addVisiteurModal" (click)="showAddForm()">
             <i class="mdi mdi-plus"></i>
             <span>Ajouter un Visiteur</span>
           </button>
@@ -83,7 +85,7 @@
                 <th>Téléphone</th>
                 <th>Fonction</th>
                 <th>Date</th>
-                 <th class="text-center action-buttons">Options</th>
+                <th class="text-center action-buttons">Options</th>
               </tr>
             </thead>
 
@@ -100,10 +102,12 @@
                 <td>{{ visiteur.id }}</td>
                 <td>
                   <div class="d-flex align-items-center">
-                    <div class="avatar-abbr me-2" *ngIf="this.visiteur?.sexe ==='Homme'" style="background-color: #2196F3;">
+                    <div class="avatar-abbr me-2" *ngIf="this.visiteur?.sexe ==='Homme'"
+                      style="background-color: #2196F3;">
                       {{ getInitials(visiteur?.nomComplet) }}
                     </div>
-                    <div class="avatar-abbr me-2" *ngIf="this.visiteur?.sexe ==='Femme'" style="background-color: #f45187;">
+                    <div class="avatar-abbr me-2" *ngIf="this.visiteur?.sexe ==='Femme'"
+                      style="background-color: #f45187;">
                       {{ getInitials(visiteur.nomComplet) }}
                     </div>
                     <span>{{ visiteur.nomComplet }}</span>
@@ -122,7 +126,7 @@
                   {{formatPhone(visiteur.numeroTelephone) }}
                 </td>
                 <td>{{ visiteur.fonction }}</td>
-              <!--   <td [class]="isDark ? 'td-d' : 'td-w'">
+                <!--   <td [class]="isDark ? 'td-d' : 'td-w'">
                   <div class="d-flex align-items-center">
                     <img *ngIf="!visiteur.image" src="assets/images/profile/avatar.jpeg" alt="Not"
                       class="img-avatar me-2" />
@@ -134,9 +138,9 @@
                     </div>
                   </div>
                 </td> -->
-                 <td>{{ visiteur.created_at | date: 'dd/MM/yyyy'}}</td>
+                <td>{{ visiteur.created_at | date: 'dd/MM/yyyy'}}</td>
 
-             <!--    <td [class]="isDark ? 'td-d' : 'td-w'">
+                <!--    <td [class]="isDark ? 'td-d' : 'td-w'">
                   <span [class]="(visiteur.statut === 'Actif') ? 'acces_active' : 'acces_block'">
                     <i class="mdi"
                       [ngClass]="(visiteur.statut === 'Actif') ? 'mdi-check-circle text-success' : 'mdi-timer-sand text-warning'"></i>
@@ -154,12 +158,12 @@
                       data-target="#detailUserModal" (click)="showDetail(visiteur)">
                       <img src="assets/icons/mdi/eye.png" alt="Voir" class="icon-btn" />
                     </button>
-                    <button class="btn btn-light btn-icon" title="Modifier" data-backdrop="static" data-toggle="modal"
-                      data-target="#addVisiteurModal" (click)="showEditForm(visiteur)">
+                    <button class="btn btn-light btn-icon" title="Modifier" data-backdrop="static"
+                      data-toggle="modal" data-target="#addVisiteurModal" (click)="showEditForm(visiteur)">
                       <img src="assets/icons/mdi/edit.png" alt="Modifier" class="icon-btn" />
                     </button>
-                    <button *ngIf="false" class="btn btn-light btn-icon" title="Supprimer" data-backdrop="static" data-toggle="modal"
-                      data-target="#deleteConfirmModal" (click)="showDeleteDialog(visiteur)">
+                    <button *ngIf="false" class="btn btn-light btn-icon" title="Supprimer" data-backdrop="static"
+                      data-toggle="modal" data-target="#deleteConfirmModal" (click)="showDeleteDialog(visiteur)">
                       <img src="assets/icons/mdi/delete.png" alt="Supprimer" class="icon-btn" />
                     </button>
                     <button *ngIf="false" class="btn btn-danger btn-sm fw-semibold">Bloquer</button>
@@ -205,250 +209,303 @@
     <!-- /list -->
 
     <!-- detail -->
+    <div class="container demo" *ngIf="currentView === 'detail'">
+      <div class="container-detail" style="background-color: #fff;padding-bottom: 20px;">
+              <a style="float: right; margin-top: 15px; margin-right: 50px; color: red; font-size: 20px; cursor: pointer;" (click)="showList()"><i class="fa fa-times"></i></a>
+
+        <div id="print-section" class="a4-container">
+          <!-- HEADER -->
+          <div class="header">
+            <img src="assets/images/v1.png" alt="Logo" class="logo">
+            <div class="header-text">
+              <h2 class="company-name">CABINET / ENTREPRISE</h2>
+              <p class="sub-title">Fiche de renseignement du visiteur</p>
+            </div>
+            <img src="assets/images/ppef.png" alt="Logo" class="logo">
+          </div>
+          <hr class="separator">
+          <div class="d-flex justify-content-center">
+            <div class="card shadow-sm rounded-3 p-4 mb-4" style="max-width: 600px; width: 100%;">
+              <h3 class="card-title mb-4 text-primary text-center">
+                <i class="mdi mdi-account-circle-outline me-2"></i> Informations personnelles
+              </h3>
+
+              <div class="row mb-2">
+                <div class="col-5 fw-bold text-end">Nom complet</div>
+                <div class="col-7 text-start">{{ visiteur.nomComplet }}</div>
+              </div>
+
+              <div class="row mb-2">
+                <div class="col-5 fw-bold text-end">Sexe</div>
+                <div class="col-7 text-start">{{ visiteur.sexe }}</div>
+              </div>
+
+              <div class="row mb-2">
+                <div class="col-5 fw-bold text-end">Type de pièce</div>
+                <div class="col-7 text-start">{{ visiteur.typePiece }}</div>
+              </div>
+
+              <div class="row mb-2">
+                <div class="col-5 fw-bold text-end">Numéro de pièce</div>
+                <div class="col-7 text-start">{{ visiteur.numeroPiece }}</div>
+              </div>
+
+              <div class="row mb-2">
+                <div class="col-5 fw-bold text-end">Adresse</div>
+                <div class="col-7 text-start">{{ visiteur.adresse }}</div>
+              </div>
+
+              <div class="row mb-2">
+                <div class="col-5 fw-bold text-end">Téléphone</div>
+                <div class="col-7 text-start">{{ visiteur.numeroTelephone }}</div>
+              </div>
+
+              <div class="row mb-2">
+                <div class="col-5 fw-bold text-end">Fonction</div>
+                <div class="col-7 text-start">{{ visiteur.fonction }}</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Informations de la demande -->
+          <div *ngIf="visiteur.demande?.length > 0">
+            <h3 class="section-title">Informations de la demande</h3>
+            <table class="info-table">
+              <thead>
+                <tr>
+                  <th>Objet retiré</th>
+                  <th>Objet saisi</th>
+                  <th>Motif de visite</th>
+                  <th>Date visite</th>
+                  <th>Heure arrivée</th>
+                  <th>Heure départ</th>
+                  <th>Statut</th>
+                  <th>Pièce d'identité</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let d of visiteur.demande">
+                  <td>{{ d.objet_retirer }}</td>
+                  <td>{{ d.objet_saisie }}</td>
+                  <td>{{ d.raisonVisite }}</td>
+                  <td>{{ d.dateVisite | date:'dd/MM/yyyy' }}</td>
+                  <td>{{ d.heureArrive }}</td>
+                  <td>{{ d.heureDepart }}</td>
+                  <td>
+                    <span class="badge bg-warning" *ngIf="d.statut === 'En cours'">En cours</span>
+                    <span class="badge bg-success" *ngIf="d.statut === 'Terminée'">Terminée</span>
+                  </td>
+                  <td>
+                    <button class="btn btn-sm btn-info me-1" (click)="openPreview(visiteur.pieceUrl)">
+                      <i class="mdi mdi-eye"></i>
+                    </button>
+                    <button class="btn btn-sm btn-success" (click)="downloadPiece(visiteur.pieceUrl)">
+                      <i class="mdi mdi-download"></i>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Signature -->
+          <div class="signature-block">
+            <div class="sign">
+              <p>Signature du visiteur</p>
+                <img src="assets/images/signature.png" alt="Signature preview" class="signature-preview shadow-sm" width="200px" height="100px" />
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Boutons centrés -->
+        <div class="d-flex justify-content-center mt-4">
+          <button class="btn btn-primary me-3" (click)="printPage()" style="margin-right: 10px;">
+            <i class="mdi mdi-printer me-1"></i> Imprimer
+          </button>
+
+          <button class="btn btn-danger" (click)="showList()">
+            <i class="mdi mdi-close-circle-outline me-1"></i> Fermer
+          </button>
+        </div>
+      </div>
+
+    </div>
+    <!-- /detail -->
+    <!-- ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±± -->
+    <!-- Aperçu pièce -->
+    <div class="modal fade" id="previewModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Aperçu de la pièce d'identité</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body text-center">
+
+            <iframe [src]="visiteur.pieceUrl" width="100%" height="500px"
+              style="border: 1px solid #ccc; border-radius: 8px;"></iframe>
+
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-success" (click)="downloadPiece(visiteur.pieceUrl)">
+              <i class="mdi mdi-download me-1"></i> Télécharger
+            </button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±± -->
+
+    <!-- detail -->
     <div class="container demo" *ngIf="currentView === 'list'">
       <div class="modal right fade" id="detailUserModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel2">
         <div class="modal-dialog" role="document">
           <div class="modal-content" [style]="{'background-color': isDark ? '#1f1f1f' : '#FFFFFF'}">
-            <div class="d-flex" style="margin-top: 15px;">
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="margin-left: 10px;"
-                #closeDetailElementDialog>
-                <label [class]="isDark? 'txt-title-d ml-2': 'ml-1'" style="font-size: 14px;">
-                  <i class="fa fa-chevron-left mr-2"></i> Détail de visiteur du Cabinet N°
-                  {{visiteur?.cabinet?.designation}}
-                </label>
+
+            <!-- 🔹 Header - Bouton retour -->
+            <div class="d-flex align-items-center p-3 border-bottom">
+              <button type="button" class="btn btn-link p-0 d-flex align-items-center" data-dismiss="modal"
+                aria-label="Close" #closeDetailElementDialog>
+                <i class="fa fa-chevron-left mr-2"></i>
+                <span [class]="isDark ? 'txt-title-d' : ''" style="font-size: 15px;">
+                  Détail du visiteur : <strong>{{ visiteur?.nomComplet }}</strong>
+                </span>
               </button>
             </div>
 
+            <!-- 🔹 Body -->
             <div class="modal-body">
-              <div class="row mb-l-20 mb-10">
-                <div class="col-md-12 col-lg-12">
-                  <form #formAddUser="ngForm">
-                    <div class="row mb-l-20 mb-10">
-                      <div class="col-md-12 col-lg-12 p-right-0">
-                        <div [class]="isDark? 'card cust_card_d':'card cust_card_w'">
-                          <div class="card-block">
-                            <div class="row mb-3 mt-2">
-                              <div class="col-md-12 col-lg-12 p-right-0 ta-center">
-                                <label
-                                  [class]="isDark? 'form-control-label ft-w-b c-cab-1' : 'form-control-label ft-w-b c-cab-2'">
-                                  Information générale
-                                </label>
-                              </div>
-                            </div>
+              <div class="card shadow-sm p-3 rounded-3" *ngIf="visiteur">
 
-                            <div class="row mb-2">
-                              <div class="col-lg-6 p-right-0">
-                                <div class="form-group has-success align-left">
-                                  <label
-                                    [class]="isDark? 'form-control-label c-cab-1 detail_lab' : 'form-control-label c-cab-2 detail_lab'">Date
-                                    du jour</label>
-                                  <div [class]="isDark? 'detail_desc c-cab-1' : 'detail_desc c-cab-2'">
-                                    {{visiteur?.dateVisite}}</div>
-                                </div>
-                              </div>
-                              <div class="col-lg-6 p-right-0">
-                                <div class="form-group has-success align-left">
-                                  <label
-                                    [class]="isDark? 'form-control-label c-cab-1 detail_lab' : 'form-control-label c-cab-2 detail_lab'">Type
-                                    de pièce</label>
-                                  <div [class]="isDark? 'detail_desc c-cab-1' : 'detail_desc c-cab-2'">
-                                    {{visiteur?.typePiece}}</div>
-                                </div>
-                              </div>
-                            </div>
+                <!-- 🔹 Titre -->
+                <h5 class="fw-bold mb-3">
+                  <i class="mdi mdi-account-circle-outline me-2"></i>
+                  Informations personnelles
+                </h5>
 
-                            <div class="row mb-2">
-                              <div class="col-lg-6 p-right-0">
-                                <div class="form-group has-success align-left">
-                                  <label
-                                    [class]="isDark? 'form-control-label c-cab-1 detail_lab' : 'form-control-label c-cab-2 detail_lab'">Nom
-                                    Complet</label>
-                                  <div [class]="isDark? 'detail_desc c-cab-1' : 'detail_desc c-cab-2'">
-                                    {{visiteur?.nomComplet}}</div>
-                                </div>
-                              </div>
-                              <div class="col-lg-6 p-right-0">
-                                <div class="form-group has-success align-left">
-                                  <label
-                                    [class]="isDark? 'form-control-label c-cab-1 detail_lab' : 'form-control-label c-cab-2 detail_lab'">Téléphone</label>
-                                  <div [class]="isDark? 'detail_desc c-cab-1' : 'detail_desc c-cab-2'">
-                                    {{visiteur?.numeroTelephone}}</div>
-                                </div>
-                              </div>
-                            </div>
+                <!-- 🔹 Infos générales -->
+                <table class="table table-bordered mb-4">
+                  <tbody>
+                    <tr>
+                      <th>Nom complet</th>
+                      <td>{{ visiteur.nomComplet }}</td>
+                    </tr>
+                    <tr>
+                      <th>Sexe</th>
+                      <td>{{ visiteur.sexe }}</td>
+                    </tr>
+                    <tr>
+                      <th>Type de pièce</th>
+                      <td>{{ visiteur.typePiece }}</td>
+                    </tr>
+                    <tr>
+                      <th>Numéro de pièce</th>
+                      <td>{{ visiteur.numeroPiece }}</td>
+                    </tr>
+                    <tr>
+                      <th>Adresse</th>
+                      <td>{{ visiteur.adresse }}</td>
+                    </tr>
+                    <tr>
+                      <th>Téléphone</th>
+                      <td>{{ visiteur.numeroTelephone }}</td>
+                    </tr>
+                    <tr>
+                      <th>Fonction</th>
+                      <td>{{ visiteur.fonction }}</td>
+                    </tr>
+                  </tbody>
+                </table>
 
-                            <div class="row mb-2">
-                              <div class="col-lg-6 p-right-0">
-                                <div class="form-group has-success align-left">
-                                  <label
-                                    [class]="isDark? 'form-control-label c-cab-1 detail_lab' : 'form-control-label c-cab-2 detail_lab'">Nunéro
-                                    de pièce</label>
-                                  <div [class]="isDark? 'detail_desc c-cab-1' : 'detail_desc c-cab-2'">
-                                    {{visiteur?.numeroPiece}}</div>
-                                </div>
-                              </div>
-                              <div class="col-lg-6 p-right-0">
-                                <div class="form-group has-success align-left">
-                                  <label
-                                    [class]="isDark? 'form-control-label c-cab-1 detail_lab' : 'form-control-label c-cab-2 detail_lab'">Adresse</label>
-                                  <div [class]="isDark? 'detail_desc c-cab-1' : 'detail_desc c-cab-2'">
-                                    {{visiteur?.adresse}}</div>
-                                </div>
-                              </div>
-                            </div>
+                <!-- 🔹 Informations sur les demandes -->
+                <div *ngIf="visiteur.demande?.length > 0">
+                  <h5 class="fw-bold mb-3">
+                    <i class="mdi mdi-file-document-outline me-2"></i>
+                    Détails de la demande
+                  </h5>
 
-                          </div>
-                        </div>
-                      </div>
-                      <div
-                        [class]="isDark? 'col-md-12 col-lg-12 p-right-0 div_separate_d':'col-md-12 col-lg-12 p-right-0 div_separate_w'">
-                      </div>
+                  <table class="table table-hover table-striped table-bordered rounded-3 overflow-hidden">
+                    <thead class="table-light">
+                      <tr>
+                        <th>Objet retiré</th>
+                        <th>Objet saisi</th>
+                        <th>Raison</th>
+                        <th>Date visite</th>
+                        <th>Heure arrivée</th>
+                        <th>Heure départ</th>
+                        <th>Statut</th>
+                      </tr>
+                    </thead>
 
-                      <div class="col-md-12 col-lg-12 p-right-0">
-                        <div [class]="isDark? 'card cust_card_d':'card cust_card_w'">
-                          <div class="card-block">
-                            <div class="row mb-3 mt-2">
-                              <div class="col-md-12 col-lg-12 p-right-0 ta-center">
-                                <label
-                                  [class]="isDark? 'form-control-label ft-w-b c-cab-1' : 'form-control-label ft-w-b c-cab-2'">
-                                  Information du cabinet :
-                                </label>
-                              </div>
-                            </div>
-
-                            <div class="row mb-2">
-                              <div class="col-lg-6 p-right-0">
-                                <div class="form-group has-success align-left">
-                                  <label
-                                    [class]="isDark? 'form-control-label c-cab-1 detail_lab' : 'form-control-label c-cab-2 detail_lab'">Cabinet</label>
-                                  <div [class]="isDark? 'detail_desc c-cab-1' : 'detail_desc c-cab-2'">
-                                    {{visiteur?.cabinet?.designation}}</div>
-                                </div>
-                              </div>
-                              <div class="col-lg-6 p-right-0 mb-3">
-                                <div class="form-group has-success align-left">
-                                  <label
-                                    [class]="isDark? 'form-control-label c-cab-1 detail_lab' : 'form-control-label c-cab-2 detail_lab'"
-                                    for="typeUser">Employé</label>
-                                  <div [class]="isDark? 'detail_desc c-cab-1' : 'detail_desc c-cab-2'">
-                                    {{visiteur?.service?.designation}}</div>
-                                </div>
-                              </div>
-                            </div>
-
-                            <div class="row mb-2">
-                              <div class="col-lg-6 p-right-0">
-                                <div class="form-group has-success align-left">
-                                  <label
-                                    [class]="isDark? 'form-control-label c-cab-1 detail_lab' : 'form-control-label c-cab-2 detail_lab'">Heure
-                                    d'arrivée</label>
-                                  <div [class]="isDark? 'detail_desc c-cab-1' : 'detail_desc c-cab-2'">
-                                    {{visiteur?.heureArrive}}</div>
-                                </div>
-                              </div>
-                              <div class="col-lg-6 p-right-0">
-                                <div class="form-group has-success align-left">
-                                  <label
-                                    [class]="isDark? 'form-control-label c-cab-1 detail_lab' : 'form-control-label c-cab-2 detail_lab'">Fonction</label>
-                                  <div [class]="isDark? 'detail_desc c-cab-1' : 'detail_desc c-cab-2'">
-                                    {{visiteur?.fonction}}</div>
-                                </div>
-                              </div>
-                            </div>
-
-                            <div class="row mb-2">
-                              <div class="col-lg-6 p-right-0">
-                                <div class="form-group has-success align-left">
-                                  <label
-                                    [class]="isDark? 'form-control-label c-cab-1 detail_lab' : 'form-control-label c-cab-2 detail_lab'"
-                                    for="organisationname">Heure de départ</label>
-                                  <div [class]="isDark? 'detail_desc c-cab-1' : 'detail_desc c-cab-2'">
-                                    {{visiteur?.heureDepart}}</div>
-                                </div>
-                              </div>
-                              <div class="col-lg-6 p-right-0">
-                                <div class="form-group has-success align-left">
-                                  <label
-                                    [class]="isDark? 'form-control-label c-cab-1 detail_lab' : 'form-control-label c-cab-2 detail_lab'"
-                                    for="organisationname">Heure de visite</label>
-                                  <div [class]="isDark? 'detail_desc c-cab-1' : 'detail_desc c-cab-2'">
-                                    {{visiteur?.heureVisite}}</div>
-                                </div>
-                              </div>
-                            </div>
-
-                          </div>
-                        </div>
-                      </div>
-                      <div [class]="isDark ? 'card cust_card_d' : 'card cust_card_w'">
-                        <div class="card-block p-4 text-center">
-                          <!-- Aperçu -->
-                          <div class="mt-3">
-                            <h6 class="text-muted mb-2">Aperçu de la signature :</h6>
-                            <img src="assets/images/signature.png" alt="Signature preview"
-                              class="signature-preview shadow-sm" />
-                          </div>
-                        </div>
-                      </div>
-
-                      <div
-                        [class]="isDark? 'col-md-12 col-lg-12 p-right-0 div_separate_d':'col-md-12 col-lg-12 p-right-0 div_separate_w'">
-                      </div>
-                    </div>
-                    <div class="row">
-                      <div class="col-md-12 ta-center">
-                        <label class="lab_reset" data-dismiss="modal" aria-label="Close">Fermer</label>
-                      </div>
-                    </div>
-                  </form>
+                    <tbody>
+                      <tr *ngFor="let d of visiteur.demande">
+                        <td>{{ d.objet_retirer }}</td>
+                        <td>{{ d.objet_saisie }}</td>
+                        <td>{{ d.raisonVisite }}</td>
+                        <td>{{ d.dateVisite | date:'dd/MM/yyyy' }}</td>
+                        <td>{{ d.heureArrive }}</td>
+                        <td>{{ d.heureDepart }}</td>
+                        <td>
+                          <span class="badge bg-warning" *ngIf="d.statut === 'En cours'">En cours</span>
+                          <span class="badge bg-success" *ngIf="d.statut === 'Validé'">Validé</span>
+                          <span class="badge bg-danger" *ngIf="d.statut === 'Rejeté'">Rejeté</span>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
                 </div>
-              </div>
 
+              </div>
             </div>
+
           </div>
         </div>
       </div>
     </div>
     <!-- /detail -->
 
-    <!-- Modal confim bloque -->
-    <div *ngIf="currentView === 'list'" class="modal fade text-xs-left" id="userConfirmModal" tabindex="-1"
-      role="dialog" aria-labelledby="myModalLabel2" aria-hidden="true">
-
-      <div class="modal-sm modal-dialog" role="document">
+    <!-- Modal confim delete -->
+    <div class="modal fade text-xs-left" id="deleteConfirmModal" tabindex="-1" role="dialog"
+      aria-labelledby="myModalLabel2" aria-hidden="true">
+      <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
         <div class="modal-content" style="width: 340px;">
 
-          <!-- Header -->
-          <div class="modal-header d-flex justify-content-between align-items-center">
-            <h4 class="modal-title" id="myModalLabel2">
-              <i class="mdi mdi-alert-circle-outline text-warning mr-2"></i>
-              Confirmation
+          <!-- 🔹 HEADER -->
+          <div class="modal-header justify-content-center position-relative">
+            <h4 class="modal-title text-center" id="myModalLabel2">
+              <img src="assets/images/close_c.png" alt="" class="im_confirm">
             </h4>
-            <i class="mdi mdi-close-circle cursor-pointer text-danger" data-dismiss="modal"></i>
+            <img src="assets/images/close_x.png" alt="" class="cursor-p position-absolute"
+              style="top: 10px; right: 10px;" data-dismiss="modal">
           </div>
 
-          <!-- Body -->
-          <div class="modal-body">
-            <span class="txt_confirm d-block mb-2">
-              Bonjour, vous vous apprêtez à changer le statut de
-              <strong>{{visiteur?.nomComplet}}</strong>.
-            </span>
-            <span class="desc_confirm text-muted">
-              Êtes-vous sûr de continuer cette opération ?
-            </span>
+          <!-- 🔹 BODY -->
+          <div class="modal-body text-center">
+            <p class="txt_confirm">
+              Bonjour, vous vous apprêtez à bloquer le {{visiteur?.nomComplet}}
+            </p>
+            <p class="desc_confirm">
+              Êtes-vous sûr de supprimer cette demande ?
+            </p>
+
+            <!--  <div class="form-group mt-3 text-left">
+          <label>Motif de suppression <span class="text-danger">*</span></label>
+          <textarea class="form-control" placeholder="Taper le motif de suppression ici..." 
+                    id="motif" rows="4" [(ngModel)]="demande.commentaire" required>
+          </textarea>
+        </div> -->
           </div>
 
-          <!-- Footer -->
-          <div class="modal-footer">
-            <div class="w-100 d-flex justify-content-between">
-              <button class="btn btn-success btn-sm d-flex align-items-center" (click)="UpdateStatut('Terminé')">
-                <i class="mdi mdi-check-circle mr-1"></i> Valider
-              </button>
-
-              <button class="btn btn-secondary btn-sm d-flex align-items-center" data-dismiss="modal">
-                <i class="mdi mdi-close-circle mr-1"></i> Annuler
-              </button>
-            </div>
+          <!-- 🔹 FOOTER -->
+          <div class="modal-footer d-flex justify-content-between">
+            <button class="btn btn-blocked btn-sm" type="button" (click)="deleteVisiteur()">
+              Supprimer
+            </button>
+            <button class="btn btn-cancel btn-sm" type="button" data-dismiss="modal" (click)="closeDeleteDialog()">
+              Annuler
+            </button>
           </div>
 
         </div>
@@ -456,288 +513,128 @@
     </div>
 
 
-    <!-- Modal confim delete -->
-   <div class="modal fade text-xs-left" id="deleteConfirmModal" tabindex="-1" role="dialog"
-  aria-labelledby="myModalLabel2" aria-hidden="true">
-  <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
-    <div class="modal-content" style="width: 340px;">
-
-      <!-- 🔹 HEADER -->
-      <div class="modal-header justify-content-center position-relative">
-        <h4 class="modal-title text-center" id="myModalLabel2">
-          <img src="assets/images/close_c.png" alt="" class="im_confirm">
-        </h4>
-        <img src="assets/images/close_x.png" alt="" class="cursor-p position-absolute" 
-             style="top: 10px; right: 10px;" data-dismiss="modal">
-      </div>
-
-      <!-- 🔹 BODY -->
-      <div class="modal-body text-center">
-        <p class="txt_confirm">
-          Bonjour, vous vous apprêtez à bloquer le {{visiteur?.nomComplet}}
-        </p>
-        <p class="desc_confirm">
-          Êtes-vous sûr de supprimer cette demande ?
-        </p>
-
-       <!--  <div class="form-group mt-3 text-left">
-          <label>Motif de suppression <span class="text-danger">*</span></label>
-          <textarea class="form-control" placeholder="Taper le motif de suppression ici..." 
-                    id="motif" rows="4" [(ngModel)]="demande.commentaire" required>
-          </textarea>
-        </div> -->
-      </div>
-
-      <!-- 🔹 FOOTER -->
-      <div class="modal-footer d-flex justify-content-between">
-        <button class="btn btn-blocked btn-sm" type="button" (click)="deleteVisiteur()">
-          Supprimer
-        </button>
-        <button class="btn btn-cancel btn-sm" type="button" data-dismiss="modal" 
-                (click)="closeDeleteDialog()">
-          Annuler
-        </button>
-      </div>
-
-    </div>
-  </div>
-</div>
-
-
     <!-- add user modal -->
-    <div class="container demo" *ngIf="currentView === 'add' || currentView === 'edit'">
+    <div class="container demo" *ngIf="currentView === 'edit'">
       <div class="modal right fade" id="addVisiteurModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel2">
         <div class="modal-dialog" role="document">
           <div class="modal-content" [style]="{'background-color': isDark ? '#1f1f1f' : '#FFFFFF'}">
             <div class="d-flex" style="margin-top: 15px;">
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="margin-left: 10px;"
-                #closeAddElementDialog>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="margin-left: 10px;"  #closeAddElementDialog>
                 <span aria-hidden="true">
-                  <i
-                    [class]="isDark? 'txt-title-d mdi mdi-arrow-left-bold-circle' : 'mdi mdi-arrow-left-bold-circle'"></i>
+                  <i [class]="isDark? 'txt-title-d mdi mdi-arrow-left-bold-circle' : 'mdi mdi-arrow-left-bold-circle'"></i>
                 </span>
-                <label [class]="isDark? 'txt-title-d ml-2': 'ml-1'" style="font-size: 14px;"> Ajouter un
-                  enregistrement</label>
+                <label [class]="isDark? 'txt-title-d ml-2': 'ml-1'" style="font-size: 14px;"> Modification de la demande</label>
               </button>
             </div>
-
             <div class="modal-body">
-              <div class="row mb-l-20 mb-10">
-                <div class="col-md-12 col-lg-12">
-                  <form #formAddUser="ngForm">
-                    <div class="row mb-l-20 mb-10">
-                      <div class="col-md-12 col-lg-12 p-right-0">
-                        <div [class]="isDark? 'card cust_card_d':'card cust_card_w'">
-                          <div class="card-block">
-                            <div class="row mb-l20">
-                              <div class="col-md-6 col-lg-12">
-                                <div class="form-group has-success align-left ft-w-b d-flex">
-                                  <div class="flex ta-center mr-3">
-                                    <p-radioButton name="homme" value="Homme" [(ngModel)]="visiteur.sexe"
-                                      inputId="male" />
-                                    <label for="male" class="ml-2 mb-0"> Homme </label>
-                                  </div>
-                                  <div class="flex align-items-center">
-                                    <p-radioButton name="femme" value="Femme" [(ngModel)]="visiteur.sexe"
-                                      inputId="female" />
-                                    <label for="female" class="ml-2 mb-0"> Femme </label>
-                                  </div>
-                                </div>
+              <form #formAddUser="ngForm">
+                <!-- Étape 1 : Informations du visiteur -->
+                  <div class="col-md-12 col-lg-12 p-right-0">
+                    <div [class]="isDark? 'card cust_card_d':'card cust_card_w'">
+                      <div class="card-block">
+                        <div class="row mb-l20">
+                          <div class="col-md-6 col-lg-12">
+                            <div class="form-group has-success align-left ft-w-b d-flex">
+                              <div class="flex ta-center mr-3">
+                                <p-radioButton name="homme" value="Homme" [(ngModel)]="visiteur.sexe"
+                                  inputId="male" />
+                                <label for="male" class="ml-2 mb-0"> Homme </label>
                               </div>
-                              <div class="col-lg-12 p-right-0 mb-3">
-                                <div class="form-group has-success align-left ft-w-b">
-                                  <label [class]="isDark ? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
-                                    for="dateDuJour">
-                                    Date du jour *
-                                  </label>
-                                  <div class="select select-add">
-                                    <p-calendar [(ngModel)]="visiteur.dateVisite" readonly name="dateDuJour"
-                                      dateFormat="dd/mm/yy" yearRange="1950:2030" placeholder="Choisir la date du jour"
-                                      styleClass="wd_100 initialwd">
-                                    </p-calendar>
-                                    <div class="arrow" [class]="isDark ? 'option-select-d' : 'option-select-w'"></div>
-                                  </div>
-                                </div>
+                              <div class="flex align-items-center">
+                                <p-radioButton name="femme" value="Femme" [(ngModel)]="visiteur.sexe"
+                                  inputId="female" />
+                                <label for="female" class="ml-2 mb-0"> Femme </label>
                               </div>
-                              <div class="col-lg-12 p-right-0">
-                                <div class="form-group has-success align-left ft-w-b">
-                                  <label [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
-                                    for="nomComplet">Non Complet *</label>
-                                  <input
-                                    [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'"
-                                    id="nomComplet" name="nomComplet" type="text" [(ngModel)]="visiteur.nomComplet"
-                                    required>
+                            </div>
+                          </div>
+                        
+                          <div class="col-lg-12 p-right-0">
+                            <div class="form-group has-success align-left ft-w-b">
+                              <label [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
+                                for="nomComplet">Non Complet *</label>
+                              <input
+                                [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'"
+                                id="nomComplet" name="nomComplet" type="text" [(ngModel)]="visiteur.nomComplet"
+                                required>
+                            </div>
+                          </div>
+                          <div class="col-md-12 col-lg-12 p-right-0">
+                            <div class="form-group has-success align-left ft-w-b">
+                              <label [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'">Pièce
+                                d’identité *</label><br />
+                              <div class="d-flex">
+                                <div class="flex ta-center mr-3">
+                                  <p-radioButton name="CNI" value="CNI" [(ngModel)]="visiteur.typePiece"
+                                    inputId="CNI" />
+                                  <label for="CNI" class="ml-2 mb-0"> Carte d’identité </label>
                                 </div>
-                              </div>
-                              <div class="col-md-12 col-lg-12 p-right-0">
-                                <div class="form-group has-success align-left ft-w-b">
-                                  <label
-                                    [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'">Pièce
-                                    d’identité *</label><br />
-                                  <div class="d-flex">
-                                    <div class="flex ta-center mr-3">
-                                      <p-radioButton name="CNI" value="CNI" [(ngModel)]="visiteur.typePiece"
-                                        inputId="CNI" />
-                                      <label for="CNI" class="ml-2 mb-0"> Carte d’identité </label>
-                                    </div>
-                                    <div class="flex ta-center mr-3">
-                                      <p-radioButton name="permis" value="Permis" [(ngModel)]="visiteur.typePiece"
-                                        inputId="permis" />
-                                      <label for="permis" class="ml-2 mb-0"> Permis </label>
-                                    </div>
-
-
-                                    <div class="flex ta-center">
-                                      <p-radioButton name="passeport" value="Passeport" [(ngModel)]="visiteur.typePiece"
-                                        inputId="passeport" />
-                                      <label for="passeport" class="ml-2 mb-0"> Passeport </label>
-                                    </div>
-                                  </div>
+                                <div class="flex ta-center mr-3">
+                                  <p-radioButton name="permis" value="Permis" [(ngModel)]="visiteur.typePiece"
+                                    inputId="permis" />
+                                  <label for="permis" class="ml-2 mb-0"> Permis </label>
                                 </div>
-                              </div>
-                              <div class="col-lg-12 p-right-0">
-                                <div class="form-group has-success align-left ft-w-b">
-                                  <label [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
-                                    for="numeroPiece">Numéro de la pièce *</label>
-                                  <input
-                                    [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'"
-                                    id="numeroPiece" name="numeroPiece" type="text" [(ngModel)]="visiteur.numeroPiece"
-                                    required>
-                                </div>
-                              </div>
-                              <div class="col-lg-12 p-right-0">
-                                <div class="form-group has-success align-left ft-w-b">
-                                  <label [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
-                                    for="numeroTelephone">Numéro de téléphone *</label>
-                                  <input
-                                    [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'"
-                                    id="numeroTelephone" name="numeroTelephone" type="text"
-                                    [(ngModel)]="visiteur.numeroTelephone" required>
-                                </div>
-                              </div>
-                              <div class="col-lg-12 p-right-0">
-                                <div class="form-group has-success align-left ft-w-b">
-                                  <label [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
-                                    for="cabinetUser">Choisir un service</label>
-                                  <div class="select select-add">
-                                    <p-dropdown [options]="cabinets" [(ngModel)]="visiteur.service_id" [showClear]="true"
-                                      [filter]="true" name="cabinetUser" filterBy="designation"
-                                      optionLabel="designation" optionValue="id" placeholder="Choisir un cabinet"
-                                      styleClass="wd_100 initialwd" />
-                                    <div class="arrow" [class]="isDark? 'option-select-d' : 'option-select-w'"></div>
-                                  </div>
-                                </div>
-                              </div>
-                              <div class="col-lg-12 p-right-0 mb-3">
-                                <div class="form-group has-success align-left ft-w-b">
-                                  <label [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
-                                    for="typeUser">Choisir type agent</label>
-                                  <div class="select select-add">
-                                    <p-dropdown [options]="services" [(ngModel)]="visiteur.service_id"
-                                      [showClear]="true" [filter]="true" name="typeUser" filterBy="designation"
-                                      optionLabel="designation" optionValue="id" placeholder="Choisir un type"
-                                      styleClass="wd_100 initialwd" />
-                                    <div class="arrow" [class]="isDark? 'option-select-d' : 'option-select-w'"></div>
-                                  </div>
-                                </div>
-                              </div>
-                              <div class="col-lg-12 p-right-0">
-                                <div class="form-group has-success align-left ft-w-b">
-                                  <label [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
-                                    for="fonction">Fonction *</label>
-                                  <input
-                                    [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'"
-                                    id="fonction" name="fonction" type="text" [(ngModel)]="visiteur.fonction" required>
-                                </div>
-                              </div>
-                              <div class="col-lg-6 p-right-0">
-                                <div class="form-group has-success align-left ft-w-b">
-                                  <label [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
-                                    for="adresse">Adresse *</label>
-                                  <textarea
-                                    [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'"
-                                    id="adresse" name="adresse" type="adresse" [(ngModel)]="visiteur.adresse"
-                                    required></textarea>
-                                </div>
-                              </div>
-                              <div class="col-lg-12 p-right-0">
-                                <div class="form-group has-success align-left ft-w-b">
-                                  <label [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
-                                    for="raisonVisite">Raison de la Visite *</label>
-                                  <textarea
-                                    [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'"
-                                    id="raisonVisite" name="raisonVisite" type="raisonVisite" [(ngModel)]="visiteur.raisonVisite"
-                                    required></textarea>
-                                </div>
-                              </div>
-
-                              <div class="col-lg-5 p-right-0">
-                                <div class="form-group has-success align-left ft-w-b">
-                                  <label [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
-                                    for="nom">Heure arrivée *</label>
-                                  <input
-                                    [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'"
-                                    id="heureArrive" name="heureArrive" type="time" [(ngModel)]="visiteur.heureArrive"
-                                    required>
-                                </div>
-                              </div>
-                              <div class="col-lg-6 p-right-0">
-                                <div class="form-group has-success align-left ft-w-b">
-                                  <label [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
-                                    for="heureDepart">Heure départ *</label>
-                                  <input
-                                    [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'"
-                                    id="heureDepart" name="heureDepart" type="time" [(ngModel)]="visiteur.heureDepart"
-                                    required>
-                                </div>
-                              </div>
-                              <div class="col-lg-6 p-right-0">
-                                <div class="form-group has-success align-left ft-w-b">
-                                  <label [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
-                                    for="heureVisite">Heure visite *</label>
-                                  <input
-                                    [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'"
-                                    id="heureVisite" name="heureVisite" type="time" [(ngModel)]="visiteur.heureVisite"
-                                    required>
+                                <div class="flex ta-center">
+                                  <p-radioButton name="passeport" value="Passeport"
+                                    [(ngModel)]="visiteur.typePiece" inputId="passeport" />
+                                  <label for="passeport" class="ml-2 mb-0"> Passeport </label>
                                 </div>
                               </div>
                             </div>
                           </div>
-                        </div>
-                      </div>
-                      <div
-                        [class]="isDark? 'col-md-12 col-lg-12 p-right-0 div_separate_d':'col-md-12 col-lg-12 p-right-0 div_separate_w'">
-                      </div>
-
-                      <div class="col-md-12 col-lg-12 p-right-0">
-                        <div [class]="isDark ? 'card cust_card_d' : 'card cust_card_w'">
-                          <div class="card-block p-4 text-center">
-                            <!-- Aperçu -->
-                            <div class="mt-3">
-                              <h6 class="text-muted mb-2">Aperçu de la signature :</h6>
-                              <img src="assets/images/signature.png" alt="Signature preview"
-                                class="signature-preview shadow-sm" />
+                          <div class="col-lg-12 p-right-0">
+                            <div class="form-group has-success align-left ft-w-b">
+                              <label [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
+                                for="numeroPiece">Numéro de la pièce *</label>
+                              <input
+                                [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'"
+                                id="numeroPiece" name="numeroPiece" type="text"
+                                [(ngModel)]="visiteur.numeroPiece" required>
                             </div>
                           </div>
+                          <div class="col-lg-12 p-right-0">
+                            <div class="form-group has-success align-left ft-w-b">
+                              <label [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
+                                for="numeroTelephone">Numéro de téléphone *</label>
+                              <input
+                                [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'"
+                                id="numeroTelephone" name="numeroTelephone" type="text"
+                                [(ngModel)]="visiteur.numeroTelephone" required>
+                            </div>
+                          </div>
+                          <div class="col-lg-12 p-right-0">
+                            <div class="form-group has-success align-left ft-w-b">
+                              <label [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
+                                for="fonction">Fonction *</label>
+                              <input
+                                [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'"
+                                id="fonction" name="fonction" type="text" [(ngModel)]="visiteur.fonction"
+                                required>
+                            </div>
+                          </div>
+                          <div class="col-lg-12 p-right-0">
+                            <div class="form-group has-success align-left ft-w-b">
+                              <label [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
+                                for="adresse">Adresse *</label>
+                              <textarea
+                                [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'"
+                                id="adresse" name="adresse" type="adresse" [(ngModel)]="visiteur.adresse"
+                                required></textarea>
+                            </div>
+                          </div>
+
                         </div>
                       </div>
-
                     </div>
-                    <div class="row">
-                      <div class="col-md-12">
-                        <button class="btn btn-login btn-block btnn_save" [disabled]="!formAddUser.valid"
-                          (click)="visiteur.id?Update():Save()">
-                          <img src="assets/images/save.png" alt="" class="icon_save">Enregistrer et terminer </button>
-                      </div>
-                      <div class="col-md-12 ta-center">
-                        <label class="lab_reset" *ngIf="visiteur.id" data-dismiss="modal"
-                          aria-label="Close">Fermer</label>
-                      </div>
-                    </div>
-                  </form>
-                </div>
-              </div>
+                  </div>
 
+                  <div class="d-flex justify-content-center gap-3 mt-4">
+                    <button type="button" class="btn btn-outline-danger"   data-dismiss="modal" #closeAddElementDialog style="margin-right: 10px;">
+                      <i class="mdi mdi-arrow-left me-1"></i> Retour
+                    </button>
+                    <button class="btn btn-login btn-block btnn_save" [disabled]="!formAddUser.valid"
+                      (click)="Update()"><i class="mdi mdi-check-circle me-2"></i> Modifier </button>
+                  </div>               
+              </form>
             </div>
           </div>
         </div>

@@ -14,6 +14,10 @@ import { HttpClient } from '@angular/common/http';
 import { Service } from 'src/app/shared/models/service';
 import { ServiceService } from 'src/app/shared/services/service.service';
 import { Modal } from 'bootstrap';
+import html2canvas from 'html2canvas';
+import { DomSanitizer } from '@angular/platform-browser';
+
+
 declare var bootstrap: any;
 @Component({
   selector: 'app-rendezvous',
@@ -62,7 +66,6 @@ export class RendezvousComponent implements OnInit {
   @ViewChild('fileInputUpload', { static: false }) fileInputUpload: ElementRef;
   @ViewChild('canvas', { static: false }) canvas!: ElementRef<HTMLCanvasElement>;
   private ctx!: CanvasRenderingContext2D;
-  private drawing = false;
   signatureImage: string | null = null;
   paginatedList: any[] = []; // la portion affichée
   itemsPerPage = 10; // nombre d’éléments par page
@@ -73,8 +76,8 @@ export class RendezvousComponent implements OnInit {
   indicatifs: any = {};
   public isNumberPhone: boolean ;
   public deleteModal?: Modal;
-
-modalInstance: any;
+  modalInstance: any;
+  previewUrl: any | null = null;
   
   constructor(
     private demandeService: DemandeService,
@@ -82,7 +85,9 @@ modalInstance: any;
     private serviceService: ServiceService,
     private toast: AppToastService,
     private appConfig: AppConfig,
-    private http: HttpClient
+    private http: HttpClient,
+    private sanitizer: DomSanitizer
+
   ) {
     this.currentUser = this.appConfig.currentUser;
     this.roleManager = new RoleManager();
@@ -207,11 +212,74 @@ toggleSelectOne() {
     this.pageTitle = 'Modification d\'demande';
   }
 
-  showDetail(user: Demande) {
-    this.demande = user;
-    //this.currentView = 'detail';
-    this.pageTitle = 'Détails user'
-  }
+  showDetail(d: Demande) {
+   this.demande = d;
+   console.log('+++++++++++ detail++++++++++++',this.demande)
+   // PDF en dur
+   const filePath = "assets/images/piece.pdf";
+   // Sécurisation Angular obligatoire
+   this.demande.pieceUrl = this.sanitizer.bypassSecurityTrustResourceUrl(filePath);
+   this.currentView = 'detail';
+ }
+ 
+ // Ouvrir le modal d'aperçu
+ openPreview(url: string) {
+   this.previewUrl = url;
+   const modalElement = document.getElementById('previewModal');
+   if (modalElement) {
+     const modal = new bootstrap.Modal(modalElement);
+     modal.show();
+   }
+ }
+ 
+ // Télécharger le fichier
+ downloadPiece(url: string) {
+   if (!url) return;
+ 
+   // Assurer URL absolue
+   const baseUrl = window.location.origin; // http://localhost:4200
+   const fileUrl = 'http://localhost:4200/assets/images/piece.pdf';
+ 
+   const link = document.createElement('a');
+   link.href = fileUrl;
+   link.download = `PieceIdentite_${this.visiteur.nomComplet}${fileUrl.substring(fileUrl.lastIndexOf('.'))}`;
+   link.click();
+ }
+ 
+ // Impression de la fiche
+ printPage() {
+   const element = document.getElementById('print-section');
+   if (!element) return;
+ 
+   // Capture l'élément en image
+   html2canvas(element, { scale: 2 }).then(canvas => {
+     // Convertir en image
+     const imgData = canvas.toDataURL('image/png');
+ 
+     // Créer une nouvelle fenêtre pour impression
+     const printWindow = window.open('', '_blank', 'width=900,height=700');
+     if (printWindow) {
+       printWindow.document.write(`
+         <html>
+           <head>
+             <title>Impression</title>
+             <style>
+               body { margin: 0; padding: 20px; text-align: center; }
+               img { max-width: 100%; }
+             </style>
+           </head>
+           <body>
+             <img src="${imgData}" />
+             <script>
+               window.onload = function() { window.print(); window.close(); }
+             </script>
+           </body>
+         </html>
+       `);
+       printWindow.document.close();
+     }
+   });
+ }
 
   showResetDialog(demande: Demande): void {
     this.demande = demande;
@@ -557,32 +625,6 @@ getButtonIdByIndex(index: number): string {
   }
 
   /* +++++++++++++++++++++++++ new code for signature++++++++++++++++++ */
-    ngAfterViewInit() {
-    const canvas = this.canvas.nativeElement;
-    this.ctx = canvas.getContext('2d')!;
-    canvas.addEventListener('mousedown', this.startDrawing.bind(this));
-    canvas.addEventListener('mousemove', this.draw.bind(this));
-    canvas.addEventListener('mouseup', this.stopDrawing.bind(this));
-    canvas.addEventListener('mouseout', this.stopDrawing.bind(this));
-  }
-
-  startDrawing(event: MouseEvent) {
-    this.drawing = true;
-    this.ctx.beginPath();
-    this.ctx.moveTo(event.offsetX, event.offsetY);
-  }
-
-  draw(event: MouseEvent) {
-    if (!this.drawing) return;
-    this.ctx.lineTo(event.offsetX, event.offsetY);
-    this.ctx.strokeStyle = '#000';
-    this.ctx.lineWidth = 2;
-    this.ctx.stroke();
-  }
-
-  stopDrawing() {
-    this.drawing = false;
-  }
 
   clearSignature() {
     const canvas = this.canvas.nativeElement;

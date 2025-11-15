@@ -49,12 +49,13 @@
     </li>
 
     <!-- Réclamations -->
-    <li class="menu-item" [ngClass]="{ active: activeMenu === 'reclamations' }" (click)="clickLi('reclamations')">
+       <li class="menu-item" [ngClass]="{ active: activeMenu === 'reclamation' }" (click)="clickLi('reclamation')">
       <a routerLink="/admin/reclamation" class="menu-link">
-        <div class="icon-box"><i class="mdi mdi-alert-circle-outline"></i></div>
+        <div class="icon-box"><i class="mdi mdi-chart-bar"></i></div>
         <span class="menu-label">Réclamations</span>
       </a>
     </li>
+    
 
   
     <!-- Administration / Paramètres -->

@@ -427,3 +427,295 @@ textarea {
 .modal.show .modal-dialog {
   transform: translateY(0);
 }
+
+/* ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±± */
+/* ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±± */
+/* Bouton Imprimer visible sur page mais pas à l’impression */
+.print-button-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 999;
+  
+}
+
+/* Masquer éléments inutiles à l'impression */
+@media print {
+  .print-button-container {
+    display: none;
+  }
+  body {
+    margin: 0;
+    padding: 0;
+  }
+}
+
+/* Format A4 */
+.a4-sheet {
+  
+  padding: 5mm;
+  background: white;
+  border: 1px solid #ccc;
+  margin: auto;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  font-family: "Segoe UI", Arial, sans-serif;
+  font-size: 40px;
+}
+
+.a4-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 10px;
+  text-align: center;
+  position: relative;
+}
+
+.logo-left,
+.logo-right {
+  width: 90px;
+  height: auto;
+}
+
+.header-text {
+  flex: 1;
+}
+
+.company-name {
+  font-size: 22px;
+  font-weight: bold;
+  margin: 0;
+}
+
+.sheet-title {
+  margin: 0;
+  font-size: 14px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.separator {
+  border: none;
+  border-top: 2px solid #444;
+  margin: 8px 0 20px;
+}
+
+.section-title {
+  font-size: 18px;
+  font-weight: bold;
+  color: #0d6efd;
+  margin-bottom: 12px;
+}
+
+.info-card {
+  border: 1px solid #ddd;
+  padding: 15px;
+  border-radius: 8px;
+  background: #fafafa;
+}
+
+.info-row {
+  margin-bottom: 8px;
+}
+
+.label {
+  font-weight: bold;
+  text-align: right;
+}
+
+.value {
+  text-align: left;
+}
+
+.demande-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+}
+
+.demande-table th,
+.demande-table td {
+  border: 1px solid #ccc;
+  padding: 6px;
+  font-size: 13px;
+  text-align: center;
+}
+
+.demande-table th {
+  background: #f1f1f1;
+  font-weight: bold;
+}
+
+.signature-block {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 40px;
+}
+
+.sign {
+  width: 45%;
+  text-align: center;
+}
+
+.signature-line {
+  border-top: 1px solid #000;
+  margin-top: 50px;
+}
+
+/* ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±± */
+/* Conteneur 3 blocs */
+/* --- STRUCTURE --- */
+.three-blocks {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 20px;
+}
+
+.col-md-8,
+.col-md-4 {
+  padding: 0 !important; /* Enlève les marges bootstrap inutiles */
+}
+
+/* --- CARDS --- */
+.info-card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 18px 20px;
+  margin-bottom: 20px;
+  border: 1px solid #e8e8e8;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+/* Titres */
+.section-title {
+  font-weight: 700;
+  font-size: 17px;
+  color: #1d1d1d;
+  margin-bottom: 15px;
+  border-left: 4px solid #1976d2;
+  padding-left: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* --- LIGNES D’INFO --- */
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  border-bottom: 1px dashed #ddd;
+  font-size: 14px;
+}
+
+.info-row:last-child {
+  border-bottom: none;
+}
+
+.label {
+  font-weight: 600;
+  color: #444;
+}
+
+.value {
+  font-weight: 500;
+  color: #222;
+  text-align: right;
+}
+
+/* --- SIGNATURE --- */
+.sign {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 5px;
+}
+
+.signature-preview {
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+/* --- RESPONSIVE --- */
+@media (max-width: 992px) {
+  .three-blocks {
+    flex-wrap: wrap !important;
+  }
+
+  .col-md-8,
+  .col-md-4 {
+    width: 100% !important;
+  }
+}
+
+/* --- IMPRESSION --- */
+@media print {
+  .three-blocks {
+    flex-wrap: nowrap !important;
+    gap: 15px;
+  }
+  .info-card {
+    box-shadow: none !important;
+  }
+}
+
+
+/* ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±± */
+/* ===== A4 BACKGROUND IMAGE ===== */
+.a4-container {
+  background-size: contain;      /* L'image remplit la zone sans être coupée */
+  background-repeat: no-repeat;  /* Pas de répétition */
+  background-position: center;   /* Centrée parfaitement */
+  background-attachment: fixed;  /* Fixe lors du défilement */
+  padding: 30px;                 /* Pour éviter que le texte touche les bords */
+  border-radius: 10px;           /* Plus professionnel */
+  background-color: #ffffff;     /* Pour contraste si l'image est transparente */
+}
+.a4-container {
+  position: relative;
+  overflow: hidden;
+}
+
+.a4-container::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: url('../../../../assets/images/ppef.png') center/50% no-repeat;
+  opacity: 0.15; /* transparence */
+  z-index: 0;
+}
+
+.a4-container > * {
+  position: relative;
+  z-index: 2;
+}
+.a4-container::before {
+  background-size: 70%;
+  opacity: 0.1;
+}
+
+/* === Watermark pleine page === */
+.watermark-page {
+  position: relative;
+  background-size: 450px; /* Ajuste la taille selon ton besoin */
+  opacity: 0.8; /* Très léger pour laisser lire le texte */
+  width: 100%;
+  padding: 40px;
+  border-radius: 8px;
+}
+
+/* Empêche le watermark d’assombrir le texte */
+.watermark-page * {
+  position: relative;
+  z-index: 2;
+}
+
+/* Pour éviter que l’arrière-plan ne disparaisse à l'impression */
+@media print {
+  .watermark-page {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    background: url('/assets/images/ppef.png') center center no-repeat !important;
+    background-size: 450px !important;
+    opacity: 0.1 !important;
+  }
+}

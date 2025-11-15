@@ -36,6 +36,8 @@ export class Demande implements Deserializable<Demande> {
   public created_at!: Date;
   public dateVisite: Date = new Date();
   public dateModification!: Date;
+  public pieceUrl!: any  ;
+
   commentaire: string
   public selected?: boolean; // facultatif avec ?
   deserialize(input: any): Demande {
