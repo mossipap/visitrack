@@ -14,7 +14,7 @@
     <li class="menu-item" [ngClass]="{ active: activeMenu === 'dashboard' }" (click)="clickLi('dashboard')">
       <a routerLink="/admin/dashboard" class="menu-link">
         <div class="icon-box"><i class="mdi mdi-view-dashboard"></i></div>
-        <span class="menu-label">Tableau de bord</span>
+        <span class="menu-label">Accueil</span>
       </a>
     </li>
 
@@ -51,8 +51,8 @@
     <!-- Réclamations -->
        <li class="menu-item" [ngClass]="{ active: activeMenu === 'reclamation' }" (click)="clickLi('reclamation')">
       <a routerLink="/admin/reclamation" class="menu-link">
-        <div class="icon-box"><i class="mdi mdi-chart-bar"></i></div>
-        <span class="menu-label">Réclamations</span>
+        <div class="icon-box"><i class="mdi mdi-alert-circle-outline"></i></div>
+        <span class="menu-label">Incidents</span>
       </a>
     </li>
     

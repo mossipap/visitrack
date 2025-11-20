@@ -1,489 +1,322 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Chart, registerables } from 'chart.js';
+import SecureLS from 'secure-ls';
 import { Utilisateur } from 'src/app/shared/models/utilisateur';
 import { DashboardService } from 'src/app/shared/services/dashboard.service';
 import { AppConfig } from 'src/app/shared/utils/app-config';
 import { AppToastService } from 'src/app/shared/utils/AppToast.service';
-import { TableRowCollapseEvent, TableRowExpandEvent } from 'primeng/table';
-import * as SecureLS from 'secure-ls';
-import { Chart, registerables } from 'chart.js';
-
+import { environment } from 'src/environments/environment';
+Chart.register(...registerables);
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']
 })
 export class DashboardComponent implements OnInit {
-  @ViewChild('miniChart1') miniChart1!: ElementRef<HTMLCanvasElement>;
-  @ViewChild('miniChart2') miniChart2!: ElementRef<HTMLCanvasElement>;
-  @ViewChild('miniChart3') miniChart3!: ElementRef<HTMLCanvasElement>;
-  @ViewChild('bigChart') bigChart!: ElementRef<HTMLCanvasElement>;
-
-  private c1?: Chart; private c2?: Chart; private c3?: Chart; private big?: Chart;
-
-  ngAfterViewInit(): void {
-    // small demo data
-    this.c1 = this.makeMini(this.miniChart1.nativeElement, '#0664FC', [12,20,15,28,18,22,30]);
-    this.c2 = this.makeMini(this.miniChart2.nativeElement, '#2D9CDB', [8,10,22,12,18,25,20]);
-    this.c3 = this.makeMini(this.miniChart3.nativeElement, '#7B61FF', [5,15,14,18,14,20,25]);
-    this.big = this.makeBar(this.bigChart.nativeElement);
-  }
-
-  private makeMini(canvas: HTMLCanvasElement, color: string, data: number[]) {
-    const ctx = canvas.getContext('2d'); if(!ctx) return;
-    const g = ctx.createLinearGradient(0,0,0,100); g.addColorStop(0, this.hexToRgba(color,0.25)); g.addColorStop(1, this.hexToRgba(color,0));
-    return new Chart(ctx, {
-      type: 'line',
-      data: { labels: ['L','M','M','J','V','S','D'], datasets: [{ data, borderColor: color, backgroundColor: g, fill:true, tension:0.35, pointRadius:0 }] },
-      options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{x:{display:false}, y:{display:false}} }
-    });
-  }
-
-  private makeBar(canvas: HTMLCanvasElement) {
-    const ctx = canvas.getContext('2d'); if(!ctx) return;
-    return new Chart(ctx, {
-      type: 'bar',
-      data: { labels: ['Accueil','Parquet','USPG','Siège','Service A','Service B'], datasets:[{ data:[120,90,60,42,30,18], backgroundColor:['#0664FC','#2D9CDB','#7B61FF','#FF7A5A','#F2C94C','#10B981'], borderRadius:8 }] },
-      options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{x:{grid:{display:false}}, y:{beginAtZero:true}} }
-    });
-  }
-
-  private hexToRgba(hex: string, a: number){ const h = hex.replace('#',''); const n = parseInt(h,16); return `rgba(${(n>>16)&255}, ${(n>>8)&255}, ${n&255}, ${a})`;}
-
-  ngOnDestroy(): void { this.c1?.destroy(); this.c2?.destroy(); this.c3?.destroy(); this.big?.destroy(); }
-
-
-
-
-
-
-
-
-
-
-
- public currentUser: Utilisateur;
-  public loading: boolean;
+ public loading: boolean;
   public isDark: boolean;
-  public nbrDossierRecu: any = 45412;
-  public nbrPlainteSave: any = 5;
-  public nbrRequisitionIntro: any = 551;
-  public lineLabels = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"];
-    public barLabels = ['Accueil','Parquet','USPG','Siège','Service A','Service B'];
+  public isSearch: boolean;
+  public currentUser: Utilisateur;
+  public currentIndex: number = 1;
+  public currentIndexDet: number = 1;
+  public nbrDossierEncours: any = 0;
+  public nbrDossierCloture: any = 0;
+  public nbrDossierAlert: any = 0;
+  public nbrDossierHorsdelai: any = 0;
+  public nbrOrdonnanceEncours: any = 0;
+  public detentionEnAlertes: any[] = [];
+  public detentionHorsDelais: any[] = [];
+  public alertActeDossiers: any[] = [];
+  /* chart*/
+  public detenuLabels = ["7:00", "8:00", "9:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00"];
+  public chartDataInfraction = {
+   // labels: ["Siège", "Parquet", "Greffe", "Autres"],
+    datasets: [
+      {
+        label: "Des visites par service",
+        data: [11, 16, 7, 20],
+        backgroundColor: [ "#FF8F6B", "#244421ff", "#3340F4", "#8519F8"],
+      },
+    ]
+  };
+  @ViewChild('pchart') pchart: any;  
+  // data exemple — remplace par API
+  lineLabels = ['7:00','8:00','10:00','12:00','13:00','14:00','15:00','16:00','18:00'];
+  lineData = [1,2,5,8,22,40,30,18,42,30,18,4];
 
-
-  public expandedRows = {};
-
+donutLegend = [
+  { label: 'Siège', percent: 40, color: '#ff9800' },
+  { label: 'Parquet', percent: 25, color: '#2196f3' },
+  { label: 'Greffe', percent: 20, color: '#244421ff' },
+  { label: 'Autre', percent: 15, color: '#9c27b0' }
+];
+  visiteurs = [
+    { photo: 'assets/img/user1.jpg', nom: 'KONE Ibrahim', id: '12459', destination: 'Progô', service: 'Cartbis' },
+    { photo: 'assets/img/user2.jpg', nom: 'SANDY Olivier', id: '56834', destination: 'Carouet', service: 'Parquet' },
+    { photo: 'assets/img/user3.jpg', nom: 'OUEDRAOGO Ad.', id: '45050', destination: 'Groffe', service: 'Greffe' }
+  ];
+  rendezvous = [
+    { visiteur: 'TRAORE Kadidja', motif: "Visite d'audience", date: '08/11/2026', status: 'A venir' },
+    { visiteur: 'KOUAKOU Sekou', motif: 'Depot de documents', date: '08/11/2025 12:45', status: 'A venir' }
+  ];
+dashData = [
+  {label: 'Total des visites',     value: this.nbrDossierEncours=50,     icon: 'mdi mdi-account-group', colorBg: 'bg-primary-soft'},
+  {label: 'Visites en cours',      value: this.nbrDossierAlert=20,       icon: 'mdi mdi-timer-sand',             colorBg: 'bg-warning-soft'},
+  {label: 'Visites terminées',     value: this.nbrDossierHorsdelai=34,   icon: 'mdi mdi-check-circle-outline', colorBg: 'bg-success-soft'},
+  {label: 'Rendez-vous',           value: this.nbrOrdonnanceEncours=50,  icon: 'mdi mdi-calendar',         colorBg: 'bg-info-soft'},
+  {label: 'Incidents',     value: this.nbrOrdonnanceEncours,  icon: 'mdi mdi-alert-circle-outline',  colorBg: 'bg-danger-soft'},
+];
+totalVisites: number = 0;
   constructor(
     private dashboardService: DashboardService,
     private toast: AppToastService,
     private appConfig: AppConfig) {
     this.currentUser = this.appConfig.currentUser;
   }
- setPeriod(period: 'day' | 'month' | 'year') {
-   // this.selectedPeriod = period;
-    //this.updateDisplayedData();
-  }
+
   ngOnInit(): void {
     const ls = new SecureLS({ encodingType: 'aes', encryptionSecret: 'MyAdminApp' });
-    if (ls.get('current_theme')) {//dark
-      this.isDark = true;
-      const headerLeft = document.getElementsByClassName("theme-light");
-      for(var i = headerLeft.length - 1; i >= 0; --i) {
-        headerLeft[i].classList.replace('theme-light', 'theme-dark');
-      }
-      this.changePaginationBg('#000000');
-      this.changePaginationFg('#ffffff');
-      this.changePrimeTbBg('#000000');
-      this.changeTrHover('#1c1c1c');
-      this.changePrimeTbHead('#000000');
-      this.changePaginatorLight('#252116');
-      this.changeScrollView('#1c1d1d');
-      this.changeScrollBorder('#1c1d1d');
-      this.changeSearchbar('#1c1d1d');
-      this.changeBgTheader('rgba(10, 141, 208, 0.2)');
-    } else {//white
-      this.isDark = false;
-      const headerLeft = document.getElementsByClassName("theme-dark");
-      for(var i = headerLeft.length - 1; i >= 0; --i) {
-        headerLeft[i].classList.replace('theme-dark', 'theme-light');
-      }
-      this.changePaginationBg('#ffffff');
-      this.changePaginationFg('#000000');
-      this.changePrimeTbBg('#ffffff');
-      this.changeTrHover('rgba(0, 0, 0, 0.3)');
-      this.changePrimeTbHead('#f8f9fa');
-      this.changePaginatorLight('#ecf5ee');
-      this.changeScrollView('#FFFFFF');
-      this.changeScrollBorder('#EBEBEB');
-      this.changeSearchbar('#F5F5F5');
-      this.changeBgTheader('rgba(10, 141, 208, 0.2)');
-    }
-    this.initLine1();
-    this.initLine2();
-    this.initLine3();
-    this.initLine4();
-    this.initLine5();
-    this.initLine6();
-    this.initLine7();
+    this.initDoughnut();
+    this.initLineDetenus();
+    this.ActualiseDash();
+    this.calculerTotalVisites();
   }
-  changeTrHover(newValue: string): void {
-    document.documentElement.style.setProperty('--tr-hover', newValue);
+  getStatusClass(status: string): string {
+  switch (status.toLowerCase()) {
+    case 'validé': return 'pill valid';
+    case 'en attente': return 'pill pending';
+    case 'annulé': return 'pill cancelled';
+    default: return 'pill';
   }
-  changePaginationBg(newValue: string): void {
-    document.documentElement.style.setProperty('--bgpaginator', newValue);
-  }
-  changePaginationFg(newValue: string): void {
-    document.documentElement.style.setProperty('--fgpaginator', newValue);
-  }
-  changePrimeTbBg(newValue: string): void {
-    document.documentElement.style.setProperty('--bgprimetb', newValue);
-  }
-  changePrimeTbHead(newValue: string): void {
-    document.documentElement.style.setProperty('--bgprimetbhead', newValue);
-  }
-  changePaginatorLight(newValue: string): void {
-    document.documentElement.style.setProperty('--paginatorlight', newValue);
-  }
-  changeScrollView(newValue: string): void {
-    document.documentElement.style.setProperty('--scroll_view', newValue);
-  }
-  changeScrollBorder(newValue: string): void {
-    document.documentElement.style.setProperty('--scroll_border', newValue);
-  }
-  changeSearchbar(newValue: string): void {
-    document.documentElement.style.setProperty('--search_bar', newValue);
-  }
-  changeBgTheader(newValue: string): void {
-    document.documentElement.style.setProperty('--theaderbg', newValue);
-  }
-  onRowExpand(event: TableRowExpandEvent) {}
-  onRowCollapse(event: TableRowCollapseEvent) {}
-initLine1() {
-  const canvas = document.getElementById('chartDossierRecu') as HTMLCanvasElement;
-  if (!canvas) return;
-
-  const ctx = canvas.getContext('2d');
-  if (!ctx) return;
-
-  const gradient1 = ctx.createLinearGradient(0, 0, 0, 400);
- gradient1.addColorStop(0.1, ' #0664FC');  // Start color
-    gradient1.addColorStop(1, ' #DEE3FF');  // Mid color #8ea2f9
-    gradient1.addColorStop(0.6, ' #FD5DEF');  // 
-
-  new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: this.lineLabels,
-      datasets: [{
-        label: 'Nombre de Visites',
-        data: [65, 55, 80, 67, 48, 55, 43],
-        fill: true,
-        borderColor: '#0664FC',
-        backgroundColor: 'rgba(222, 227, 255, 0.5)',
-        borderWidth: 2,
-        tension: 0.5
-      }]
-    },
+}
+  
+calculerTotalVisites() {
+  this.totalVisites = this.donutLegend
+    .map(x => x.percent)
+    .reduce((a, b) => a + b, 0);
+}
+ initDoughnut() {
+  const ctx = document.getElementById("pieChartInfraction") as HTMLCanvasElement;
+  this.pchart = new Chart(ctx, {
+    type: "doughnut",
+    data: this.chartDataInfraction,
     options: {
       responsive: true,
       plugins: {
-        legend: {
-          display: false,
-          position: 'top'
-        },
         title: {
           display: true,
-          text: ''
-        }
-      },
-      scales: {
-        x: {
-          ticks: {
-            color: '#666'
-          },
-          grid: {
-            color: '#e0e0e0'
+          text: '',
+          font: { size: 16 },
+        },
+        legend: {
+          display: true,
+          position: "bottom",
+          align: 'start',
+          labels: {
+            usePointStyle: true,
+            pointStyle: 'circle',
+            boxWidth: 15,
+            font: {
+              size: 14,
+              family: 'Arial, sans-serif',
+              weight: 'normal'
+            },
+            color: '#404040',
           }
         },
-        y: {
-          beginAtZero: true, // ✅ ici (pas dans ticks)
-          ticks: {
-            color: '#666'
-          },
-          grid: {
-            color: '#e0e0e0'
-          }
-        }
       }
     }
   });
 }
+initLineDetenus() {
+  const ctx = (document.getElementById('chartLineDetenus') as HTMLCanvasElement).getContext('2d')!;
 
-
-initLine2() {
-  const ctx = (document.getElementById('chartPlainteSave') as HTMLCanvasElement).getContext('2d');
+  // Create the gradient for the line
   const gradient1 = ctx.createLinearGradient(0, 0, 0, 400);
-  gradient1.addColorStop(0.1, '#0664FC');  // Start color
-  gradient1.addColorStop(0.6, '#FD5DEF');  // Mid color
-  gradient1.addColorStop(1, '#DEE3FF');    // End color
+  gradient1.addColorStop(0.1, '#0952c8ff');  
+  gradient1.addColorStop(0.6, '#064996ff');  
+  gradient1.addColorStop(1, '#0b7709ff');  
 
   new Chart(ctx, {
     type: "line",
     data: {
-      labels: this.lineLabels,
+      labels: this.detenuLabels,
       datasets: [{
-        label: 'Rendez-vous en attente',
-        data: [65, 55, 80, 67, 48, 55, 43],
-        fill: true,
+        label: 'Visite du jours',
+        data: this.lineData,
+        fill: false,
         borderColor: gradient1,
-        backgroundColor: 'rgba(222, 227, 255, 0.5)',
-        borderWidth: 2,
-        tension: 0.5,
+        backgroundColor: '#FFFFFF',
+        borderWidth: 3,
+        tension: 0.3,
+        pointRadius: 4,
+        pointBackgroundColor: '#fff',
+        pointBorderColor: gradient1
       }]
     },
     options: {
       responsive: true,
       plugins: {
-        legend: {
-          position: "top",
-          display: false,
-        },
         title: {
           display: true,
+          text: 'Visite par Jour',
+          font: { size: 16 }
+        },
+        legend: {
+          display: false,
+          position: 'top'
         }
       },
       scales: {
-        y: {        // <-- remplacer yAxes par y
+        y: {
           beginAtZero: true
         },
-        x: {        // <-- si besoin d'options pour x
-          ticks: {
-            // vos options ici
-          }
+        x: {
+          grid: { display: false }
         }
       }
     }
   });
 }
+  onChangeCritere(criteriaLine: string) {
+    switch(criteriaLine) {
+      case '1':// par semaine
+        this.detenuLabels = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
+        break;
+      case '2':// par mois
+        this.detenuLabels = ["Jan", "Fév", "Mar", "Avr", "Mai", "Juin", "Juil", "Aoû", "Sep", "Oct", "Nov", "Déc"];
+        break;
+      case '3':// par années
+        const years = [];
+        const neDay = new Date();
+        let currentAnnee = neDay.getUTCFullYear();
+        for (let index = 11; index > 0; index--) {
+          years.push(currentAnnee-index)
+        }
+        years.push(currentAnnee);
+        this.detenuLabels = years;
+        break;
+    }
+    this.initLineDetenus();
+  }
+  ActualiseDash() {
+    this.dashboardService.findTotalDosEnCour().subscribe(ret => {
+      if (ret['code'] === 200) {
+        this.nbrDossierEncours = ret['DossierEncours'];
+        this.nbrDossierCloture = ret['DossierCloturer'];
+        this.loading = false;
+      } else {
+        this.loading = false;
+        this.toast.error(ret['message']);
+      }
+    }, error => {
+      console.log("error===>", error);
+      this.toast.error(environment.erreur_connexion_message);
+      this.loading = false;
+    });
 
-  initLine3() {
-    const ctx = (document.getElementById('chartRequiIntro') as HTMLCanvasElement).getContext('2d');
-    const gradient1 = ctx.createLinearGradient(0, 0, 0, 400);
-    gradient1.addColorStop(0.1, ' #0664FC');  // Start color
-    gradient1.addColorStop(1, ' #DEE3FF');  // Mid color #8ea2f9
-    gradient1.addColorStop(0.6, ' #FD5DEF');  // End color
-    new Chart(ctx, {
-      type: "line",
-      data: {
-        labels: this.lineLabels,
-        datasets: [{
-          label: 'Rendez-vous Terminées',
-          data: [65, 55, 80, 67, 48, 55, 43],
-          fill: true,
-          borderColor: gradient1,
-          backgroundColor: ' rgba(222, 227, 255, 0.5)',
-          borderWidth: 2,
-          tension: 0.5,
-        }]
-      },
-       options: {
-      responsive: true,
-      plugins: {
-        legend: {
-          position: "top",
-          display: false,
-        },
-        title: {
-          display: true,
-        }
-      },
-      scales: {
-        y: {        // <-- remplacer yAxes par y
-          beginAtZero: true
-        },
-        x: {        // <-- si besoin d'options pour x
-          ticks: {
-            // vos options ici
-          }
-        }
+    this.dashboardService.findTotalOrdo().subscribe(ret => {
+      if (ret['code'] === 200) {
+        this.nbrOrdonnanceEncours = ret['data'];
+        this.loading = false;
+      } else {
+        this.loading = false;
+        this.toast.error(ret['message']);
       }
-    }
+    }, error => {
+      console.log("error===>", error);
+      this.toast.error(environment.erreur_connexion_message);
+      this.loading = false;
+    });
+
+    this.dashboardService.findDetentionAlert().subscribe(ret => {
+      if (ret['code'] === 200) {
+        this.detentionEnAlertes = ret['En_alert'];
+        this.detentionHorsDelais = ret['Hors_delai'];
+        this.loading = false;
+      } else {
+        this.loading = false;
+        this.toast.error(ret['message']);
+      }
+    }, error => {
+      console.log("error===>", error);
+      this.toast.error(environment.erreur_connexion_message);
+      this.loading = false;
+    });
+
+    this.dashboardService.findActeDossiers().subscribe(ret => {
+      if (ret['code'] === 200) {
+        this.alertActeDossiers = ret['Alert_acte_dossier'];
+        this.nbrDossierAlert = ret['Alert_dossier'].length;
+        this.nbrDossierHorsdelai = ret['Hors_delai'].length;
+        this.loading = false;
+      } else {
+        this.loading = false;
+        this.toast.error(ret['message']);
+      }
+    }, error => {
+      console.log("error===>", error);
+      this.toast.error(environment.erreur_connexion_message);
+      this.loading = false;
     });
   }
-  initLine4() {
-    const ctx = (document.getElementById('chartDosTransmis') as HTMLCanvasElement).getContext('2d');
-    const gradient1 = ctx.createLinearGradient(0, 0, 0, 400);
-    gradient1.addColorStop(0.1, ' #0664FC');  // Start color
-    gradient1.addColorStop(1, ' #DEE3FF');  // Mid color
-    gradient1.addColorStop(0.6, ' #FD5DEF');  // End color
-    new Chart(ctx, {
-      type: "line",
-      data: {
-        labels: this.lineLabels,
-        datasets: [{
-          label: 'Rendez-vous planifiés',
-          data: [65, 55, 80, 67, 48, 55, 43],
-          fill: true,
-          borderColor: gradient1,
-          backgroundColor: ' rgba(222, 227, 255, 0.5)',
-          borderWidth: 2,
-          tension: 0.5,
-        }]
-      },
-      options: {
-      responsive: true,
-      plugins: {
-        legend: {
-          position: "top",
-          display: false,
-        },
-        title: {
-          display: true,
-        }
-      },
-      scales: {
-        y: {        // <-- remplacer yAxes par y
-          beginAtZero: true
-        },
-        x: {        // <-- si besoin d'options pour x
-          ticks: {
-            // vos options ici
-          }
-        }
-      }
-    }
-    });
-  }
-  initLine5() {
-    const ctx = (document.getElementById('chartSansSuite') as HTMLCanvasElement).getContext('2d');
-    const gradient1 = ctx.createLinearGradient(0, 0, 0, 400);
-    gradient1.addColorStop(0.1, ' #0664FC');  // Start color
-    gradient1.addColorStop(1, ' #DEE3FF');  // Mid color #8ea2f9
-    gradient1.addColorStop(0.6, ' #FD5DEF');  // End color
-    new Chart(ctx, {
-      type: "line",
-      data: {
-        labels: this.lineLabels,
-        datasets: [{
-          label: 'Rendez-vous récu',
-          data: [65, 55, 80, 67, 48, 55, 43],
-          fill: true,
-          borderColor: gradient1,
-          backgroundColor: ' rgba(222, 227, 255, 0.5)',
-          borderWidth: 2,
-          tension: 0.5,
-        }]
-      },
-     options: {
-      responsive: true,
-      plugins: {
-        legend: {
-          position: "top",
-          display: false,
-        },
-        title: {
-          display: true,
-        }
-      },
-      scales: {
-        y: {        // <-- remplacer yAxes par y
-          beginAtZero: true
-        },
-        x: {        // <-- si besoin d'options pour x
-          ticks: {
-            // vos options ici
-          }
-        }
-      }
-    }
-    });
-  }
-  initLine6() {
-    const ctx = (document.getElementById('chartAtteTraite') as HTMLCanvasElement).getContext('2d');
-    const gradient1 = ctx.createLinearGradient(0, 0, 0, 400);
-    gradient1.addColorStop(0.1, ' #0664FC');  // Start color
-    gradient1.addColorStop(1, ' #DEE3FF');  // Mid color #8ea2f9
-    gradient1.addColorStop(0.6, ' #FD5DEF');  // End color
-    new Chart(ctx, {
-      type: "line",
-      data: {
-        labels: this.lineLabels,
-        datasets: [{
-          label: 'Nombre de visites',
-          data: [65, 55, 80, 67, 48, 55, 43],
-          fill: true,
-          borderColor: gradient1,
-          backgroundColor: ' rgba(222, 227, 255, 0.5)',
-          borderWidth: 2,
-          tension: 0.5,
-        }]
-      },
-     options: {
-      responsive: true,
-      plugins: {
-        legend: {
-          position: "top",
-          display: false,
-        },
-        title: {
-          display: true,
-        }
-      },
-      scales: {
-        y: {        // <-- remplacer yAxes par y
-          beginAtZero: true
-        },
-        x: {        // <-- si besoin d'options pour x
-          ticks: {
-            // vos options ici
-          }
-        }
-      }
-    }
-    });
-  }
-  initLine7() {
-    const ctx = (document.getElementById('chartDossierRenvoie') as HTMLCanvasElement).getContext('2d');
-    const gradient1 = ctx.createLinearGradient(0, 0, 0, 400);
-    gradient1.addColorStop(0.1, ' #0664FC');  // Start color
-    gradient1.addColorStop(1, ' #0664FC');  // Mid color #8ea2f9
-    gradient1.addColorStop(0.6, ' #0664FC');  // End color
-    new Chart(ctx, {
-      type: "bar",
-      data: {
-        labels: this.barLabels,
-        datasets: [{
-          label: 'Nombre de visites',
-          data: [120,90,60,42,30,18],
-         // fill: true,
-          borderColor: ['#0664FC','#2D9CDB','#7B61FF','#FF7A5A','#F2C94C','#10B981'],
-          backgroundColor: ['#0664FC','#2D9CDB','#7B61FF','#FF7A5A','#F2C94C','#10B981'], borderRadius:8 ,
-          borderWidth: 2,
-         // tension: 0.5,
-        }]
-      },
-        options: {
-      responsive: true,
-      plugins: {
-        legend: {
-          position: "top",
-          display: false,
-        },
-        title: {
-          display: true,
-        }
-      },
-      scales: {
-        y: {        // <-- remplacer yAxes par y
-          beginAtZero: true
-        },
-        x: {        // <-- si besoin d'options pour x
-          ticks: {
-            // vos options ici
-          }
-        }
-      }
-    }
-    });
-  }
+
+
+
+
+  /* ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±± */
+   totalVics = 142;
+  visitesEnCours = 12;
+  visitesTerminees = 128;
+  rendezvous1 = 56;
+  incidents = 3;
+
+  // Line chart
+  lineChartData = [{
+    data: [5, 8, 10, 15, 40, 28, 20, 35, 50],
+    label: 'Visites',
+    fill: true,
+    tension: 0.4
+  }];
+
+  lineChartLabels = ['7:00','8:00','9:00','11:00','13:00','15:00','16:00','18:00'];
+
+  lineChartOptions = {
+    responsive: true,
+    maintainAspectRatio: false
+  };
+
+ // PIE CHART DATA
+pieChartData = {
+  labels: ['Siège', 'Parquet', 'Greffe', 'Autres'],
+  datasets: [{
+    data: [34, 47, 12, 7],
+    backgroundColor: [
+      '#3B82F6',
+      '#6366F1',
+      '#06B6D4',
+      '#9CA3AF'
+    ],
+    borderWidth: 0
+  }]
+};
+
+pieChartOptions = {
+  responsive: true,
+  maintainAspectRatio: false
+};
+
+  visiteurs2 = [
+    { photo:'assets/images/profile/avatar.jpeg', nom:'KONE Ibrahim', id:'12459', dest:'Progô', service:'Carlbis', content:true },
+    { photo:'assets/images/profile/avatar.jpeg', nom:'Karin Traore.', id:'45050', dest:'Groffe', service:'Greffe', content:false },
+    { photo:'assets/images/profile/avatar.jpeg', nom:'Allassane Thera', id:'45050', dest:'Groffe', service:'Greffe', content:false },
+  ];
+
+  prochains = [
+    {photo:'assets/images/profile/avatar.jpeg', nom:'TRAORE Kadidja', forme:'Visite d’audience', date:'08/11/2026', heure:'-', status:'🔔' },
+    {photo:'assets/images/profile/avatar.jpeg', nom:'KOUAKOU Sekou', forme:'Dépôt de documents', date:'08/11/2025', heure:'12:45', status:'-' },
+    {photo:'assets/images/profile/avatar.jpeg', nom:'KOUAKOU Moussa', forme:'Dépôt de documents', date:'08/11/2025', heure:'12:45', status:'-' },
+  ];
+
+  /* ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±± */
 }

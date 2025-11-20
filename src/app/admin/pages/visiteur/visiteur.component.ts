@@ -184,6 +184,7 @@ downloadPiece(url: string) {
 }
 
 // Impression de la fiche
+
 printPage() {
   const element = document.getElementById('print-section');
   if (!element) return;
@@ -343,8 +344,9 @@ search() {
     this.selectAll = this.visiteurs.every(item => item.selected);
   }
   Save() {
-    this.currentUser.service_name;
+    //this.currentUser.service_name;
     // this.visiteur.image = null;
+     this.visiteur.nomComplet = this.visiteur.prenom + ' ' + this.visiteur.nom;
     this.loading = true;
     this.visiteurService.saveVisiteur(this.visiteur).subscribe(ret => {
       if (ret['code'] === 200) {

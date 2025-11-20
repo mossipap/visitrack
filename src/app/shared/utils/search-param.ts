@@ -11,6 +11,7 @@ export class SearchParam implements Deserializable<SearchParam> {
   public query: string;
   public type: string;
   public criteria: string;
+  public indicatif: string;
   public enabled: boolean;
 
   deserialize(input: any): SearchParam {

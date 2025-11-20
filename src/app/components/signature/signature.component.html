@@ -1,0 +1,18 @@
+<div class="card p-3">
+  <h5>Signature Wacom STU-430 (macOS via WebSocket bridge)</h5>
+
+  <canvas #canvas class="sig-canvas" style="border:1px solid #ddd"></canvas>
+
+  <div class="mt-3 d-flex gap-2">
+    <button class="btn btn-primary" (click)="start()">Démarrer</button>
+    <button class="btn btn-success" (click)="stop()">Terminer</button>
+    <button class="btn btn-warning" (click)="clear()">Effacer</button>
+    <button class="btn btn-info" (click)="download()" [disabled]="!signatureBase64">Télécharger</button>
+    <button class="btn btn-secondary" (click)="sendToBackend()" [disabled]="!signatureBase64">Envoyer</button>
+  </div>
+
+  <div class="mt-3" *ngIf="signatureBase64">
+    <h6>Aperçu :</h6>
+    <img [src]="'data:image/png;base64,' + signatureBase64" style="max-width:100%; border:1px solid #ccc" />
+  </div>
+</div>

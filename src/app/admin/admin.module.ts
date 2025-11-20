@@ -18,6 +18,7 @@ import { DropdownModule } from 'primeng/dropdown';
 import { CalendarModule } from 'primeng/calendar';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { CommonModule } from '@angular/common';
+import { SignatureComponent } from '../components/signature/signature.component';
 export class MyClock extends TimeagoClock {
   tick(then: number): Observable<number> {
     return of(0)
@@ -41,7 +42,7 @@ export class MyIntl extends TimeagoIntl {
     AdminComponent,
     HeaderComponent,
     SidebarComponent,
-    FooterComponent
+    FooterComponent,
   ],
   imports: [
     CommonModule,

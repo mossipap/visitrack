@@ -1,77 +1,13 @@
-::ng-deep .mat-form-field-appearance-fill .mat-form-field-underline {
-    display: none !important;
-}
-::ng-deep .mat-form-field-appearance-fill .mat-form-field-flex {
-    padding: 0em .75em 0 .75em !important;
-    height: 36px !important;
-    border: 1px solid #D0D5DD;
-    box-shadow: 0px 4px 8px -2px #00000014;
-    background-color: #FFFFFF !important;
-    border-radius: 8px !important;
-    margin-top: -5px !important ;
-}
-::ng-deep .mat-form-field-appearance-legacy .mat-form-field-wrapper {
-    margin-bottom: 0px !important;
-    margin-top: -7px !important;
-    padding-bottom: .35em !important;
-    padding-left: .35em !important;
-}
-::ng-deep .mat-form-field-appearance-legacy .mat-form-field-underline {
-  bottom: .25em !important;
-  display: none !important;
-}
-.btn-session {
-  color: #FFFFFF !important;
-  background: #CD0508 !important;
-  border-color: #CD0508 !important;
-}
-.btn-nosession {
-  color: #FFFFFF !important;
-  background: #6c757d !important;
-  border-color: #6c757d !important;
-}
-.minw-12 {
-    min-width: 12rem !important;
-    margin-top: -8px !important;
-}
-.app-search__input {
-    border-radius: 25px !important;
-}
-
-.icon-org {
-    width: 25px;
-    margin-top: 15px;
-    cursor: pointer;
-}
-.user-avatar {
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-}
 
 .div_role {
     font-family: inherit;
     font-size: 14px;
     color: #f7931a;
 }
-.ft_cal {
-    font-family: inherit;
-    font-size: 17px;
-}
 .cursor_p {
     cursor: pointer;
 }
-.img_timer {
-    width: 30px;
-    height: 26px;
-    margin-bottom: 4px;
-}
-.lib_timer {
-    margin-left: -26px;
-    margin-top: 10px;
-    font-size: 20px;
-    font-family: 'Times New Roman', Times, serif;
-}
+
 .header-left-w {
     background-color: #051D43;
     color: #000000;
@@ -82,11 +18,10 @@
 }
 .header-right-w {
     background-color: #051D43;
-    max-height: 76px;
+    max-height: 50px;
 }
 .header-right-d {
-    background-color: #000000;
-    max-height: 76px;
+    max-height: 50px;
 }
 .c-white {
     color: #ffffff;
@@ -94,6 +29,7 @@
 .c-black {
     color: #fff;
     margin-left: 5px;
+    margin-top: -10px;
 }
 
 .time-white {
@@ -118,19 +54,14 @@
     cursor: pointer;
 }
 .left_logo {
-    height: 48px;
+    height: 40px;
     display: block;
-    padding-top: 10px;
+    padding-top: 4px;
 }
 .v {
     width: 50px;
     float: left;
     padding-top: 10px;
-}
-/* generation static */
-::ng-deep .cdk-global-overlay-wrapper,
-::ng-deep .cdk-overlay-container {
-    z-index: 10000 !important;
 }
 /* side right */
 .modal.right .modal-dialog {
@@ -167,7 +98,7 @@
 /*     height: 31px;
  */    padding: 5px 5px 5px 5px;
     border-radius: 4px;
-    margin-top: 15px;
+    margin-top: 5px;
     background: #fff;
     color: #3e3c3c;
     font-family: Calibri;
@@ -263,6 +194,7 @@ a:not([href]):not([tabindex]) {
   border-radius: 50%;
   object-fit: cover;
   border: 2px solid #dee2e6;
+  margin-top: -10px;
 }
 
 /* ✅ Petit point vert (connecté) avec animation pulsée */

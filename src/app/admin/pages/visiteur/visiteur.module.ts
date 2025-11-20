@@ -22,6 +22,7 @@ import { ParametreRoutingModule } from '../parametre/parametre-routing.module';
 import { VisiteurComponent } from './visiteur.component';
 import { VisiteurRoutingModule } from './visiteur-routing.module';
 import { RadioButtonModule } from 'primeng/radiobutton';
+import { SignatureComponent } from 'src/app/components/signature/signature.component';
 export class MyClock extends TimeagoClock {
   tick(then: number): Observable<number> {
     return of(0)
@@ -41,7 +42,7 @@ export class MyIntl extends TimeagoIntl {
 }
 @NgModule({
   declarations: [
-    VisiteurComponent
+    VisiteurComponent, SignatureComponent
   ],
   imports: [
     VisiteurRoutingModule,

@@ -17,19 +17,19 @@ export class ReclamationService {
     public findAll() {
         return this.http.get(this.serviceURL + '/Reclamation' , this.httpOptions);
     }
-    public findById(profilId: number) {
-        return this.http.get(this.serviceURL + '/Reclamation/'+profilId , this.httpOptions);
+    public findById(reclamationId: number) {
+        return this.http.get(this.serviceURL + '/Reclamation/'+reclamationId , this.httpOptions);
     }
-    public findByCabinetId(cabinetId: number) {
-        return this.http.get(this.serviceURL + '/ReclamationByCabinet/'+cabinetId , this.httpOptions);
+    public save(reclamation: Reclamation) {
+        return this.http.post(this.serviceURL + '/Reclamation', reclamation, this.httpOptions);
     }
-    public save(profil: Reclamation) {
-        return this.http.post(this.serviceURL + '/Reclamation', profil, this.httpOptions);
+    public update(reclamation: Reclamation) {
+        return this.http.put(this.serviceURL + '/Reclamation/'+reclamation.id, reclamation, this.httpOptions);
     }
-    public update(profil: Reclamation) {
-        return this.http.put(this.serviceURL + '/Reclamation/'+profil.id, profil, this.httpOptions);
+    public updateStatut(reclamation: Reclamation) {
+        return this.http.put(this.serviceURL + '/ChangeStatut/'+reclamation.id, reclamation, this.httpOptions);
     }
-    public delete(profil: Reclamation) {
-        return this.http.delete(this.serviceURL + '/Reclamation/'+profil.id, this.httpOptions);
+    public delete(reclamation: Reclamation) {
+        return this.http.delete(this.serviceURL + '/Reclamation/'+reclamation.id, this.httpOptions);
     }
 }

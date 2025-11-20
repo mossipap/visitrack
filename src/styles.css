@@ -442,7 +442,7 @@ body {
   padding: 5px;
   font-size: 0.95rem;
   background: transparent;
-  width: 180px;
+  width: 400px;
 }
 
 .filter-btn {
@@ -485,4 +485,15 @@ body {
   color: red;
   font-family: inherit;
   font-size: 17px;
+}
+.NgxEditor__MenuBar {
+    background-color: #fff !important; 
+    color: #212529 !important;
+}
+.NgxEditor {
+     background: #fff !important; 
+    color: black !important;
+}
+.NgxEditor__Content {
+    min-height: 6em !important;
 }

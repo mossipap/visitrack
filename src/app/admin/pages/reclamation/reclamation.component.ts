@@ -3,14 +3,15 @@ import { AppConfig } from 'src/app/shared/utils/app-config';
 import { AppToastService } from 'src/app/shared/utils/AppToast.service';
 import * as SecureLS from 'secure-ls';
 import { environment } from 'src/environments/environment';
-import { Droit } from 'src/app/shared/models/droit';
 import { RoleManager } from 'src/app/shared/utils/role-manager';
 import { SearchParam } from 'src/app/shared/utils/search-param';
 import { Reclamation } from 'src/app/shared/models/reclamation ';
 import { ReclamationService } from 'src/app/shared/services/reclamation.service';
 import { Utilisateur } from 'src/app/shared/models/utilisateur';
-import { Demande } from 'src/app/shared/models/demande';
 import { DemandeService } from 'src/app/shared/services/demande.service';
+import { Visiteur } from 'src/app/shared/models/visiteur';
+import * as bootstrap from 'bootstrap';
+
 
 @Component({
   selector: 'app-reclamation',
@@ -19,24 +20,17 @@ import { DemandeService } from 'src/app/shared/services/demande.service';
 })
 export class ReclamationComponent implements OnInit {
   public reclamation: Reclamation;
-  public reclamations: any[] = [];
-  public selectedReclamations: Reclamation[]
-  public visiteurs: Demande[] = [];
-
+  public reclamations: Reclamation[] = [];
+  public visiteurs: Visiteur[] = [];
   public droitFilter: any = { nom: '' }
   public roleManager: RoleManager;
   public searchParam: SearchParam;
-  public isSearch: boolean = false;
   public currentUser: Utilisateur;
   public dialogAction: string;
   public searchFilterText: string = '';
   public loading: boolean;
   public isDark: boolean;
-  public isSelectedRole: boolean;
-  public criteriaList = [
-    { id: 1, name: 'N° ID' },
-    { id: 2, name: 'Nom' },
-  ];
+
   @ViewChild('closeAddElementDialog') closeAddElementDialog: any;
   @ViewChild('openConfirmDialog') openConfirmDialog: any;
   @ViewChild('deleteConfirmDialog') deleteConfirmDialog: any;
@@ -44,8 +38,10 @@ export class ReclamationComponent implements OnInit {
   itemsPerPage = 10; // nombre d’éléments par page
   totalPages = 0;
   selectAll: boolean = false;
+  filteredReclamations: any[] = [];
   public currentView = 'list';
   public currentPage = 1; 
+  selectedVisiteur: any = null;
   constructor(
     private reclamationService: ReclamationService,
     private visiteurService: DemandeService,
@@ -59,187 +55,14 @@ export class ReclamationComponent implements OnInit {
 
   ngOnInit(): void {
     const ls = new SecureLS({ encodingType: 'aes', encryptionSecret: 'MyAdminApp' });
-    if (ls.get('current_theme')) {//dark
-      this.isDark = true;
-      const headerLeft = document.getElementsByClassName("theme-light");
-      for (var i = headerLeft.length - 1; i >= 0; --i) {
-        headerLeft[i].classList.replace('theme-light', 'theme-dark');
-      }
-      this.changePaginationBg('#000000');
-      this.changePaginationFg('#ffffff');
-      this.changePrimeTbBg('#000000');
-      this.changePrimeTbHead('#000000');
-      this.changePaginatorLight('#252116');
-      this.changeRowPad('rgb(21 21 21 / 100%)');
-      this.changeTrHover('#1c1c1c');
-      this.changeBgsearchbar('rgb(28, 28, 28)');
-      this.changeBgBtnSave('#f78e39');
-      this.changeBgTheader('rgb(37 33 22)');
-    } else {//white
-      this.isDark = false;
-      const headerLeft = document.getElementsByClassName("theme-dark");
-      for (var i = headerLeft.length - 1; i >= 0; --i) {
-        headerLeft[i].classList.replace('theme-dark', 'theme-light');
-      }
-      this.changePaginationBg('#ffffff');
-      this.changePaginationFg('#000000');
-      this.changePrimeTbBg('none');
-      this.changePrimeTbHead('#f8f9fa');
-      this.changePaginatorLight('#ecf5ee');
-      this.changeRowPad('rgb(255 255 255 / 100%)');
-      this.changeTrHover('rgba(0, 0, 0, 0.3)');
-      this.changeBgsearchbar('rgba(255, 255, 255, 0.8)');
-      this.changeBgBtnSave('#605bff');
-      this.changeBgTheader('#296af7ff');
-    }
-    this.searchParam.dateFin.setDate(this.searchParam.dateFin.getDate() + 1);
-   // this.Search();
-      this.reclamations = [
-  {
-    "id": 1,
-    "description": "Problème de facturation sur la dernière commande",
-    "statut": "ENVOYER",
-    "dateCreation": "2025-09-20T09:15:00Z",
-    "dateModification": "2025-09-20T09:15:00Z"
-  },
-  {
-    "id": 2,
-    "description": "Erreur dans l’adresse de livraison",
-    "statut": "ENVOYER",
-    "dateCreation": "2025-09-18T14:45:00Z",
-    "dateModification": "2025-09-21T10:30:00Z"
-  },
-  {
-    "id": 3,
-    "description": "Produit reçu endommagé, demande de remplacement",
-    "statut": "ENVOYER",
-    "dateCreation": "2025-09-10T11:00:00Z",
-    "dateModification": "2025-09-15T08:20:00Z"
-  },
-  {
-    "id": 4,
-    "description": "Demande d’assistance technique pour configuration",
-    "statut": "ENVOYER",
-    "dateCreation": "2025-09-12T16:10:00Z",
-    "dateModification": "2025-09-21T13:45:00Z"
-  },
-  {
-    "id": 5,
-    "description": "Réclamation sur un retard de remboursement",
-    "statut": "NON ENVOYER",
-    "dateCreation": "2025-09-19T08:00:00Z",
-    "dateModification": "2025-09-19T08:00:00Z"
+  this.Search();
+ 
   }
-];
-  
-this.reclamations = this.reclamations.map(item => ({
-    ...item,
-    selected: false
-  }));
-
-this.totalPages = Math.ceil(this.reclamations.length / this.itemsPerPage);
-    this.updatePaginatedList();
-  }
- updatePaginatedList() {
-    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
-    const endIndex = startIndex + this.itemsPerPage;
-    this.paginatedList = this.reclamations.slice(startIndex, endIndex);
-  }
-
-  nextPage() {
-    if (this.currentPage < this.totalPages) {
-      this.currentPage++;
-      this.updatePaginatedList();
-    }
-  }
-
-  previousPage() {
-    if (this.currentPage > 1) {
-      this.currentPage--;
-      this.updatePaginatedList();
-    }
-  }
-getInitials(fullName: string): string {
-  if (!fullName) return '';
-  return fullName
-    .split(' ')
-    .map(p => p.charAt(0).toUpperCase())
-    .join('')
-    .slice(0, 3);
-}
-
-getSexColor(sexe: string): string {
-  if (!sexe) return '#999';
-
-  // Normalisation
-  sexe = sexe.toLowerCase();
-
-  // Homme
-  if (sexe === 'm' || sexe === 'masculin' || sexe === 'male') {
-    return '#2196F3'; // Bleu
-  }
-
-  // Femme
-  if (sexe === 'f' || sexe === 'feminin' || sexe === 'female') {
-    return '#f45187ff'; // Rose doux
-  }
-
-  return '#666'; // Valeur neutre si non défini
-}
-toggleSelectAll() {
-  this.selectAll = !this.selectAll;
-  this.reclamations.forEach(item => item.selected = this.selectAll);
-}
-
-toggleSelectOne() {
-  // si tous sont cochés, selectAll = true sinon false
-  this.selectAll = this.reclamations.every(item => item.selected);
-}
-  changeTrHover(newValue: string): void {
-    document.documentElement.style.setProperty('--tr-hover', newValue);
-  }
-  changePaginationBg(newValue: string): void {
-    document.documentElement.style.setProperty('--bgpaginator', newValue);
-  }
-  changePaginationFg(newValue: string): void {
-    document.documentElement.style.setProperty('--fgpaginator', newValue);
-  }
-  changePrimeTbBg(newValue: string): void {
-    document.documentElement.style.setProperty('--bgprimetb', newValue);
-  }
-  changePrimeTbHead(newValue: string): void {
-    document.documentElement.style.setProperty('--bgprimetbhead', newValue);
-  }
-  changePaginatorLight(newValue: string): void {
-    document.documentElement.style.setProperty('--paginatorlight', newValue);
-  }
-  changeRowPad(newValue: string): void {
-    document.documentElement.style.setProperty('--bg-trtable', newValue);
-  }
-  changeBgsearchbar(newValue: string): void {
-    document.documentElement.style.setProperty('--bg-searchbar', newValue);
-  }
-  changeBgBtnSave(newValue: string): void {
-    document.documentElement.style.setProperty('--btn-save-bg', newValue);
-  }
-  changeBgTheader(newValue: string): void {
-    document.documentElement.style.setProperty('--theaderbg', newValue);
-  }
-  reclamationFiltres() {
-    if (!this.searchFilterText) return this.reclamations
-    const search = this.searchFilterText.toLowerCase()
-    return this.reclamations.filter(item => {
-      const text = (item.id + ' ' + item.description).toLowerCase()
-      return text.indexOf(search) > -1
-    })
-  }
-
   showAddForm() {
     this.reclamation = new Reclamation();
     this.currentView = 'add';
     this.findVisiteurs()
   }
-
   showEditForm(reclamation: Reclamation) {
     this.reclamation = reclamation;
     this.currentView = 'add';
@@ -261,6 +84,7 @@ toggleSelectOne() {
       this.toast.info(environment.erreur_connexion_message);
       this.loading = false;
     });
+   
   }
   showConfirmDialog(reclamation: Reclamation, action: string): void {
     this.reclamation = reclamation;
@@ -271,11 +95,12 @@ toggleSelectOne() {
     this.reclamation = reclamation;
     this.deleteConfirmDialog.nativeElement.click();
   }
+  
  findVisiteurs() {
     this.visiteurService.findAllVisiteur().subscribe(ret => {
       if (ret['code'] === 200) {
-        this.visiteurs = ret['data']['data'];
-        console.log("visiteurs===>", this.visiteurs);
+        this.visiteurs = ret['data'].data;
+        //console.log("errovisiteursr===>", this.visiteurs);
         if (this.currentView === 'add' || this.currentView === 'detail' && this.reclamation.visiteur && this.visiteurs.length > 0) {
           this.reclamation.visiteur = this.visiteurs.find(p => p.id === this.reclamation.visiteur.id)
         }
@@ -290,32 +115,19 @@ toggleSelectOne() {
       this.loading = false;
     });
   }
-  Search() {
-    this.loading = true;
-    this.reclamationService.findAll().subscribe(ret => {
-      if (ret['code'] === 200) {
-        this.reclamations = ret['data'];
-        this.loading = false;
-      } else {
-        this.loading = false;
-        this.toast.error(ret['message']);
-      }
-    }, error => {
-      console.log("error===>", error);
-      this.toast.error(environment.erreur_connexion_message);
-      this.loading = false;
-    });
-  }
+
   Save() {
     this.loading = true;
+     this.reclamation.user_id = this.currentUser.id
+      this.reclamation.statut='EN_COURS'
     this.reclamationService.save(this.reclamation).subscribe(ret => {
       if (ret['code'] === 200) {
-        this.reclamation.statut='ENVOYER'
         this.reclamation = ret['data'];
         this.reclamations.push(this.reclamation);
         this.closeAddElementDialog.nativeElement.click();
         this.loading = false;
         this.toast.success("Reclamation enregistré avec succès");
+        this.Search();
       } else {
         this.loading = false;
         this.toast.error(ret['message']);
@@ -336,6 +148,7 @@ toggleSelectOne() {
             prof = this.reclamation;
           }
         });
+        this.Search();
         this.closeAddElementDialog.nativeElement.click();
         this.loading = false;
         this.toast.success("Reclamation modifié avec succès");
@@ -356,8 +169,9 @@ toggleSelectOne() {
       if (ret['code'] === 200) {
         this.reclamation = ret['data'];
         this.reclamations.filter(pr => { return pr.id !== this.reclamation.id });
-        this.deleteConfirmDialog.nativeElement.click();
+        this.closeModal('deleteModal');   // 🔥 Ferme automatiquement le modal
         this.toast.success("Reclamation supprimé avec succès");
+        this.Search();
         this.loading = false;
       } else {
         this.toast.error(ret['message']);
@@ -368,5 +182,130 @@ toggleSelectOne() {
       this.loading = false;
     });
   }
+
+showDeletedDialog(r: Reclamation) {
+  this.reclamation = r;
+}
+showRecupererDialog(r: Reclamation) {
+  this.reclamation = r;
+}
+closeModal(id: string) {
+  const modalEl = document.getElementById(id);
+  const modal = bootstrap.Modal.getInstance(modalEl);
+  if (modal) modal.hide();
+}
+getStatusClass(status: string) {
+  switch (status) {
+    case 'En cours d\'investigation':
+      return 'bg-warning text-dark';
+    case 'Objet retrouvé':
+      return 'bg-success';
+    case 'En attente de restitution':
+      return 'bg-primary';
+    case 'Restitué':
+      return 'bg-info';
+    case 'Clôturé sans suite':
+      return 'bg-secondary';
+    default:
+      return 'bg-light text-dark';
+  }
+}
+RetirerObjet() {
+  this.loading = true;
+    this.reclamationService.updateStatut(this.reclamation).subscribe(ret => {
+      if (ret['code'] === 200) {
+        this.reclamation = ret['data'];
+        this.reclamations.filter(pr => { return pr.id !== this.reclamation.id });
+        this.closeModal('restoreModal');   // 🔥 Ferme automatiquement le modal
+        this.toast.success("Reclamation supprimé avec succès");
+        this.Search();
+        this.loading = false;
+      } else {
+        this.toast.error(ret['message']);
+        this.loading = false;
+      }
+    }, error => {
+      this.toast.error(environment.erreur_connexion_message);
+      this.loading = false;
+    });
+}
+  // 🔍 Recherche texte
+reclamationFiltres() {
+  const term = this.searchFilterText.toLowerCase().trim();
+  // Si le champ est vide => on réinitialise
+  if (!term) {
+    this.filteredReclamations = [...this.reclamations];
+  } else {
+    this.filteredReclamations = this.reclamations.filter(R =>
+      R.visiteur.nomComplet?.toLowerCase().includes(term) ||
+      R.texte?.toLowerCase().includes(term)||
+      R.visiteur.numeroTelephone?.toLowerCase().includes(term)
+    );
+  }
+
+  this.currentPage = 1; // retour page 1
+  this.updatePaginatedList();
+}
+
+// 🔹 Charger tous les reclamations
+Search() {
+  this.loading = true;
+  this.reclamationService.findAll().subscribe({
+    next: (ret) => {
+      this.loading = false;
+      if (ret['code'] === 200) {
+        // Ajouter selected et initialiser filteredReclamations
+        this.reclamations = ret['data'].data.map((p: any) => ({ ...p, selected: false }));
+        this.filteredReclamations = [...this.reclamations]; // ✅ important
+
+        this.totalPages = Math.ceil(this.filteredReclamations.length / this.itemsPerPage);
+        this.currentPage = 1;
+        this.updatePaginatedList();
+      } else {
+        this.toast.error(ret['message']);
+      }
+    },
+    error: () => {
+      this.toast.error(environment.erreur_connexion_message);
+      this.loading = false;
+    }
+  });
+}
+
+// 🔹 Mettre à jour la liste paginée à partir de filteredReclamations
+updatePaginatedList() {
+  if (!this.filteredReclamations || this.filteredReclamations.length === 0) {
+    this.paginatedList = [];
+    this.totalPages = 0;
+    return;
+  }
+
+  this.totalPages = Math.ceil(this.filteredReclamations.length / this.itemsPerPage);
+  const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+  const endIndex = startIndex + this.itemsPerPage;
+  this.paginatedList = this.filteredReclamations.slice(startIndex, endIndex);
+  //console.log("+++++ paginatedList reçues +++++", this.paginatedList);
+}
+  nextPage() {
+    if (this.currentPage < this.totalPages) {
+      this.currentPage++;
+      this.updatePaginatedList();
+    }
+  }
+
+  previousPage() {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+      this.updatePaginatedList();
+    }
+  }
+toggleSelectAll() {
+  this.selectAll = !this.selectAll;
+  this.reclamations.forEach(item => item.selected = this.selectAll);
+}
+toggleSelectOne() {
+  // si tous sont cochés, selectAll = true sinon false
+  this.selectAll = this.reclamations.every(item => item.selected);
+}
 
 }

@@ -16,7 +16,8 @@ import { ServiceService } from 'src/app/shared/services/service.service';
 import { Modal } from 'bootstrap';
 import html2canvas from 'html2canvas';
 import { DomSanitizer } from '@angular/platform-browser';
-
+import { Editor } from 'ngx-editor';
+import { Indicatifs, Nationalites } from 'src/app/shared/models/nationalite';
 
 declare var bootstrap: any;
 @Component({
@@ -25,12 +26,12 @@ declare var bootstrap: any;
   styleUrls: ['./rendezvous.component.css']
 })
 export class RendezvousComponent implements OnInit {
- public demandes: Demande[] = [];
+  public demandes: Demande[] = [];
   public allList: any[] = [];
   public activeList: any[] = [];
   public bloqueList: Demande[] = [];
   public suppriList: Demande[] = [];
-  public selectedUsers: Demande[] [];
+  public selectedUsers: Demande[][];
   public demande: Demande = new Demande();
   public visiteur: Demande = new Demande();
   public cabinets: Cabinet[] = [];
@@ -63,7 +64,7 @@ export class RendezvousComponent implements OnInit {
   @ViewChild('openConfirmDialog') openConfirmDialog: any;
   @ViewChild('deleteConfirmDialog') deleteConfirmDialog: any;
   @ViewChild('closeAddElementDialog') closeAddElementDialog: any;
-  @ViewChild('fileInputUpload', { static: false }) fileInputUpload: ElementRef;
+  @ViewChild('fileInput', { static: false }) fileInput!: ElementRef;
   @ViewChild('canvas', { static: false }) canvas!: ElementRef<HTMLCanvasElement>;
   private ctx!: CanvasRenderingContext2D;
   signatureImage: string | null = null;
@@ -72,13 +73,40 @@ export class RendezvousComponent implements OnInit {
   totalPages = 0;
   selectAll: boolean = false;
   public currentView = 'list';
-  public currentPage = 1; 
+  public currentPage = 1;
   indicatifs: any = {};
-  public isNumberPhone: boolean ;
+  public isNumberPhone: boolean;
   public deleteModal?: Modal;
   modalInstance: any;
   previewUrl: any | null = null;
-  
+  editor!: Editor;
+  editor1!: Editor;
+  indicatifsJson: any = {};
+  indicatifsAdds: { country: string, dial: string, flag: string }[] = [];
+  selectedIndicatif: { country: string, dial: string, flag: string };
+  phoneNumber: string = '';
+  // Liste des objets possibles
+  objetOptions = [
+    { id: 1, label: 'Téléphone portable' },
+    { id: 2, label: 'Pièce d\'identité' },
+    { id: 3, label: 'Ordinateur / Tablette' },
+    { id: 4, label: 'Objets dangereux' },
+    { id: 5, label: 'Autres objets' }
+  ];
+  sexeOptions = [
+  { label: 'Homme', value: 'Homme' },
+  { label: 'Femme', value: 'Femme' }
+];
+typePieceOptions = [
+  { label: 'Carte d’identité', value: 'CNI' },
+  { label: 'Permis', value: 'Permis' },
+  { label: 'Passeport', value: 'Passeport' },
+  { label: 'Catre Scolaire', value: 'Carte Scolaire' }
+];
+
+nationalites = Nationalites;
+indicatifsNums = Indicatifs;
+
   constructor(
     private demandeService: DemandeService,
     private cabinetService: CabinetService,
@@ -97,10 +125,35 @@ export class RendezvousComponent implements OnInit {
   ngOnInit(): void {
     const ls = new SecureLS({ encodingType: 'aes', encryptionSecret: 'MyAdminApp' });
     this.searchParam.dateFin.setDate(this.searchParam.dateFin.getDate() + 1);
+    this.editor = new Editor();
+    this.editor1 = new Editor();
     this.search();
+    this.loadIndicatifs();
+    this.loadIndicatifsAdd();
 
 
-   this.loadIndicatifs();
+  }
+  // make sure to destory the editor
+  ngOnDestroy(): void {
+    this.editor.destroy();
+    this.editor1.destroy();
+  }
+  loadIndicatifsAdd() {
+    this.http.get<any>('assets/indicatifsAdd.json').subscribe(
+      data => {
+        this.indicatifsAdds = Object.keys(data).map(key => ({
+          dial: key,
+          flag: data[key].flag,
+          country: data[key].country
+        }));
+        this.selectedIndicatif = this.indicatifsAdds[0];
+      },
+      error => console.error('Erreur chargement indicatifs', error)
+    );
+  }
+
+  getFullNumber(): string {
+    return this.selectedIndicatif?.dial + this.phoneNumber;
   }
 
   loadIndicatifs() {
@@ -122,41 +175,42 @@ export class RendezvousComponent implements OnInit {
     return code ? this.indicatifs[code] : '🌍';
   }
 
-getInitials(fullName: string): string {
-  if (!fullName) return '';
-  return fullName
-    .split(' ')
-    .map(p => p.charAt(0).toUpperCase())
-    .join('')
-    .slice(0, 3);
-}
-getSexColor(sexe: string): string {
-  if (!sexe) return '#999';
 
-  // Normalisation
-  sexe = sexe.toLowerCase();
+  getInitials(fullName: string): string {
+    if (!fullName) return '';
+    return fullName
+      .split(' ')
+      .map(p => p.charAt(0).toUpperCase())
+      .join('')
+      .slice(0, 3);
+  }
+  getSexColor(sexe: string): string {
+    if (!sexe) return '#999';
 
-  // Homme
-  if (sexe === 'Homme' || sexe === 'masculin' || sexe === 'male') {
-    return '#2196F3'; // Bleu
+    // Normalisation
+    sexe = sexe.toLowerCase();
+
+    // Homme
+    if (sexe === 'Homme' || sexe === 'masculin' || sexe === 'male') {
+      return '#2196F3'; // Bleu
+    }
+
+    // Femme
+    if (sexe === 'Femme' || sexe === 'feminin' || sexe === 'female') {
+      return '#f45187ff'; // Rose doux
+    }
+
+    return '#666'; // Valeur neutre si non défini
+  }
+  toggleSelectAll() {
+    this.selectAll = !this.selectAll;
+    this.activeList.forEach(item => item.selected = this.selectAll);
   }
 
-  // Femme
-  if (sexe === 'Femme' || sexe === 'feminin' || sexe === 'female') {
-    return '#f45187ff'; // Rose doux
+  toggleSelectOne() {
+    // si tous sont cochés, selectAll = true sinon false
+    this.selectAll = this.activeList.every(item => item.selected);
   }
-
-  return '#666'; // Valeur neutre si non défini
-}
-toggleSelectAll() {
-  this.selectAll = !this.selectAll;
-  this.activeList.forEach(item => item.selected = this.selectAll);
-}
-
-toggleSelectOne() {
-  // si tous sont cochés, selectAll = true sinon false
-  this.selectAll = this.activeList.every(item => item.selected);
-}
   changeRowPad(newValue: string): void {
     document.documentElement.style.setProperty('--bg-trtable', newValue);
   }
@@ -213,53 +267,53 @@ toggleSelectOne() {
   }
 
   showDetail(d: Demande) {
-   this.demande = d;
-   console.log('+++++++++++ detail++++++++++++',this.demande)
-   // PDF en dur
-   const filePath = "assets/images/piece.pdf";
-   // Sécurisation Angular obligatoire
-   this.demande.pieceUrl = this.sanitizer.bypassSecurityTrustResourceUrl(filePath);
-   this.currentView = 'detail';
- }
- 
- // Ouvrir le modal d'aperçu
- openPreview(url: string) {
-   this.previewUrl = url;
-   const modalElement = document.getElementById('previewModal');
-   if (modalElement) {
-     const modal = new bootstrap.Modal(modalElement);
-     modal.show();
-   }
- }
- 
- // Télécharger le fichier
- downloadPiece(url: string) {
-   if (!url) return;
- 
-   // Assurer URL absolue
-   const baseUrl = window.location.origin; // http://localhost:4200
-   const fileUrl = 'http://localhost:4200/assets/images/piece.pdf';
- 
-   const link = document.createElement('a');
-   link.href = fileUrl;
-   link.download = `PieceIdentite_${this.visiteur.nomComplet}${fileUrl.substring(fileUrl.lastIndexOf('.'))}`;
-   link.click();
- }
- 
- // Impression de la fiche
- printPage() {
-   const element = document.getElementById('print-section');
-   if (!element) return;
- 
-   // Capture l'élément en image
-   html2canvas(element, { scale: 2 }).then(canvas => {
-     // Convertir en image
-     const imgData = canvas.toDataURL('image/png');
- 
-     // Créer une nouvelle fenêtre pour impression
-     const printWindow = window.open('', '_blank', 'width=900,height=700');
-     if (printWindow) {
-       printWindow.document.write(`
+    this.demande = d;
+    //console.log('+++++++++++ detail++++++++++++',this.demande)
+    // PDF en dur
+    const filePath = "assets/images/piece.pdf";
+    // Sécurisation Angular obligatoire
+    this.demande.pieceUrl = this.sanitizer.bypassSecurityTrustResourceUrl(filePath);
+    this.currentView = 'detail';
+  }
+
+  // Ouvrir le modal d'aperçu
+  openPreview(url: string) {
+    this.previewUrl = url;
+    const modalElement = document.getElementById('previewModal');
+    if (modalElement) {
+      const modal = new bootstrap.Modal(modalElement);
+      modal.show();
+    }
+  }
+
+  // Télécharger le fichier
+  downloadPiece(url: string) {
+    if (!url) return;
+
+    // Assurer URL absolue
+    const baseUrl = window.location.origin; // http://localhost:4200
+    const fileUrl = 'http://localhost:4200/assets/images/piece.pdf';
+
+    const link = document.createElement('a');
+    link.href = fileUrl;
+    link.download = `PieceIdentite_${this.visiteur.nomComplet}${fileUrl.substring(fileUrl.lastIndexOf('.'))}`;
+    link.click();
+  }
+
+  // Impression de la fiche
+  printPage() {
+    const element = document.getElementById('print-section');
+    if (!element) return;
+
+    // Capture l'élément en image
+    html2canvas(element, { scale: 2 }).then(canvas => {
+      // Convertir en image
+      const imgData = canvas.toDataURL('image/png');
+
+      // Créer une nouvelle fenêtre pour impression
+      const printWindow = window.open('', '_blank', 'width=900,height=700');
+      if (printWindow) {
+        printWindow.document.write(`
          <html>
            <head>
              <title>Impression</title>
@@ -276,17 +330,17 @@ toggleSelectOne() {
            </body>
          </html>
        `);
-       printWindow.document.close();
-     }
-   });
- }
+        printWindow.document.close();
+      }
+    });
+  }
 
   showResetDialog(demande: Demande): void {
     this.demande = demande;
   }
 
   showConfirmDialog(demande: Demande): void {
-   // this.dialogAction = action;
+    // this.dialogAction = action;
     this.demande = demande;
     this.openConfirmDialog.nativeElement.click();
   }
@@ -294,7 +348,7 @@ toggleSelectOne() {
   // 🔹 Ouvrir la modale
 
 
- showDeleteDialog(demande: Demande): void {
+  showDeleteDialog(demande: Demande): void {
     this.demande = demande;
     if (this.deleteModal) {
       this.deleteModal.show();
@@ -305,125 +359,125 @@ toggleSelectOne() {
   closeDeleteDialog(): void {
     this.deleteModal?.hide();
   }
-search() {
-  this.loading = true;
-  this.demandeService.findAll().subscribe(
-    (ret) => {
-      this.loading = false;
-      if (ret['code'] == 200) {
-        this.demandes = ret['data']['data'];
+  search() {
+    this.loading = true;
+    this.demandeService.findAll().subscribe(
+      (ret) => {
+        this.loading = false;
+        if (ret['code'] == 200) {
+          this.demandes = ret['data']['data'];
 
-        // Séparer les listes
-        this.activeList = this.demandes.filter(d => d.statut === 'En cours');
-        this.bloqueList = this.demandes.filter(d => d.statut === 'Terminée');
-        this.suppriList = this.demandes.filter(d => d.statut === 'Supprimé');
+          // Séparer les listes
+          this.activeList = this.demandes.filter(d => d.statut === 'En cours');
+          this.bloqueList = this.demandes.filter(d => d.statut === 'Terminée');
+          this.suppriList = this.demandes.filter(d => d.statut === 'Supprimé');
 
-        // ✅ Tout afficher par défaut
-        this.allList = [...this.demandes];
+          // ✅ Tout afficher par défaut
+          this.allList = [...this.demandes];
 
-        // Calcul pagination
-        this.totalPages = Math.ceil(this.allList.length / this.itemsPerPage);
-        this.updatePaginatedList();
+          // Calcul pagination
+          this.totalPages = Math.ceil(this.allList.length / this.itemsPerPage);
+          this.updatePaginatedList();
 
-        this.toast.info(`${this.demandes.length} demande(s) trouvée(s)`);
-      } else {
-        this.toast.error(ret['message']);
+          this.toast.info(`${this.demandes.length} demande(s) trouvée(s)`);
+        } else {
+          this.toast.error(ret['message']);
+        }
+      },
+      () => {
+        this.toast.error(environment.erreur_connexion_message);
+        this.loading = false;
       }
-    },
-    () => {
-      this.toast.error(environment.erreur_connexion_message);
-      this.loading = false;
-    }
-  );
-}
-
-updatePaginatedList() {
-  let sourceList: any[] = [];
-
-  // 🟢 Choisir la liste selon le filtre actif
-  switch (this.currentIndex) {
-    case 1:
-      sourceList = this.activeFiltres();
-      break;
-    case 2:
-      sourceList = this.bloqueFiltres();
-      break;
-    case 3:
-      sourceList = this.supprimeFiltres();
-      break;
-    default:
-      sourceList = this.allFiltres(); // ✅ Tous par défaut
-      break;
+    );
   }
 
-  // Pagination
-  this.totalPages = Math.ceil(sourceList.length / this.itemsPerPage);
-  const startIndex = (this.currentPage - 1) * this.itemsPerPage;
-  this.paginatedList = sourceList.slice(startIndex, startIndex + this.itemsPerPage);
+  updatePaginatedList() {
+    let sourceList: any[] = [];
 
-  console.log("+++++ paginatedList affichée +++++", this.paginatedList);
-}
-
-// ✅ Filtres pour chaque catégorie + "Tous"
-allFiltres() {
-  if (!this.searchFilterText) return this.allList;
-  const search = this.searchFilterText.toLowerCase();
-  return this.allList.filter(item =>
-    (item.visiteur.nomComplet + ' ' + item.numeroTelephone + ' ' + item.cabinet?.numerocabinet)
-      .toLowerCase()
-      .includes(search)
-  );
-}
-
-activeFiltres() {
-  if (!this.searchFilterText) return this.activeList;
-  const search = this.searchFilterText.toLowerCase();
-  return this.activeList.filter(item =>
-    (item.nomComplet + ' ' + item.numeroTelephone + ' ' + item.cabinet?.numerocabinet)
-      .toLowerCase()
-      .includes(search)
-  );
-}
-
-bloqueFiltres() {
-  if (!this.searchFilterText) return this.bloqueList;
-  const search = this.searchFilterText.toLowerCase();
-  return this.bloqueList.filter(item =>
-    (item.nomComplet + ' ' + item.numeroTelephone).toLowerCase().includes(search)
-  );
-}
-
-supprimeFiltres() {
-  if (!this.searchFilterText) return this.suppriList;
-  const search = this.searchFilterText.toLowerCase();
-  return this.suppriList.filter(item =>
-    (item.nomComplet + ' ' + item.numeroTelephone).toLowerCase().includes(search)
-  );
-}
-
-onChangeCode(index: number) {
-  this.currentIndex = index;
-  this.currentPage = 1;
-  this.updatePaginatedList();
-
-  // Gérer les boutons actifs
-  ['user_active', 'user_block', 'user_delete', 'user_all'].forEach(id => {
-    const btn = document.getElementById(id);
-    if (btn) {
-      btn.classList.toggle('btn_active', id === this.getButtonIdByIndex(index));
-      btn.classList.toggle('btn_not_active', id !== this.getButtonIdByIndex(index));
+    // 🟢 Choisir la liste selon le filtre actif
+    switch (this.currentIndex) {
+      case 1:
+        sourceList = this.activeFiltres();
+        break;
+      case 2:
+        sourceList = this.bloqueFiltres();
+        break;
+      case 3:
+        sourceList = this.supprimeFiltres();
+        break;
+      default:
+        sourceList = this.allFiltres(); // ✅ Tous par défaut
+        break;
     }
-  });
-}
 
-getButtonIdByIndex(index: number): string {
-  switch (index) {
-    case 1: return 'user_active';
-    case 2: return 'user_block';
-    case 3: return 'user_delete';
-    default: return 'user_all'; // ✅ nouveau bouton "Tous"
+    // Pagination
+    this.totalPages = Math.ceil(sourceList.length / this.itemsPerPage);
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    this.paginatedList = sourceList.slice(startIndex, startIndex + this.itemsPerPage);
+
+    console.log("+++++ paginatedList affichée +++++", this.paginatedList);
   }
-}
+
+  // ✅ Filtres pour chaque catégorie + "Tous"
+  allFiltres() {
+    if (!this.searchFilterText) return this.allList;
+    const search = this.searchFilterText.toLowerCase();
+    return this.allList.filter(item =>
+      (item.visiteur.nomComplet + ' ' + item.numeroTelephone + ' ' + item.cabinet?.numerocabinet)
+        .toLowerCase()
+        .includes(search)
+    );
+  }
+
+  activeFiltres() {
+    if (!this.searchFilterText) return this.activeList;
+    const search = this.searchFilterText.toLowerCase();
+    return this.activeList.filter(item =>
+      (item.nomComplet + ' ' + item.numeroTelephone + ' ' + item.cabinet?.numerocabinet)
+        .toLowerCase()
+        .includes(search)
+    );
+  }
+
+  bloqueFiltres() {
+    if (!this.searchFilterText) return this.bloqueList;
+    const search = this.searchFilterText.toLowerCase();
+    return this.bloqueList.filter(item =>
+      (item.nomComplet + ' ' + item.numeroTelephone).toLowerCase().includes(search)
+    );
+  }
+
+  supprimeFiltres() {
+    if (!this.searchFilterText) return this.suppriList;
+    const search = this.searchFilterText.toLowerCase();
+    return this.suppriList.filter(item =>
+      (item.nomComplet + ' ' + item.numeroTelephone).toLowerCase().includes(search)
+    );
+  }
+
+  onChangeCode(index: number) {
+    this.currentIndex = index;
+    this.currentPage = 1;
+    this.updatePaginatedList();
+
+    // Gérer les boutons actifs
+    ['user_active', 'user_block', 'user_delete', 'user_all'].forEach(id => {
+      const btn = document.getElementById(id);
+      if (btn) {
+        btn.classList.toggle('btn_active', id === this.getButtonIdByIndex(index));
+        btn.classList.toggle('btn_not_active', id !== this.getButtonIdByIndex(index));
+      }
+    });
+  }
+
+  getButtonIdByIndex(index: number): string {
+    switch (index) {
+      case 1: return 'user_active';
+      case 2: return 'user_block';
+      case 3: return 'user_delete';
+      default: return 'user_all'; // ✅ nouveau bouton "Tous"
+    }
+  }
   nextPage() {
     if (this.currentPage < this.totalPages) {
       this.currentPage++;
@@ -438,52 +492,89 @@ getButtonIdByIndex(index: number): string {
     }
   }
 
- Save() {
-  this.demande.statut = "En_attente";
-  this.currentUser = this.demande.user_id;
- // this.demande.user_personnel_id = null;
-  //this.demande.visiteur_id = null;
-  this.loading = true;
 
-  this.demandeService.save(this.demande).subscribe(ret => {
-    if (ret['code'] === 200) {
+  toggleObjet(objet: string) {
+    const index = this.demande.objet_saisie.indexOf(objet);
 
-      this.demande = ret['data'];
-
-      // ✅ Sécurisation ici
-      if (!Array.isArray(this.demandes)) {
-        this.demandes = [];
-      }
-
-      this.demandes.push(this.demande);
-
-      this.closeAddElementDialog.nativeElement.click();
-      this.toast.success("Demande ajoutée avec succès");
-
-      this.search(); // Recharge les listes
-      this.showList();
+    if (index === -1) {
+      // Ajouter
+      this.demande.objet_saisie.push(objet);
     } else {
-      this.toast.error(ret['message']);
+      // Retirer
+      this.demande.objet_saisie.splice(index, 1);
     }
-    this.loading = false;
-  }, error => {
-    this.toast.error(environment.erreur_connexion_message);
-    this.loading = false;
-  });
-}
+
+    console.log("Objets sélectionnés :", this.demande.objet_saisie);
+  }
+  toggleObjetRetire(objet: any) {
+    const index = this.demande.objet_retirer.indexOf(objet);
+
+    if (index === -1) {
+      // Ajouter
+      this.demande.objet_retirer.push(objet);
+    } else {
+      // Retirer
+      this.demande.objet_retirer.splice(index, 1);
+    }
+
+    console.log("Objets sélectionnés :", this.demande.objet_retirer);
+  }
+  Save() {
+    if (!this.demande.scan_piece) {
+      this.toast.error('Veuillez selectionner la pièce justificatif du visiteur');
+      return;
+    }
+    this.demande.statut = "En_attente";
+    this.currentUser = this.demande.user_id;
+    this.demande.objet_saisie
+    console.log("========== objet_saisie ±±±±±±±±±±±±±±±±±±±±±±±", this.demande.objet_saisie)
+    console.log("========== rendez-vous ±±±±±±±±±±±±±±±±±±±±±±±", this.demande)
+    // this.demande.user_personnel_id = null;
+    //this.demande.visiteur_id = null;
+   // this.loading = true;
+    this.demande.nomComplet = this.demande.prenom + ' ' + this.demande.nom;
+    /*   this.demandeService.save(this.demande).subscribe(ret => {
+        if (ret['code'] === 200) {
+    
+          this.demande = ret['data'];
+    
+          // ✅ Sécurisation ici
+          if (!Array.isArray(this.demandes)) {
+            this.demandes = [];
+          }
+    
+          this.demandes.push(this.demande);
+    
+          this.closeAddElementDialog.nativeElement.click();
+          this.toast.success("Demande ajoutée avec succès");
+    
+          this.search(); // Recharge les listes
+          this.showList();
+        } else {
+          this.toast.error(ret['message']);
+        }
+        this.loading = false;
+      }, error => {
+        this.toast.error(environment.erreur_connexion_message);
+        this.loading = false;
+      }); */
+  }
 
 
   Update() {
-    this.loading = true;
+    //this.loading = true;
     /* this.demande.cabinet_id = this.demande.cabinet.id;
     this.demande.service_id = this.demande.service.id;
     this.demande.profil_id = this.demande.profil.id; */
     this.demande.statut = 'Terminée'
-    this.demandeService.update(this.demande).subscribe(ret => {
+    this.demande.objet_retirer
+       console.log("========== objet_saisie ±±±±±±±±±±±±±±±±±±±±±±±", this.demande.objet_retirer)
+    console.log("========== rendez-vous ±±±±±±±±±±±±±±±±±±±±±±±", this.demande)
+  /*   this.demandeService.update(this.demande).subscribe(ret => {
       if (ret['code'] === 200) {
         this.demande = ret['data'];
         this.demandes.forEach(user => {
-          if(user.id === this.demande.id) {
+          if (user.id === this.demande.id) {
             user = this.demande;
           }
         });
@@ -499,17 +590,17 @@ getButtonIdByIndex(index: number): string {
     }, error => {
       this.toast.error(environment.erreur_connexion_message);
       this.loading = false;
-    });
+    }); */
   }
 
   deleteDemande(): void {
     if (this.demande) {
       console.log(`Suppression de ${this.demande.visiteur.nomComplet}`);
-       this.loading = true;
-      this.demandeService.delete(this.demande).subscribe((ret:any) => {
-       if (ret['code'] == 200) {
-         this.demande = ret['data'];
-         this.closeDeleteDialog();
+      this.loading = true;
+      this.demandeService.delete(this.demande).subscribe((ret: any) => {
+        if (ret['code'] == 200) {
+          this.demande = ret['data'];
+          this.closeDeleteDialog();
           this.search();
           this.loading = false;
           this.toast.success(ret['message']);
@@ -561,67 +652,66 @@ getButtonIdByIndex(index: number): string {
       this.loading = false;
     });
   }
-  
 
- searchVisiteurByNumber(numberPhone: string) {
-  console.log("query ===>", numberPhone);
-  this.loading = true;
 
-  this.demandeService.findByNumero(this.searchParam).subscribe({
-    next: (ret) => {
-      this.loading = false;
-      if (ret['code'] === 200) {
-        // ✅ Numéro trouvé → on remplit le formulaire
-        this.demande = ret['data'];
-        this.toast.success("Visiteur trouvé avec succès");
-        this.isNumberPhone = true; // On affiche le formulaire pré-rempli
-      } 
-      else if (ret['code'] === 404) {
-        // ⚠️ Numéro non trouvé → on affiche le formulaire vide
-        this.toast.warning("Aucun visiteur trouvé. Vous pouvez remplir le formulaire.");
-        this.isNumberPhone = true; // On affiche quand même le formulaire
-         //this.demande = new Demande(); // Formulaire vide avec numéro déjà saisi
-         this.showAddForm();
-      } 
-      else {
-        this.toast.error(ret['message'] || "Erreur inconnue");
+  searchVisiteurByNumber(numberPhone: string) {
+    console.log("query ===>", numberPhone);
+    this.loading = true;
+
+    this.demandeService.findByNumero(this.searchParam).subscribe({
+      next: (ret) => {
+        this.loading = false;
+        if (ret['code'] === 200) {
+          // ✅ Numéro trouvé → on remplit le formulaire
+          this.demande = ret['data'];
+          this.toast.success("Visiteur trouvé avec succès");
+          this.isNumberPhone = true; // On affiche le formulaire pré-rempli
+        }
+        else if (ret['code'] === 404) {
+          // ⚠️ Numéro non trouvé → on affiche le formulaire vide
+          this.toast.warning("Aucun visiteur trouvé. Vous pouvez remplir le formulaire.");
+          this.isNumberPhone = true; // On affiche quand même le formulaire
+          //this.demande = new Demande(); // Formulaire vide avec numéro déjà saisi
+          this.showAddForm();
+        }
+        else {
+          this.toast.error(ret['message'] || "Erreur inconnue");
+          this.isNumberPhone = false;
+        }
+      },
+      error: () => {
+        this.toast.error(environment.erreur_connexion_message);
+        this.loading = false;
         this.isNumberPhone = false;
       }
-    },
-    error: () => {
-      this.toast.error(environment.erreur_connexion_message);
-      this.loading = false;
-      this.isNumberPhone = false;
-    }
-  });
-}
+    });
+  }
 
 
 
-  /* *********************Upload Photo************** */
+  /* ======================== Ulpoad Image ================================= */
   selectPicture() {
-    this.fileInputUpload.nativeElement.click();
+    // la methode de selection du media
+    this.fileInput.nativeElement.click();
   }
-  deleteImageProfile() {
-  }
-  onFileUploadChange(event) {
-    if (event.target.files.length <= 0) {
+
+  processWebImage(medias: any) {
+    const file = medias.target.files[0];
+
+    if (!file) return;
+
+    const isPdf = file.type === 'application/pdf';
+
+    if (!isPdf) {
+      this.toast.error('Veuillez sélectionner uniquement un fichier PDF.');
       return;
     }
-    let file = event.target.files[0];
-    if (!file.type.includes("image")) {
-      this.toast.info("Veuilez choisir une image!");
-      return;
-    }
-    if ((file.size / 1024) > 1024 * 1024 * 5) {
-      this.toast.info("La taille à dépasser 5 Mo");
-      return;
-    }
-    let reader = new FileReader();
-    reader.onload = readerEvent => {
-      //this.imageProfile = (readerEvent.target as any).result;
+    const reader = new FileReader();
+    reader.onload = (readermedias) => {
+      const pdfData = (readermedias.target as any).result;
+      this.demande.scan_piece = pdfData;
     };
-    reader.readAsDataURL(event.target.files[0]);
+    reader.readAsDataURL(file);
   }
 
   /* +++++++++++++++++++++++++ new code for signature++++++++++++++++++ */
@@ -638,15 +728,54 @@ getButtonIdByIndex(index: number): string {
     alert('Signature sauvegardée avec succès ✅');
   }
   goToRecap() {
-  this.signatureImage = this.canvas.nativeElement.toDataURL('image/png');
-  this.step = 3;
-}
-formatPhone(numero: string): string {
-  if (!numero) return '';
-  // Exemple simple pour Mali
-  if (numero.startsWith('+223')) {
-    return numero.replace(/(\+223)(\d{2})(\d{2})(\d{2})(\d{2})/, '$1 $2 $3 $4 $5');
+   /*  this.demande.objet_saisie
+    if (!this.demande.scan_piece) {
+      this.toast.error('Veuillez sélectionner la pièce justificative du visiteur.');
+      return;
+    } */
+    this.step = 3;
   }
-  return numero;
-}
+  formatPhone(numero: string): string {
+    if (!numero) return '';
+    // Exemple simple pour Mali
+    if (numero.startsWith('+223')) {
+      return numero.replace(/(\+223)(\d{2})(\d{2})(\d{2})(\d{2})/, '$1 $2 $3 $4 $5');
+    }
+    return numero;
+  }
+
+
+
+  filePDF!: File | null;
+  pdfURL: any = null;
+
+  onFileSelected(event: any) {
+    this.filePDF = event.target.files[0];
+
+    if (this.filePDF) {
+      this.pdfURL = URL.createObjectURL(this.filePDF);
+    }
+  }
+
+  previewPDF() {
+    if (this.filePDF) {
+      const url = URL.createObjectURL(this.filePDF);
+      this.pdfURL = this.sanitizer.bypassSecurityTrustResourceUrl(url);
+
+      const modal = new bootstrap.Modal(document.getElementById('pdfModal'));
+      modal.show();
+    }
+  }
+
+  previewURLPDF(url: string) {
+    this.pdfURL = this.sanitizer.bypassSecurityTrustResourceUrl(url);
+
+    const modal = new bootstrap.Modal(document.getElementById('pdfModal'));
+    modal.show();
+  }
+
+  removePDF() {
+    this.filePDF = null;
+    this.pdfURL = null;
+  }
 }

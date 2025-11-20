@@ -20,45 +20,17 @@
           <!-- 🔍 Barre de recherche -->
           <div class="search-wrapper d-flex align-items-center">
             <i class="mdi mdi-magnify search-icon"></i>
-            <input type="text" [(ngModel)]="searchFilterText" placeholder="Rechercher un profil..."
+            <input type="text" [(ngModel)]="searchFilterText" placeholder="Rechercher un visiteur..."
               (input)="filterVisiteurs($event)" class="search-input" />
           </div>
           <!-- 🧩 Bouton filtre -->
-          <button *ngIf="!isSearch" (click)="isSearch = true"
-            class="btn btn-outline-light filter-btn d-flex align-items-center gap-1">
-            <i class="mdi mdi-filter-variant text-dark"></i>
-            <span class="text-dark">Filtres</span>
-          </button>
-          <div class="row gx-1 align-items-center" *ngIf="isSearch">
-            <div class="col-auto d-flex align-items-center">
-              <label class="lab_input me-1" [class]="isDark? 'c-white' : 'c-black'">Du</label>
-              <p-calendar [(ngModel)]="searchParam.dateDebut" [showIcon]="true"></p-calendar>
-            </div>
-
-            <div class="col-auto d-flex align-items-center">
-              <label class="lab_input me-1" [class]="isDark? 'c-white' : 'c-black'">Au</label>
-              <p-calendar [(ngModel)]="searchParam.dateFin" [showIcon]="true"></p-calendar>
-            </div>
-
-            <div class="col-auto">
-              <p-dropdown [options]="criteriaList" [(ngModel)]="searchParam.criteria" optionLabel="name"
-                placeholder="Critère"></p-dropdown>
-            </div>
-
             <div class="col-auto">
               <button class="btn_refresh" (click)="search()" title="Rafraichir">
                 <i class="mdi mdi-refresh fs-20"></i>
               </button>
             </div>
-
-            <div class="col-auto">
-              <button class="btn_refresh text-danger" (click)="isSearch = false" title="Fermer">
-                <i class="mdi mdi-close fs-20"></i>
-              </button>
-            </div>
-          </div>
           <!-- ➕ Bouton ajout -->
-          <button *ngIf="false" class="btn btn-dark d-flex align-items-center gap-1 px-3" data-backdrop="static"
+          <button class="btn btn-dark d-flex align-items-center gap-1 px-3" data-backdrop="static"
             data-toggle="modal" data-target="#addVisiteurModal" (click)="showAddForm()">
             <i class="mdi mdi-plus"></i>
             <span>Ajouter un Visiteur</span>
@@ -286,8 +258,8 @@
               <tbody>
                 <tr *ngFor="let d of visiteur.demande">
                   <td>{{ d.objet_retirer }}</td>
-                  <td>{{ d.objet_saisie }}</td>
-                  <td>{{ d.raisonVisite }}</td>
+                  <td [innerHTML]="d.objet_saisie"></td>
+                  <td [innerHTML]="d.raisonVisite "></td>
                   <td>{{ d.dateVisite | date:'dd/MM/yyyy' }}</td>
                   <td>{{ d.heureArrive }}</td>
                   <td>{{ d.heureDepart }}</td>
@@ -514,7 +486,7 @@
 
 
     <!-- add user modal -->
-    <div class="container demo" *ngIf="currentView === 'edit'">
+    <div class="container demo" *ngIf="currentView === 'add' || currentView === 'edit'">
       <div class="modal right fade" id="addVisiteurModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel2">
         <div class="modal-dialog" role="document">
           <div class="modal-content" [style]="{'background-color': isDark ? '#1f1f1f' : '#FFFFFF'}">
@@ -548,13 +520,33 @@
                             </div>
                           </div>
                         
-                          <div class="col-lg-12 p-right-0">
+                          <div class="col-lg-12 p-right-0" *ngIf="this.visiteur.id">
                             <div class="form-group has-success align-left ft-w-b">
                               <label [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
                                 for="nomComplet">Non Complet *</label>
                               <input
                                 [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'"
                                 id="nomComplet" name="nomComplet" type="text" [(ngModel)]="visiteur.nomComplet"
+                                required>
+                            </div>
+                          </div>
+                          <div class="col-lg-6 p-right-0" *ngIf="!this.visiteur.id">
+                            <div class="form-group has-success align-left ft-w-b">
+                              <label [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
+                                for="nom">Non *</label>
+                              <input
+                                [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'"
+                                id="nom" name="nomComplet" type="text" [(ngModel)]="visiteur.nom"
+                                required>
+                            </div>
+                          </div>
+                          <div class="col-lg-6 p-right-0" *ngIf="!this.visiteur.id">
+                            <div class="form-group has-success align-left ft-w-b">
+                              <label [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
+                                for="prenom">Prénom *</label>
+                              <input
+                                [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'"
+                                id="prenom" name="prenom" type="text" [(ngModel)]="visiteur.prenom"
                                 required>
                             </div>
                           </div>
@@ -581,27 +573,27 @@
                               </div>
                             </div>
                           </div>
-                          <div class="col-lg-12 p-right-0">
+                          <div class="col-lg-6 p-right-0">
                             <div class="form-group has-success align-left ft-w-b">
                               <label [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
-                                for="numeroPiece">Numéro de la pièce *</label>
+                                for="numeroPiece">N° de la pièce *</label>
                               <input
                                 [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'"
                                 id="numeroPiece" name="numeroPiece" type="text"
                                 [(ngModel)]="visiteur.numeroPiece" required>
                             </div>
                           </div>
-                          <div class="col-lg-12 p-right-0">
+                          <div class="col-lg-6 p-right-0">
                             <div class="form-group has-success align-left ft-w-b">
                               <label [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
-                                for="numeroTelephone">Numéro de téléphone *</label>
+                                for="numeroTelephone">Téléphone *</label>
                               <input
                                 [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'"
                                 id="numeroTelephone" name="numeroTelephone" type="text"
                                 [(ngModel)]="visiteur.numeroTelephone" required>
                             </div>
                           </div>
-                          <div class="col-lg-12 p-right-0">
+                          <div class="col-lg-6 p-right-0">
                             <div class="form-group has-success align-left ft-w-b">
                               <label [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
                                 for="fonction">Fonction *</label>
@@ -611,7 +603,7 @@
                                 required>
                             </div>
                           </div>
-                          <div class="col-lg-12 p-right-0">
+                          <div class="col-lg-6 p-right-0">
                             <div class="form-group has-success align-left ft-w-b">
                               <label [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
                                 for="adresse">Adresse *</label>
@@ -631,8 +623,10 @@
                     <button type="button" class="btn btn-outline-danger"   data-dismiss="modal" #closeAddElementDialog style="margin-right: 10px;">
                       <i class="mdi mdi-arrow-left me-1"></i> Retour
                     </button>
-                    <button class="btn btn-login btn-block btnn_save" [disabled]="!formAddUser.valid"
+                    <button *ngIf="this.visiteur.id" class="btn btn-login btn-block btnn_save" [disabled]="!formAddUser.valid"
                       (click)="Update()"><i class="mdi mdi-check-circle me-2"></i> Modifier </button>
+                    <button *ngIf="!this.visiteur.id"class="btn btn-login btn-block btnn_save" [disabled]="!formAddUser.valid"
+                      (click)="Save()"><i class="mdi mdi-check-circle me-2"></i> Enregistrer </button>
                   </div>               
               </form>
             </div>
@@ -641,6 +635,28 @@
       </div>
     </div>
     <!-- /add user modal -->
+     
+    <!-- add signature modal -->
+    <div class="container demo" *ngIf="false">
+      <div class="modal  fade" id="addVisiteurModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel2">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content" [style]="{'background-color': isDark ? '#1f1f1f' : '#FFFFFF'}">
+            <div class="d-flex" style="margin-top: 15px;">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="margin-left: 10px;"  #closeAddElementDialog>
+                <span aria-hidden="true">
+                  <i [class]="isDark? 'txt-title-d mdi mdi-arrow-left-bold-circle' : 'mdi mdi-arrow-left-bold-circle'"></i>
+                </span>
+                <label [class]="isDark? 'txt-title-d ml-2': 'ml-1'" style="font-size: 14px;"> Signature Electronique</label>
+              </button>
+            </div>
+            <div class="modal-body">                 
+                <app-signature></app-signature>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- /add signature modal -->
   </div>
 </div>
 <input type="file" name="fileUpload" #fileInputUpload accept="image/*" style="visibility: hidden; height: 0px"
