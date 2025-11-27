@@ -7,7 +7,7 @@ import { Service } from './service';
 @Injectable()
 export class Utilisateur implements Deserializable<Utilisateur> {
   public id: number;
-  public type_user_id: number;
+  public cabinet_id: number;
   public service_id: number;
   public profil_id: number;
   public prenom: string;
@@ -41,6 +41,7 @@ export class Utilisateur implements Deserializable<Utilisateur> {
   public service: Service;
   public cabinet: Cabinet;
   public checked: boolean = true;
+  public isDepartement: string = 'SIEGE';
   public isConnected: boolean = true;
   selected?: boolean;
   deserialize(input: any): Utilisateur {

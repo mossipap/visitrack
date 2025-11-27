@@ -11,6 +11,7 @@ import { Utilisateur } from 'src/app/shared/models/utilisateur';
 import { DemandeService } from 'src/app/shared/services/demande.service';
 import { Visiteur } from 'src/app/shared/models/visiteur';
 import * as bootstrap from 'bootstrap';
+import { Editor } from 'ngx-editor';
 
 
 @Component({
@@ -42,6 +43,21 @@ export class ReclamationComponent implements OnInit {
   public currentView = 'list';
   public currentPage = 1; 
   selectedVisiteur: any = null;
+  typesIncidents = [
+  { id: 1, libelle: 'Problème administratif' },
+  { id: 2, libelle: 'Comportement' },
+  { id: 3, libelle: 'Sécurité' },
+  { id: 4, libelle: 'Matériel' },
+  { id: 5, libelle: 'Retard' },
+  { id: 6, libelle: 'Réclamation' }
+];
+niveauxGravites = [
+  { id: 1, libelle: 'Faible' },
+  { id: 2, libelle: 'Modéré' },
+  { id: 3, libelle: 'Critique' }
+];
+  editor!: Editor;
+
   constructor(
     private reclamationService: ReclamationService,
     private visiteurService: DemandeService,
@@ -55,8 +71,13 @@ export class ReclamationComponent implements OnInit {
 
   ngOnInit(): void {
     const ls = new SecureLS({ encodingType: 'aes', encryptionSecret: 'MyAdminApp' });
+   this.editor = new Editor();
   this.Search();
  
+  }
+    // make sure to destory the editor
+  ngOnDestroy(): void {
+    this.editor.destroy();
   }
   showAddForm() {
     this.reclamation = new Reclamation();
@@ -143,14 +164,9 @@ export class ReclamationComponent implements OnInit {
     this.reclamationService.update(this.reclamation).subscribe(ret => {
       if (ret['code'] === 200) {
         this.reclamation = ret['data'];
-        this.reclamations.forEach(prof => {
-          if (prof.id === this.reclamation.id) {
-            prof = this.reclamation;
-          }
-        });
-        this.Search();
         this.closeAddElementDialog.nativeElement.click();
         this.loading = false;
+         this.Search();
         this.toast.success("Reclamation modifié avec succès");
       } else {
         this.loading = false;
@@ -194,22 +210,7 @@ closeModal(id: string) {
   const modal = bootstrap.Modal.getInstance(modalEl);
   if (modal) modal.hide();
 }
-getStatusClass(status: string) {
-  switch (status) {
-    case 'En cours d\'investigation':
-      return 'bg-warning text-dark';
-    case 'Objet retrouvé':
-      return 'bg-success';
-    case 'En attente de restitution':
-      return 'bg-primary';
-    case 'Restitué':
-      return 'bg-info';
-    case 'Clôturé sans suite':
-      return 'bg-secondary';
-    default:
-      return 'bg-light text-dark';
-  }
-}
+
 RetirerObjet() {
   this.loading = true;
     this.reclamationService.updateStatut(this.reclamation).subscribe(ret => {
@@ -257,7 +258,6 @@ Search() {
         // Ajouter selected et initialiser filteredReclamations
         this.reclamations = ret['data'].data.map((p: any) => ({ ...p, selected: false }));
         this.filteredReclamations = [...this.reclamations]; // ✅ important
-
         this.totalPages = Math.ceil(this.filteredReclamations.length / this.itemsPerPage);
         this.currentPage = 1;
         this.updatePaginatedList();
@@ -271,7 +271,6 @@ Search() {
     }
   });
 }
-
 // 🔹 Mettre à jour la liste paginée à partir de filteredReclamations
 updatePaginatedList() {
   if (!this.filteredReclamations || this.filteredReclamations.length === 0) {
@@ -292,7 +291,6 @@ updatePaginatedList() {
       this.updatePaginatedList();
     }
   }
-
   previousPage() {
     if (this.currentPage > 1) {
       this.currentPage--;

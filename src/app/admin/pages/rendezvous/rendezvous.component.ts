@@ -85,28 +85,36 @@ export class RendezvousComponent implements OnInit {
   indicatifsAdds: { country: string, dial: string, flag: string }[] = [];
   selectedIndicatif: { country: string, dial: string, flag: string };
   phoneNumber: string = '';
+  isDepartement: string = '';
   // Liste des objets possibles
   objetOptions = [
-    { id: 1, label: 'Téléphone portable' },
-    { id: 2, label: 'Pièce d\'identité' },
-    { id: 3, label: 'Ordinateur / Tablette' },
-    { id: 4, label: 'Objets dangereux' },
-    { id: 5, label: 'Autres objets' }
+    { id: 1, label: 'Téléphone portable', checked: false },
+    { id: 2, label: 'Pièce d\'identité', checked: false },
+    { id: 3, label: 'Ordinateur / Tablette', checked: false },
+    { id: 4, label: 'Objets dangereux', checked: false },
+    { id: 5, label: 'Autres objets', checked: false }
   ];
   sexeOptions = [
-  { label: 'Homme', value: 'Homme' },
-  { label: 'Femme', value: 'Femme' }
-];
-typePieceOptions = [
-  { label: 'Carte d’identité', value: 'CNI' },
-  { label: 'Permis', value: 'Permis' },
-  { label: 'Passeport', value: 'Passeport' },
-  { label: 'Catre Scolaire', value: 'Carte Scolaire' }
-];
-
-nationalites = Nationalites;
-indicatifsNums = Indicatifs;
-
+    { label: 'Homme', value: 'Homme' },
+    { label: 'Femme', value: 'Femme' }
+  ];
+  typePieceOptions = [
+    { label: 'Carte d’identité', value: 'CNI' },
+    { label: 'Permis', value: 'Permis' },
+    { label: 'Passeport', value: 'Passeport' },
+    { label: 'Catre Scolaire', value: 'Carte Scolaire' }
+  ];
+  nationalites = Nationalites;
+  indicatifsNums = Indicatifs;
+   public indicatif1: any ;
+   public indicatif2: any ;
+  statutOptions = [
+    { label: 'En attente', value: 'En attente' },
+    { label: 'En cours', value: 'En cours' },
+    { label: 'Confirmé', value: 'Confirmé' },
+    { label: 'Expiré', value: 'Expiré' },
+    { label: 'Terminé', value: 'Terminé' },
+  ];
   constructor(
     private demandeService: DemandeService,
     private cabinetService: CabinetService,
@@ -128,53 +136,21 @@ indicatifsNums = Indicatifs;
     this.editor = new Editor();
     this.editor1 = new Editor();
     this.search();
-    this.loadIndicatifs();
-    this.loadIndicatifsAdd();
-
-
+    this.searchParam.criteria === '1'
+  }
+   onChangeCritere() {
+    if(this.searchParam.criteria === '3') {
+      this.findCabinets();
+    }
+    if(this.searchParam.criteria === '4') {
+      this.findServices();
+    }
   }
   // make sure to destory the editor
   ngOnDestroy(): void {
     this.editor.destroy();
     this.editor1.destroy();
   }
-  loadIndicatifsAdd() {
-    this.http.get<any>('assets/indicatifsAdd.json').subscribe(
-      data => {
-        this.indicatifsAdds = Object.keys(data).map(key => ({
-          dial: key,
-          flag: data[key].flag,
-          country: data[key].country
-        }));
-        this.selectedIndicatif = this.indicatifsAdds[0];
-      },
-      error => console.error('Erreur chargement indicatifs', error)
-    );
-  }
-
-  getFullNumber(): string {
-    return this.selectedIndicatif?.dial + this.phoneNumber;
-  }
-
-  loadIndicatifs() {
-    this.http.get('assets/indicatifs.json').subscribe(
-      (data) => {
-        this.indicatifs = data;
-      },
-      (error) => {
-        console.error('Erreur chargement indicatifs', error);
-      }
-    );
-  }
-
-  getFlag(numero: string): string {
-    if (!numero) return '';
-    const code = Object.keys(this.indicatifs).find((prefix) =>
-      numero.startsWith(prefix)
-    );
-    return code ? this.indicatifs[code] : '🌍';
-  }
-
 
   getInitials(fullName: string): string {
     if (!fullName) return '';
@@ -211,39 +187,6 @@ indicatifsNums = Indicatifs;
     // si tous sont cochés, selectAll = true sinon false
     this.selectAll = this.activeList.every(item => item.selected);
   }
-  changeRowPad(newValue: string): void {
-    document.documentElement.style.setProperty('--bg-trtable', newValue);
-  }
-  changeTrHover(newValue: string): void {
-    document.documentElement.style.setProperty('--tr-hover', newValue);
-  }
-  changePaginationBg(newValue: string): void {
-    document.documentElement.style.setProperty('--bgpaginator', newValue);
-  }
-  changePaginationFg(newValue: string): void {
-    document.documentElement.style.setProperty('--fgpaginator', newValue);
-  }
-  changePrimeTbBg(newValue: string): void {
-    document.documentElement.style.setProperty('--bgprimetb', newValue);
-  }
-  changePrimeTbHead(newValue: string): void {
-    document.documentElement.style.setProperty('--bgprimetbhead', newValue);
-  }
-  changePaginatorLight(newValue: string): void {
-    document.documentElement.style.setProperty('--paginatorlight', newValue);
-  }
-  changeBgsearchbar(newValue: string): void {
-    document.documentElement.style.setProperty('--bg-searchbar', newValue);
-  }
-  changeStepLabel(newValue: string): void {
-    document.documentElement.style.setProperty('--step-label', newValue);
-  }
-  changeBtnDivBg(newValue: string): void {
-    document.documentElement.style.setProperty('--btndiv', newValue);
-  }
-  changeBgTheader(newValue: string): void {
-    document.documentElement.style.setProperty('--theaderbg', newValue);
-  }
 
   showList() {
     this.currentView = 'list';
@@ -256,14 +199,26 @@ indicatifsNums = Indicatifs;
     this.currentView = 'add';
     this.pageTitle = 'Nouveau demande';
     this.searchParam.query = ""
+    this.demande.indicatif = this.indicatifsNums.find(i => i.value === '+225')  // ← valeur par défaut
+    this.indicatif1= this.indicatifsNums.find(i => i.value === '+225')  // ← valeur par défaut
+    this.indicatif2 = this.indicatifsNums.find(i => i.value === '+225')  // ← valeur par défaut
   }
 
-  showEditForm(user: Demande) {
-    this.demande = user;
+  showEditForm(dem: Demande) {
+    this.demande = dem;
+    this.demande.dateVisite = new Date(dem.dateVisite);
+    this.demande.dateExepiration = new Date(dem.dateExepiration);
+    this.demande.dateDelivrance = new Date(dem.dateDelivrance);
     this.findCabinets();
     this.findServices();
     this.currentView = 'edit';
     this.pageTitle = 'Modification d\'demande';
+  }
+  showSignature(dem: Demande) {
+    this.demande = dem;
+    this.findCabinets();
+    this.findServices();
+    this.currentView = 'signature';
   }
 
   showDetail(d: Demande) {
@@ -289,11 +244,9 @@ indicatifsNums = Indicatifs;
   // Télécharger le fichier
   downloadPiece(url: string) {
     if (!url) return;
-
     // Assurer URL absolue
     const baseUrl = window.location.origin; // http://localhost:4200
     const fileUrl = 'http://localhost:4200/assets/images/piece.pdf';
-
     const link = document.createElement('a');
     link.href = fileUrl;
     link.download = `PieceIdentite_${this.visiteur.nomComplet}${fileUrl.substring(fileUrl.lastIndexOf('.'))}`;
@@ -338,16 +291,12 @@ indicatifsNums = Indicatifs;
   showResetDialog(demande: Demande): void {
     this.demande = demande;
   }
-
   showConfirmDialog(demande: Demande): void {
     // this.dialogAction = action;
     this.demande = demande;
     this.openConfirmDialog.nativeElement.click();
   }
-
   // 🔹 Ouvrir la modale
-
-
   showDeleteDialog(demande: Demande): void {
     this.demande = demande;
     if (this.deleteModal) {
@@ -366,15 +315,12 @@ indicatifsNums = Indicatifs;
         this.loading = false;
         if (ret['code'] == 200) {
           this.demandes = ret['data']['data'];
-
           // Séparer les listes
           this.activeList = this.demandes.filter(d => d.statut === 'En cours');
           this.bloqueList = this.demandes.filter(d => d.statut === 'Terminée');
           this.suppriList = this.demandes.filter(d => d.statut === 'Supprimé');
-
           // ✅ Tout afficher par défaut
           this.allList = [...this.demandes];
-
           // Calcul pagination
           this.totalPages = Math.ceil(this.allList.length / this.itemsPerPage);
           this.updatePaginatedList();
@@ -393,7 +339,6 @@ indicatifsNums = Indicatifs;
 
   updatePaginatedList() {
     let sourceList: any[] = [];
-
     // 🟢 Choisir la liste selon le filtre actif
     switch (this.currentIndex) {
       case 1:
@@ -409,13 +354,11 @@ indicatifsNums = Indicatifs;
         sourceList = this.allFiltres(); // ✅ Tous par défaut
         break;
     }
-
     // Pagination
     this.totalPages = Math.ceil(sourceList.length / this.itemsPerPage);
     const startIndex = (this.currentPage - 1) * this.itemsPerPage;
     this.paginatedList = sourceList.slice(startIndex, startIndex + this.itemsPerPage);
-
-    console.log("+++++ paginatedList affichée +++++", this.paginatedList);
+    //console.log("+++++ paginatedList affichée +++++", this.paginatedList);
   }
 
   // ✅ Filtres pour chaque catégorie + "Tous"
@@ -492,38 +435,43 @@ indicatifsNums = Indicatifs;
     }
   }
 
-
-  toggleObjet(objet: string) {
-    const index = this.demande.objet_saisie.indexOf(objet);
-
-    if (index === -1) {
-      // Ajouter
-      this.demande.objet_saisie.push(objet);
+  toggleSelection(item: any) {
+    if (item.checked) {
+      if (!this.demande.objet_saisie.includes(item.label)) {
+        this.demande.objet_saisie.push(item.label);
+      }
     } else {
-      // Retirer
-      this.demande.objet_saisie.splice(index, 1);
+      this.demande.objet_saisie = this.demande.objet_saisie.filter(x => x !== item.label);
+
+      // Si "Autres objets" est décoché, vider le champ texte
+      if (item.id === 5) {
+        this.demande.autreObjet = '';
+      }
     }
 
-    console.log("Objets sélectionnés :", this.demande.objet_saisie);
+    console.log('Objets sélectionnés:', this.demande.objet_saisie);
+    console.log('Autre objet:', this.demande.autreObjet);
   }
-  toggleObjetRetire(objet: any) {
-    const index = this.demande.objet_retirer.indexOf(objet);
-
-    if (index === -1) {
-      // Ajouter
-      this.demande.objet_retirer.push(objet);
+  toggleSelectionObjet(item: any) {
+    if (item.checked) {
+      if (!this.demande.objet_retirer.includes(item.label)) {
+        this.demande.objet_retirer.push(item.label);
+      }
     } else {
-      // Retirer
-      this.demande.objet_retirer.splice(index, 1);
+      this.demande.objet_retirer = this.demande.objet_retirer.filter(x => x !== item.label);
+      // Si "Autres objets" est décoché, vider le champ texte
+      if (item.id === 5) {
+        this.demande.autreObjet = '';
+      }
     }
-
-    console.log("Objets sélectionnés :", this.demande.objet_retirer);
+    console.log('Objets sélectionnés:', this.demande.objet_retirer);
+    console.log('Autre objet:', this.demande.autreObjet);
   }
-  Save() {
-    if (!this.demande.scan_piece) {
-      this.toast.error('Veuillez selectionner la pièce justificatif du visiteur');
+  SaveSignature() {
+   /*  if (!this.demande.signature) {
+      this.toast.error('Veuillez ajouter la signature du visiteur ci-dessous.');
       return;
-    }
+    } */
     this.demande.statut = "En_attente";
     this.currentUser = this.demande.user_id;
     this.demande.objet_saisie
@@ -531,33 +479,74 @@ indicatifsNums = Indicatifs;
     console.log("========== rendez-vous ±±±±±±±±±±±±±±±±±±±±±±±", this.demande)
     // this.demande.user_personnel_id = null;
     //this.demande.visiteur_id = null;
-   // this.loading = true;
+    // this.loading = true;
     this.demande.nomComplet = this.demande.prenom + ' ' + this.demande.nom;
-    /*   this.demandeService.save(this.demande).subscribe(ret => {
-        if (ret['code'] === 200) {
-    
-          this.demande = ret['data'];
-    
-          // ✅ Sécurisation ici
-          if (!Array.isArray(this.demandes)) {
-            this.demandes = [];
-          }
-    
-          this.demandes.push(this.demande);
-    
-          this.closeAddElementDialog.nativeElement.click();
-          this.toast.success("Demande ajoutée avec succès");
-    
-          this.search(); // Recharge les listes
-          this.showList();
-        } else {
-          this.toast.error(ret['message']);
+    this.demandeService.save(this.demande).subscribe(ret => {
+      if (ret['code'] === 200) {
+        this.demande = ret['data'];
+        // ✅ Sécurisation ici
+        if (!Array.isArray(this.demandes)) {
+          this.demandes = [];
         }
+        this.demandes.push(this.demande);
+
+        this.closeAddElementDialog.nativeElement.click();
+        this.toast.success("Demande ajoutée avec succès");
+
+        this.search(); // Recharge les listes
+        this.showList();
+      } else {
+        this.toast.error(ret['message']);
+      }
+      this.loading = false;
+    }, error => {
+      this.toast.error(environment.erreur_connexion_message);
+      this.loading = false;
+    });
+  }
+  Save() {
+    if (!this.demande.scan_piece_verso) {
+      this.toast.error('Veuillez selectionner la pièce justificatif du visiteur');
+      return;
+    }
+    this.demande.statut = "En_attente";
+    this.demande.objet_saisie
+    this.demande.user_id = this.currentUser.id
+    //console.log("========== objet_saisie ±±±±±±±±±±±±±±±±±±±±±±±", this.demande.objet_saisie)
+   // console.log("========== rendez-vous ±±±±±±±±±±±±±±±±±±±±±±±", this.demande)
+    // this.demande.user_personnel_id = null;
+    //this.demande.visiteur_id = null;
+    this.loading = true;
+    this.demande.nomComplet = this.demande.prenom + ' ' + this.demande.nom;
+    // 1. Remplacer le "+" par "00"
+    const indicatif2Formate = this.indicatif2.value.replace("+", "00");
+    const indicatifFormate = this.demande.indicatif.value.replace("+", "00");
+    // 2. Concaténer
+    const numeroSecondComplet = indicatif2Formate + this.demande.telephone_secondaire;
+    const numeroComplet = indicatifFormate + this.demande.numeroTelephone;
+    console.log(numeroComplet); // 002257075209345
+    console.log(numeroSecondComplet); // 002257075209345
+
+    this.demande.numeroTelephone = numeroComplet
+    this.demande.telephone_secondaire = numeroSecondComplet
+
+    this.demandeService.save(this.demande).subscribe(ret => {
+      if (ret['code'] === 200) {
+        this.demande = ret['data'];
         this.loading = false;
-      }, error => {
-        this.toast.error(environment.erreur_connexion_message);
-        this.loading = false;
-      }); */
+        this.demandes.push(this.demande);
+        //this.closeAddElementDialog.nativeElement.click();
+        this.toast.success("Demande ajoutée avec succès");
+        this.search(); // Recharge les listes
+        this.showList();
+      } else {
+        this.toast.error(ret['message']);
+      }
+      this.loading = false;
+    }, error => {
+      this.toast.error(environment.erreur_connexion_message);
+      this.loading = false;
+    });
   }
 
 
@@ -566,31 +555,30 @@ indicatifsNums = Indicatifs;
     /* this.demande.cabinet_id = this.demande.cabinet.id;
     this.demande.service_id = this.demande.service.id;
     this.demande.profil_id = this.demande.profil.id; */
-    this.demande.statut = 'Terminée'
     this.demande.objet_retirer
-       console.log("========== objet_saisie ±±±±±±±±±±±±±±±±±±±±±±±", this.demande.objet_retirer)
+    console.log("========== objet_saisie ±±±±±±±±±±±±±±±±±±±±±±±", this.demande.objet_retirer)
     console.log("========== rendez-vous ±±±±±±±±±±±±±±±±±±±±±±±", this.demande)
-  /*   this.demandeService.update(this.demande).subscribe(ret => {
-      if (ret['code'] === 200) {
-        this.demande = ret['data'];
-        this.demandes.forEach(user => {
-          if (user.id === this.demande.id) {
-            user = this.demande;
-          }
-        });
-        this.closeAddElementDialog.nativeElement.click();
-        this.toast.success("Demande modifié avec succès");
+      this.demandeService.update(this.demande).subscribe(ret => {
+        if (ret['code'] === 200) {
+          this.demande = ret['data'];
+          this.demandes.forEach(user => {
+            if (user.id === this.demande.id) {
+              user = this.demande;
+            }
+          });
+          this.closeAddElementDialog.nativeElement.click();
+          this.toast.success("Demande modifié avec succès");
+          this.loading = false;
+          this.showList();
+          this.search();
+        } else {
+          this.toast.error(ret['message']);
+          this.loading = false;
+        }
+      }, error => {
+        this.toast.error(environment.erreur_connexion_message);
         this.loading = false;
-        this.showList();
-        this.search();
-      } else {
-        this.toast.error(ret['message']);
-        this.loading = false;
-      }
-    }, error => {
-      this.toast.error(environment.erreur_connexion_message);
-      this.loading = false;
-    }); */
+      }); 
   }
 
   deleteDemande(): void {
@@ -655,9 +643,14 @@ indicatifsNums = Indicatifs;
 
 
   searchVisiteurByNumber(numberPhone: string) {
-    console.log("query ===>", numberPhone);
+   // numberPhone = this.demande.indicatif + this.searchParam.query
+    // 1. Remplacer le "+" par "00"
+    const indicatifFormate = this.indicatif1.value.replace("+", "00");
+    // 2. Concaténer
+    numberPhone = indicatifFormate + this.searchParam.query;
+    this.searchParam .query= numberPhone
+    console.log(this.searchParam.query);
     this.loading = true;
-
     this.demandeService.findByNumero(this.searchParam).subscribe({
       next: (ret) => {
         this.loading = false;
@@ -709,7 +702,7 @@ indicatifsNums = Indicatifs;
     const reader = new FileReader();
     reader.onload = (readermedias) => {
       const pdfData = (readermedias.target as any).result;
-      this.demande.scan_piece = pdfData;
+      this.demande.scan_piece_verso = pdfData;
     };
     reader.readAsDataURL(file);
   }
@@ -728,12 +721,12 @@ indicatifsNums = Indicatifs;
     alert('Signature sauvegardée avec succès ✅');
   }
   goToRecap() {
-   /*  this.demande.objet_saisie
-    if (!this.demande.scan_piece) {
-      this.toast.error('Veuillez sélectionner la pièce justificative du visiteur.');
-      return;
-    } */
-    this.step = 3;
+    /*  this.demande.objet_saisie
+     if (!this.demande.scan_piece_verso) {
+       this.toast.error('Veuillez sélectionner la pièce justificative du visiteur.');
+       return;
+     } */
+    this.step = 4;
   }
   formatPhone(numero: string): string {
     if (!numero) return '';

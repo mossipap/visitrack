@@ -16,7 +16,7 @@ export type StuMessage =
 @Injectable({ providedIn: 'root' })
 export class StuWebsocketService {
   private ws: WebSocket | null = null;
-  private url = 'ws://localhost:9000'; // adapter si nécessaire
+  private url = 'ws://192.168.1.13:8000'; // adapter si nécessaire
   private reconnectInterval = 2000;
   private isConnected = false;
 

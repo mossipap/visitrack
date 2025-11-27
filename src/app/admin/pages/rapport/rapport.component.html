@@ -20,47 +20,82 @@
 
   <!-- 🔍 Filtres -->
   <div class="justify-content-between align-items-center mb-4 header-section shadow-sm p-3 rounded">
-    <div class="row gx-2 align-items-center">
 
-  <!-- Du -->
-  <div class="col-3 align-items-center">
-    <label class="lab_input">Du</label>
-    <p-calendar 
-      [(ngModel)]="searchParam.dateDebut" 
-      [showIcon]="true"
-      styleClass="input-long"
-    ></p-calendar>
-  </div>
+    <div class="card-header enhanced-toolbar">
+      <div class="row g-3 align-items-end">
+        <!-- Date début -->
+        <div class="col-lg-2 col-md-3 col-sm-6">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Date début</mat-label>
+            <input matInput [matDatepicker]="dateDebut" [(ngModel)]="searchParam.dateDebut" name="dateDebut" readonly>
+            <mat-datepicker-toggle matSuffix [for]="dateDebut"></mat-datepicker-toggle>
+            <mat-datepicker #dateDebut></mat-datepicker>
+          </mat-form-field>
+        </div>
+        <!-- Date fin -->
+        <div class="col-lg-2 col-md-3 col-sm-6">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Date fin</mat-label>
+            <input matInput [matDatepicker]="dateFin" [(ngModel)]="searchParam.dateFin" name="dateFin" readonly>
+            <mat-datepicker-toggle matSuffix [for]="dateFin"></mat-datepicker-toggle>
+            <mat-datepicker #dateFin></mat-datepicker>
+          </mat-form-field>
+        </div>
 
-  <!-- Au -->
-  <div class="col-3 align-items-center gap-2">
-    <label class="lab_input">Au</label>
-    <p-calendar 
-      [(ngModel)]="searchParam.dateFin" 
-      [showIcon]="true"
-      styleClass="input-long"
-    ></p-calendar>
-  </div>
+        <!-- Critère -->
+        <div class="col-lg-2 col-md-3 col-sm-6">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Recherche par</mat-label>
+            <mat-select name="criteria" [(ngModel)]="searchParam.criteria">
+              <mat-option value="1">Tous</mat-option>
+              <mat-option value="2">Action</mat-option>
+              <mat-option value="3">Utilisateur</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
 
-  <!-- Critère -->
-  <div class="col-3 align-items-center" style="margin-top: 40px;"> 
-    <p-dropdown 
-      [options]="services" 
-      [(ngModel)]="searchParam.criteria"  
-      optionLabel="designation"
-      placeholder="Critère"
-      styleClass="input-long"
-    ></p-dropdown>
-  </div>
+        <!-- Recherche Action -->
+        <div class="col-lg-2 col-md-3 col-sm-6" *ngIf="searchParam.criteria === '2'">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Entrer une action</mat-label>
+            <input matInput [(ngModel)]="searchParam.query" name="searchTerm">
+          </mat-form-field>
+        </div>
 
-  <!-- Refresh -->
-  <div class="col-auto" style="margin-top: 40px;">
-    <button class="btn_refresh" title="Rafraichir">
-      <i class="mdi mdi-refresh fs-20"></i>
-    </button>
-  </div>
+        <!-- Sélection utilisateur -->
+        <div class="col-lg-3 col-md-4 col-sm-12" *ngIf="searchParam.criteria === '3'">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Utilisateur</mat-label>
+            <mat-select [(ngModel)]="searchParam.id" name="utilisateur">
 
-</div>
+              <!-- Champ recherche interne -->
+              <div class="select-search-box">
+                <input matInput autocomplete="off" placeholder="Rechercher...">
+                <i class="mdi mdi-magnify search-icon"></i>
+              </div>
+
+              <mat-divider></mat-divider>
+
+              <mat-option [value]="">Désélectionner</mat-option>
+
+              <!-- Liste utilisateurs -->
+              <mat-option [value]="">
+                diakaria coulibaly
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <!-- Bouton recherche -->
+        <div class="col-lg-1 col-md-2 col-sm-4">
+          <button type="button" class="btn btn-refresh" title="Actualiser">
+            <i class="mdi mdi-cached"></i>
+          </button>
+        </div>
+
+      </div>
+    </div>
+
 
   </div>
 

@@ -26,6 +26,8 @@ import { MultiSelectModule } from 'primeng/multiselect';
 import { DropdownModule } from 'primeng/dropdown';
 import { CalendarModule } from 'primeng/calendar';
 import { MenuParametreComponent } from './menu-parametre/menu-parametre.component';
+import { LogComponent } from './log/log.component';
+import { RadioButtonModule } from 'primeng/radiobutton';
 
 export class MyClock extends TimeagoClock {
   tick(then: number): Observable<number> {
@@ -53,6 +55,7 @@ export class MyIntl extends TimeagoIntl {
     TuserDialogComponent,
     MenuParametreComponent,
     ProfilComponent,
+    LogComponent,
   ],
   imports: [
     CommonModule,
@@ -72,6 +75,7 @@ export class MyIntl extends TimeagoIntl {
     MultiSelectModule,
     DropdownModule,
     CalendarModule,
+    RadioButtonModule,
     TranslateModule.forChild(),
     TimeagoModule.forRoot({
       clock: { provide: TimeagoClock, useClass: MyClock },

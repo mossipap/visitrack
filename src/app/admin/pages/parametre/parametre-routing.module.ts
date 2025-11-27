@@ -6,6 +6,7 @@ import { CabinetComponent } from './cabinet/cabinet.component';
 import { TypeuserComponent } from './typeuser/typeuser.component';
 import { ProfilComponent } from './profil/profil.component';
 import { MenuParametreComponent } from './menu-parametre/menu-parametre.component';
+import { LogComponent } from './log/log.component';
 
 const routes: Routes = [
   {
@@ -32,6 +33,9 @@ const routes: Routes = [
       {
         path: 'service',
         component: TypeuserComponent
+      },
+      {
+        path: 'log', component: LogComponent
       },
   
     ]

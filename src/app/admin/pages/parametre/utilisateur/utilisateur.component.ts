@@ -24,6 +24,8 @@ export class UtilisateurComponent implements OnInit {
   public activeList: Utilisateur[] = [];
   public bloqueList: Utilisateur[] = [];
   public suppriList: Utilisateur[] = [];
+  public allList: any[] = [];
+
   public selectedUsers: Utilisateur[] [];
   public utilisateur: Utilisateur = new Utilisateur();
   public cabinets: Cabinet[] = [];
@@ -84,69 +86,10 @@ private deleteModal?: Modal;
 
   ngOnInit(): void {
     const ls = new SecureLS({ encodingType: 'aes', encryptionSecret: 'MyAdminApp' });
-    if (ls.get('current_theme')) {//dark
-      this.isDark = true;
-      const headerLeft = document.getElementsByClassName("theme-light");
-      for(var i = headerLeft.length - 1; i >= 0; --i) {
-        headerLeft[i].classList.replace('theme-light', 'theme-dark');
-      }
-      this.changeRowPad('rgb(21 21 21 / 100%)');
-      this.changeStepLabel('#FFFFFF');
-      this.changeBgsearchbar('rgb(28, 28, 28)');
-      this.changePaginationBg('#000000');
-      this.changePaginationFg('#ffffff');
-      this.changePrimeTbBg('#000000');
-      this.changeTrHover('#1c1c1c');
-      this.changePrimeTbHead('#000000');
-      this.changePaginatorLight('#252116');
-      this.changeBtnDivBg('#252117');
-    } else {//white
-      this.isDark = false;
-      const headerLeft = document.getElementsByClassName("theme-dark");
-      for(var i = headerLeft.length - 1; i >= 0; --i) {
-        headerLeft[i].classList.replace('theme-dark', 'theme-light');
-      }
-      this.changeRowPad('rgb(255 255 255 / 100%)');
-      this.changeStepLabel('#7f56d9');
-      this.changeBgsearchbar('rgba(255, 255, 255, 0.8)');
-      this.changePaginationBg('#ffffff');
-      this.changePaginationFg('#000000');
-      this.changePrimeTbBg('none');
-      this.changeTrHover('rgba(0, 0, 0, 0.3)');
-      this.changePrimeTbHead('#f8f9fa');
-      this.changePaginatorLight('#ecf5ee');
-      this.changeBtnDivBg('#faf4f3');
-      this.changeBgTheader('rgba(255, 199, 154, 0.5)');
-    }
     this.searchParam.dateFin.setDate(this.searchParam.dateFin.getDate() + 1);
-    this.initUsers();
-   this.activeList.map(item => ({
-    ...item,
-    selected: false
-  }));
-
-this.totalPages = Math.ceil(this.activeList.length / this.itemsPerPage);
-    this.updatePaginatedList();
-  }
- updatePaginatedList() {
-    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
-    const endIndex = startIndex + this.itemsPerPage;
-    this.paginatedList = this.activeList.slice(startIndex, endIndex);
+    this.search();
   }
 
-  nextPage() {
-    if (this.currentPage < this.totalPages) {
-      this.currentPage++;
-      this.updatePaginatedList();
-    }
-  }
-
-  previousPage() {
-    if (this.currentPage > 1) {
-      this.currentPage--;
-      this.updatePaginatedList();
-    }
-  }
 getInitials(fullName: string): string {
   if (!fullName) return '';
   return fullName
@@ -178,109 +121,11 @@ toggleSelectAll() {
   this.selectAll = !this.selectAll;
   this.activeList.forEach(item => item.selected = this.selectAll);
 }
-
 toggleSelectOne() {
   // si tous sont cochés, selectAll = true sinon false
   this.selectAll = this.activeList.every(item => item.selected);
 }
-  changeRowPad(newValue: string): void {
-    document.documentElement.style.setProperty('--bg-trtable', newValue);
-  }
-  changeTrHover(newValue: string): void {
-    document.documentElement.style.setProperty('--tr-hover', newValue);
-  }
-  changePaginationBg(newValue: string): void {
-    document.documentElement.style.setProperty('--bgpaginator', newValue);
-  }
-  changePaginationFg(newValue: string): void {
-    document.documentElement.style.setProperty('--fgpaginator', newValue);
-  }
-  changePrimeTbBg(newValue: string): void {
-    document.documentElement.style.setProperty('--bgprimetb', newValue);
-  }
-  changePrimeTbHead(newValue: string): void {
-    document.documentElement.style.setProperty('--bgprimetbhead', newValue);
-  }
-  changePaginatorLight(newValue: string): void {
-    document.documentElement.style.setProperty('--paginatorlight', newValue);
-  }
-  changeBgsearchbar(newValue: string): void {
-    document.documentElement.style.setProperty('--bg-searchbar', newValue);
-  }
-  changeStepLabel(newValue: string): void {
-    document.documentElement.style.setProperty('--step-label', newValue);
-  }
-  changeBtnDivBg(newValue: string): void {
-    document.documentElement.style.setProperty('--btndiv', newValue);
-  }
-  changeBgTheader(newValue: string): void {
-    document.documentElement.style.setProperty('--theaderbg', newValue);
-  }
-  activeFiltres () {
-    if (!this.searchFilterText) return this.activeList
-    const search = this.searchFilterText.toLowerCase()
-    return this.activeList.filter(item => {
-      const text = (item.prenom + ' ' + item.nom + ' ' + item.login+ ' '+ item.cabinet?.id).toLowerCase();
-      return text.indexOf(search) > -1
-    })
-  }
-  bloqueFiltres () {
-    if (!this.searchFilterText) return this.bloqueList
-    const search = this.searchFilterText.toLowerCase()
-    return this.bloqueList.filter(item => {
-      const text = (item.prenom + ' ' + item.nom + ' ' + item.login).toLowerCase();
-      return text.indexOf(search) > -1
-    })
-  }
-  supprimeFiltres () {
-    if (!this.searchFilterText) return this.suppriList
-    const search = this.searchFilterText.toLowerCase()
-    return this.suppriList.filter(item => {
-      const text = (item.prenom + ' ' + item.nom + ' ' + item.login).toLowerCase();
-      return text.indexOf(search) > -1
-    })
-  }
-
-  onChangeCode(index) {
-    if(index === 1) {//active
-      let btnUserActive = document.getElementById("user_active");
-      let btnUserBlock = document.getElementById("user_block");
-      let btnUserDelete = document.getElementById("user_delete");
-
-      btnUserActive.classList.add("btn_active");
-      btnUserActive.classList.remove("btn_not_active");
-      btnUserBlock.classList.add("btn_not_active");
-      btnUserBlock.classList.remove("btn_active");
-      btnUserDelete.classList.add("btn_not_active");
-      btnUserDelete.classList.remove("btn_active");
-      this.currentIndex = index;
-    } else if(index === 2) {//block
-      let btnUserBlock = document.getElementById("user_block");
-      let btnUserActive = document.getElementById("user_active");
-      let btnUserDelete = document.getElementById("user_delete");
-
-      btnUserBlock.classList.add("btn_active");
-      btnUserBlock.classList.remove("btn_not_active");
-      btnUserActive.classList.add("btn_not_active");
-      btnUserActive.classList.remove("btn_active");
-      btnUserDelete.classList.add("btn_not_active");
-      btnUserDelete.classList.remove("btn_active");
-      this.currentIndex = index;
-    } else {//delete
-      let btnUserDelete = document.getElementById("user_delete");
-      let btnUserActive = document.getElementById("user_active");
-      let btnUserBlock = document.getElementById("user_block");
-
-      btnUserDelete.classList.add("btn_active");
-      btnUserDelete.classList.remove("btn_not_active");
-      btnUserBlock.classList.add("btn_not_active");
-      btnUserBlock.classList.remove("btn_active");
-      btnUserActive.classList.add("btn_not_active");
-      btnUserActive.classList.remove("btn_active");
-      this.currentIndex = index;
-    }
-  }
-
+ 
   showList() {
     this.currentView = 'list';
     this.pageTitle = 'Liste'
@@ -331,73 +176,146 @@ toggleSelectOne() {
     this.utilisateur = utilisateur;
     this.deleteConfirmDialog.nativeElement.click();
   }
-
-initUsers() {
-  this.loading = true;
-  this.utilisateurService.findAll().subscribe({
-    next: (ret) => {
-      if (ret['code'] === 200) {
-        const users = ret['data'];
-
-        // Déclarer tes listes AVANT de les utiliser
-        const actiList: any[] = [];
-        const blocList: any[] = [];
-        const deleList: any[] = [];
-
-        users.forEach((user: any) => {
-          user.nomComplet = `${user.prenom} ${user.nom}`;
-
-          // Séparer selon le service
-          if (this.currentUser.service_name === 'siege') {
-            if (user.service_name === 'siege') this.utilisateurs.push(user);
-          } else {
-            if (user.service_name === 'parquet') this.utilisateurs.push(user);
-          }
-          // Classer par statut
-          switch (user.statut) {
-            case 'Activé':
-              actiList.push(user);
-              break;
-            case 'Bloqué':
-              blocList.push(user);
-              break;
-            case 'Supprimé':
-              deleList.push(user);
-              break;
-          }
-        });
-        // Affecter les listes à la fin
-        this.activeList = actiList;
-        this.bloqueList = blocList;
-        this.suppriList = deleList;
+ search() {
+    this.loading = true;
+    this.utilisateurService.findAll().subscribe(
+      (ret) => {
         this.loading = false;
-        this.toast.info(`${this.utilisateurs.length} utilisateur(s) trouvé(s)`);
-      } else {
-        this.toast.error(ret['message']);
+        if (ret['code'] == 200) {
+          this.utilisateurs = ret['data']['data'];
+          // Séparer les listes
+          this.activeList = this.utilisateurs.filter(d => d.statut === 'Activé');
+          this.bloqueList = this.utilisateurs.filter(d => d.statut === 'Terminée');
+          this.suppriList = this.utilisateurs.filter(d => d.statut === 'Supprimé');
+          // ✅ Tout afficher par défaut
+          this.allList = [...this.utilisateurs];
+          // Calcul pagination
+          this.totalPages = Math.ceil(this.allList.length / this.itemsPerPage);
+          this.updatePaginatedList();
+          this.toast.info(`${this.utilisateurs.length} demande(s) trouvée(s)`);
+        } else {
+          this.toast.error(ret['message']);
+        }
+      },
+      () => {
+        this.toast.error(environment.erreur_connexion_message);
         this.loading = false;
       }
-    },
-    error: () => {
-      this.toast.error(environment.erreur_connexion_message);
-      this.loading = false;
-    }
-  });
-}
+    );
+  }
 
+  updatePaginatedList() {
+    let sourceList: any[] = [];
+    // 🟢 Choisir la liste selon le filtre actif
+    switch (this.currentIndex) {
+      case 1:
+        sourceList = this.activeFiltres();
+        break;
+      case 2:
+        sourceList = this.bloqueFiltres();
+        break;
+      case 3:
+        sourceList = this.supprimeFiltres();
+        break;
+      default:
+        sourceList = this.allFiltres(); // ✅ Tous par défaut
+        break;
+    }
+    // Pagination
+    this.totalPages = Math.ceil(sourceList.length / this.itemsPerPage);
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    this.paginatedList = sourceList.slice(startIndex, startIndex + this.itemsPerPage);
+    console.log("+++++ paginatedList affichée +++++", this.paginatedList);
+  }
+
+  // ✅ Filtres pour chaque catégorie + "Tous"
+  allFiltres() {
+    if (!this.searchFilterText) return this.allList;
+    const search = this.searchFilterText.toLowerCase();
+    return this.allList.filter(item =>
+      (item.visiteur.nomComplet + ' ' + item.numeroTelephone + ' ' + item.cabinet?.designation)
+        .toLowerCase()
+        .includes(search)
+    );
+  }
+
+  activeFiltres() {
+    if (!this.searchFilterText) return this.activeList;
+    const search = this.searchFilterText.toLowerCase();
+    return this.activeList.filter(item =>
+      (item.nomComplet + ' ' + item.telephone + ' ' + item.cabinet?.designation)
+        .toLowerCase()
+        .includes(search)
+    );
+  }
+
+  bloqueFiltres() {
+    if (!this.searchFilterText) return this.bloqueList;
+    const search = this.searchFilterText.toLowerCase();
+    return this.bloqueList.filter(item =>
+      (item.nomComplet + ' ' + item.telephone + ' ' + item.cabinet?.designation).toLowerCase().includes(search)
+    );
+  }
+
+  supprimeFiltres() {
+    if (!this.searchFilterText) return this.suppriList;
+    const search = this.searchFilterText.toLowerCase();
+    return this.suppriList.filter(item =>
+      (item.nomComplet + ' ' + item.telephone + ' ' + item.cabinet?.designation).toLowerCase().includes(search)
+    );
+  }
+
+  onChangeCode(index: number) {
+    this.currentIndex = index;
+    this.currentPage = 1;
+    this.updatePaginatedList();
+    // Gérer les boutons actifs
+    ['user_active', 'user_block', 'user_delete', 'user_all'].forEach(id => {
+      const btn = document.getElementById(id);
+      if (btn) {
+        btn.classList.toggle('btn_active', id === this.getButtonIdByIndex(index));
+        btn.classList.toggle('btn_not_active', id !== this.getButtonIdByIndex(index));
+      }
+    });
+  }
+
+  getButtonIdByIndex(index: number): string {
+    switch (index) {
+      case 1: return 'user_active';
+      case 2: return 'user_block';
+      case 3: return 'user_delete';
+      default: return 'user_all'; // ✅ nouveau bouton "Tous"
+    }
+  }
+  nextPage() {
+    if (this.currentPage < this.totalPages) {
+      this.currentPage++;
+      this.updatePaginatedList();
+    }
+  }
+
+  previousPage() {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+      this.updatePaginatedList();
+    }
+  }
   Save() {
     this.utilisateur.nomComplet = this.utilisateur.prenom + ' ' + this.utilisateur.nom;
     this.utilisateur.statut = "Activé";
-    this.utilisateur.service_name = this.currentUser.service_name;
+    //this.utilisateur.service_name = this.currentUser.service_name;
     this.utilisateur.image = null;
+    //this.utilisateur.cabinet_id = this.utilisateur.cabinet.id;
+    //this.utilisateur.service_id = this.utilisateur.service.id;
     this.loading = true;
     this.utilisateurService.save(this.utilisateur).subscribe(ret => {
       if (ret['code'] === 200) {
         this.utilisateur = ret['data'];
-        this.utilisateurs.push(this.utilisateur);
+        //this.utilisateurs.push(this.utilisateur);
         this.closeAddElementDialog.nativeElement.click();
         this.toast.success("Utilisateur ajouté avec succès");
         this.loading = false;
-        this.initUsers();
+        this.search();
         this.showList();
       } else {
         this.loading = false;
@@ -425,7 +343,7 @@ initUsers() {
         this.toast.success("Utilisateur modifié avec succès");
         this.loading = false;
         this.showList();
-        this.initUsers();
+        this.search();
       } else {
         this.toast.error(ret['message']);
         this.loading = false;
@@ -440,6 +358,64 @@ initUsers() {
     this.loading = true;
     this.utilisateur.statut = statut;
     this.utilisateurService.updateStatut(this.utilisateur).subscribe({
+      next: (ret) => {
+        this.loading = false;
+        if (ret['code'] === 200) {
+          this.utilisateur = ret['data'];
+          // Met à jour la liste
+          this.utilisateurs.forEach(u => {
+            if (u.id === this.utilisateur.id) u.statut = this.utilisateur.statut;
+          });
+          // ✅ Fermer le modal proprement
+          const modalEl = document.getElementById('confirmModal');
+          if (modalEl) {
+            const modal = Modal.getInstance(modalEl);
+            modal?.hide();
+          }
+          this.toast.success('Opération effectuée avec succès.');
+        } else {
+          this.toast.error(ret['message']);
+        }
+      },
+      error: () => {
+        this.toast.error(environment.erreur_connexion_message);
+        this.loading = false;
+      }
+    });
+  }
+ // ✅ Ferme le modal après mise à jour
+  ActiverUtilisateur(): void {
+    this.loading = true;
+    this.utilisateurService.activer(this.utilisateur).subscribe({
+      next: (ret) => {
+        this.loading = false;
+        if (ret['code'] === 200) {
+          this.utilisateur = ret['data'];
+          // Met à jour la liste
+          this.utilisateurs.forEach(u => {
+            if (u.id === this.utilisateur.id) u.statut = this.utilisateur.statut;
+          });
+          // ✅ Fermer le modal proprement
+          const modalEl = document.getElementById('confirmModal');
+          if (modalEl) {
+            const modal = Modal.getInstance(modalEl);
+            modal?.hide();
+          }
+          this.toast.success('Opération effectuée avec succès.');
+        } else {
+          this.toast.error(ret['message']);
+        }
+      },
+      error: () => {
+        this.toast.error(environment.erreur_connexion_message);
+        this.loading = false;
+      }
+    });
+  }
+ // ✅ Ferme le modal après mise à jour
+  DesactiverUtilisateur(): void {
+    this.loading = true;
+    this.utilisateurService.desactiver(this.utilisateur).subscribe({
       next: (ret) => {
         this.loading = false;
         if (ret['code'] === 200) {
@@ -546,8 +522,8 @@ initUsers() {
     this.serviceService.findAll().subscribe(ret => {
       if (ret['code'] === 200) {
         this.services = ret['data'];
-        if (this.currentView === 'edit' || this.currentView === 'detail' && this.utilisateur.type_user_id && this.services.length > 0) {
-          this.utilisateur.service = this.services.find(p => p.id === this.utilisateur.type_user_id)
+        if (this.currentView === 'edit' || this.currentView === 'detail' && this.utilisateur.service_id && this.services.length > 0) {
+          this.utilisateur.service = this.services.find(p => p.id === this.utilisateur.service_id)
         }
         this.loading = false;
       } else {
@@ -627,6 +603,7 @@ initUsers() {
   closeDeleteDialog(): void {
     this.deleteModal?.hide();
   }
+
 DeleteUtilisateur() {
   this.loading = true;
     this.utilisateurService.delete(this.utilisateur).subscribe(ret => {
@@ -645,4 +622,5 @@ DeleteUtilisateur() {
       this.loading = false;
     });
 }
+
 }

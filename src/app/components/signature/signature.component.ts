@@ -31,11 +31,12 @@ export class SignatureComponent implements OnInit {
     canvas.height = this.height;
     this.ctx = canvas.getContext('2d')!;
     this.clearCanvas();
-
+console.log("+++++++++++++++ stu ++++++++++++",this.stu)
     this.subs.push(this.stu.points$.subscribe(p => this.onPoint(p)));
     this.subs.push(this.stu.image$.subscribe(b64 => this.onImage(b64)));
     this.subs.push(this.stu.status$.subscribe(s => console.log('status', s)));
     this.subs.push(this.stu.errors$.subscribe(e => console.error('ws error', e)));
+    
   }
   start() {
     this.clearCanvas();

@@ -1,6 +1,7 @@
 <ngx-loading [show]="loading" [config]="{ backdropBorderRadius: '5px',fullScreenBackdrop:true }"></ngx-loading>
 <div class="notification-container card shadow-sm p-3">
   <div class="d-flex justify-content-between align-items-center mb-3">
+     <a style="margin-right: 40px;" [routerLink]="['/admin/parametre']" class="breadcrumb-link"> <i class="mdi mdi-cogs"></i> Menu Paramètres </a>
     <h5 class="mb-0 fw-bold">🔔 Notifications</h5>
     <button class="btn btn-sm btn-outline-primary" (click)="markAllAsRead()">
       <i class="mdi mdi-check-all me-1"></i> Marquer tout comme lu

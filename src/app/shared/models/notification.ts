@@ -5,10 +5,10 @@ import { Injectable } from '@angular/core';
 export class NotificationObjet implements Deserializable<NotificationObjet> {
   id: number;
   user_id: number;
+  demande_id: number;
   titre: string;
   statut: string;
-  Sujet: string;
-  contenu: string;
+  message: string;
   image: string;
   created_at: Date;
   updated_at: Date;

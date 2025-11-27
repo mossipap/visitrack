@@ -61,6 +61,12 @@ export class UtilisateurService {
   public delete(utilisateur: Utilisateur) {
     return this.http.delete(this.serviceURL + '/User/'+utilisateur.id, this.httpOptions);
   }
+  public desactiver(utilisateur: Utilisateur) {
+    return this.http.put(this.serviceURL + '/DesactiveUser/'+utilisateur.id, this.httpOptions);
+  }
+  public activer(utilisateur: Utilisateur) {
+    return this.http.put(this.serviceURL + '/ActiveUser/'+utilisateur.id, this.httpOptions);
+  }
 
   public changePassword(utilisateur: Utilisateur) {
     return this.http.put(this.serviceURL + '/Modifypassword/'+utilisateur.id, utilisateur, this.httpOptions);

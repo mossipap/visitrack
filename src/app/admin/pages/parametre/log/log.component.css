@@ -1,0 +1,185 @@
+/* ±±±±±±±±±±±±±±±±±±±±  style pour le header ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±± */
+.logs-header-card {
+  background: linear-gradient(135deg,#ffffff,#f7f9fc);
+  border-radius: 18px !important;
+}
+
+.title-logs {
+  color: #073272;
+  font-weight: 600;
+  font-size: 1.4rem;
+}
+
+.breadcrumb-custom {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  padding: 0;
+  gap: 6px;
+}
+
+.breadcrumb-link {
+  font-size: 0.95rem;
+  color: #0d6efd;
+  text-decoration: none;
+  font-weight: 500;
+  transition: 0.2s ease-in-out;
+}
+
+.breadcrumb-link:hover {
+  color: #073272;
+  text-decoration: underline;
+}
+
+.breadcrumb-custom .separator {
+  color: #6c757d;
+}
+
+.breadcrumb-custom .active {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #073272;
+}
+
+.card-toolbar {
+  border-bottom: 1px solid #e9ecef;
+}
+/* ±±±±±±±±±±±±±±±±±±±±±±±±. fin style pour le header ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±± */
+
+/* ±±±±±±±±±±±±±±±±±±±±±±±±.  style pour le optiom rechercher ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±± */
+.enhanced-toolbar {
+  background: #f8fafc;
+  border-radius: 12px;
+  padding: 18px 18px 10px 18px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.mat-form-field {
+  font-size: 0.9rem !important;
+}
+
+.select-search-box {
+  display: flex;
+  align-items: center;
+  padding: 6px 8px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.select-search-box input {
+  width: 100%;
+  border: none;
+  outline: none;
+  font-size: 0.85rem;
+}
+
+.search-icon {
+  font-size: 1.1rem;
+  margin-left: 6px;
+  opacity: 0.6;
+}
+
+.btn-refresh {
+  width: 45px;
+  height: 45px;
+  border-radius: 10px;
+  border: none;
+  background: #e9f3ff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: 0.25s;
+  margin-top: -70px;
+}
+
+.btn-refresh i {
+  font-size: 1.4rem;
+  color: #052f6e;
+}
+
+.btn-refresh:hover {
+  background: #052f6e;
+}
+
+.btn-refresh:hover i {
+  color: #fff;
+}
+
+/* ±±±±±±±±±±±±±±±±±±±±±±±±. fin style pour le optiom rechercher ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±± */
+/* ±±±±±±±±±±±±±±±±±±±±±±±± style pour le table ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±± */
+/* Wrapper du tableau */
+.table-wrapper {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid #eef1f5;
+}
+
+/* Style du tableau */
+/* 🔹 Conteneur plus grand */
+.big-table-container {
+  padding: 20px;
+  max-height: 70vh;     /* Ajustable */
+  overflow: auto;        /* Scroll automatique si trop de lignes */
+}
+
+/* 🔹 Agrandir la taille du texte */
+.big-table th,
+.big-table td {
+  font-size: 16px !important;        /* Texte plus grand */
+  padding: 14px 18px !important;     /* Plus d’espace */
+  line-height: 1.7 !important;       /* Hauteur augmentée */
+}
+
+/* 🔹 En-tête plus haut et lisible */
+.big-table th {
+  background: #078de7 !important;
+  color: white !important;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 17px !important;
+  padding: 16px !important;
+  border-bottom: 2px solid #ddd;
+}
+
+/* 🔹 Icône utilisateur */
+.user-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.user-icon {
+  font-size: 28px;
+  color: #7a7a7a;
+}
+
+/* 🔹 Augmenter la hauteur des lignes */
+.big-table tr.mat-row {
+  height: 60px !important;
+}
+
+/* 🔹 Effet survol amélioré */
+.row-hover:hover {
+  background: rgba(0, 0, 0, 0.06);
+  cursor: pointer;
+}
+
+/* 🔹 Amélioration du sticky header */
+.mat-header-row {
+  top: 0;
+  z-index: 10;
+}
+
+/* Conteneur esthétique */
+.table-wrapper {
+  background: white;
+  padding: 0;
+  border-radius: 14px;
+  border: 1px solid #e5e5e5;
+}
+
+/* ±±±±±±±±±±±±±±±±±±±±±±±±. fin style pour le table ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±± */

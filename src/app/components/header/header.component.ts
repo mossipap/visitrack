@@ -33,15 +33,6 @@ export class HeaderComponent implements OnInit {
   public menuTitle: string;
   public loading: boolean;
   public notifications: NotificationObjet[] = [];
-  public criteriaList = [
-    { id: 1, name: 'Dossiers en cours/clots/prescrit' },
-    { id: 2, name: 'Dossiers en alertes' },
-    { id: 3, name: 'Nombre total des inculpés' },
-    { id: 4, name: 'Nombre total des inculpés sous MD' },
-    { id: 5, name: 'Nombre total des inculpés sous MA' },
-    { id: 6, name: 'Nombre total des inculpés sous CJ' },
-    { id: 7, name: 'Types d\'infractions' },
-  ];
   /*  time part */
   public clock: any;
   public date = new Date();
@@ -117,65 +108,9 @@ export class HeaderComponent implements OnInit {
       this.time();
     });
     const ls = new SecureLS({ encodingType: 'aes', encryptionSecret: 'MyAdminApp' });
-    if (ls.get('current_theme')) {//dark
-      this.isDark = true;
-      const theme = document.getElementsByClassName("theme-light");
-      for(var i = theme.length - 1; i >= 0; --i) {
-        theme[i].classList.replace('theme-light', 'theme-dark');
-      }
-      const headerLeft = document.getElementsByClassName("header-left-w");
-      for(var i = headerLeft.length - 1; i >= 0; --i) {
-        headerLeft[i].classList.replace('header-left-w', 'header-left-d');
-      }
-      const headerRight = document.getElementsByClassName("header-right-w");
-      for(var i = headerRight.length - 1; i >= 0; --i) {
-        headerRight[i].classList.replace('header-right-w', 'header-right-d');
-      }
-      const menuNotif = document.getElementsByClassName("c-black");
-      for(var i = menuNotif.length - 1; i >= 0; --i) {
-        menuNotif[i].classList.replace('c-black', 'c-white');
-      }
-      const libTimer = document.getElementsByClassName("time-white");
-      for(var i = libTimer.length - 1; i >= 0; --i) {
-        libTimer[i].classList.replace('time-white', 'time-black');
-      }
-      const libDate = document.getElementsByClassName("lib-date-w");
-      for(var i = libDate.length - 1; i >= 0; --i) {
-        libDate[i].classList.replace('lib-date-w', 'lib-date-d');
-      }
-      this.changeConfirmBg('#1c1c1c');
-    } else {//white
-      this.isDark = false;
-      const theme = document.getElementsByClassName("theme-dark");
-      for(var i = theme.length - 1; i >= 0; --i) {
-        theme[i].classList.replace('theme-dark', 'theme-light');
-      }
-      const headerLeft = document.getElementsByClassName("header-left-d");
-      for(var i = headerLeft.length - 1; i >= 0; --i) {
-        headerLeft[i].classList.replace('header-left-d', 'header-left-w');
-      }
-      const headerRight = document.getElementsByClassName("header-right-w");
-      for(var i = headerRight.length - 1; i >= 0; --i) {
-        headerRight[i].classList.replace('header-right-d', 'header-right-w');
-      }
-      const menuNotif = document.getElementsByClassName("c-black");
-      for(var i = menuNotif.length - 1; i >= 0; --i) {
-        menuNotif[i].classList.replace('c-black', 'c-white');
-      }
-      const libTimer = document.getElementsByClassName("time-black");
-      for(var i = libTimer.length - 1; i >= 0; --i) {
-        libTimer[i].classList.replace('time-black', 'time-white');
-      }
-      const libDate = document.getElementsByClassName("lib-date-d");
-      for(var i = libDate.length - 1; i >= 0; --i) {
-        libDate[i].classList.replace('lib-date-d', 'lib-date-w');
-      }
-      this.changeConfirmBg("#ffffff")
-    }
     this.searchParam.dateFin.setDate(this.searchParam.dateFin.getDate() + 1);
-    if(this.currentUser.type_user_id === 3 || this.currentUser.type_user_id === 4) {
       this.InitNotifications();
-    }
+
   }
   selectLang(lang: string) {
     this.translateService.use(lang);
@@ -231,10 +166,6 @@ export class HeaderComponent implements OnInit {
     this.router.navigate(['/login']);
   }
 
-  goToOrganigram() {
-    this.router.navigate(['/organigramme']);
-  }
-
   changerPwd(): void {
     if(this.authUser.newPassword.length <= 0 || this.authUser.oldPassword.length <= 0 ){
       this.toast.warning("Tous les champs sont obligatoire");
@@ -268,12 +199,14 @@ export class HeaderComponent implements OnInit {
     });
   }
 
-  InitNotifications() {
-    this.notifyService.findByEventUser(this.currentUser.id).subscribe(ret => {
+   InitNotifications() {
+    this.notifyService.findAll().subscribe(ret => {
       if (ret['code'] === 200) {
+       // console.log('++++++++++++++++ ret===', ret['data']);
         const events = ret['data'];
         const notifs = ret['Notification'];
         this.notifications = events.concat(notifs);
+      //  console.log('++++++++++++++++ notifs===', this.notifications);
         this.loading = false;
       } else {
         this.loading = false;
@@ -296,27 +229,6 @@ export class HeaderComponent implements OnInit {
             element.statut = notifRet.statut;
           }
         });
-        if(notifRet.sujet === 'Ordonnance') {
-          switch(this.currentUser.type_user_id) {
-            case 1:
-              this.router.navigate(['/admin/secretariat/assistante']);
-            break;
-            case 2:
-              this.router.navigate(['/admin/secretariat/presidente']);
-            break;
-            case 3:
-              this.router.navigate(['/admin/juge/instruction']);
-            break;
-            case 4:
-              this.router.navigate(['/admin/juge/greffier']);
-            break;
-            case 5:
-              this.router.navigate(['/admin/secretariat/vice-presidente']);
-            break;
-          }
-        } else {
-          this.router.navigate(['/admin/calendriers']);
-        }
         this.loading = false;
       } else {
         this.loading = false;
@@ -327,12 +239,6 @@ export class HeaderComponent implements OnInit {
       this.toast.error(environment.erreur_connexion_message);
       this.loading = false;
     });
-  }
-
-  genereStatic() {
-    this.closeStatisticsModal.nativeElement.click();
-    const serializedObject = encodeURIComponent(JSON.stringify(this.typeStatistiques));
-    this.router.navigate(['/admin/statistique'], { queryParams: { dataStatistique: serializedObject } });
   }
 
   /* **********collapsed************ */

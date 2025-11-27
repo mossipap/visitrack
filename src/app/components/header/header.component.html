@@ -26,7 +26,7 @@
 </ul> -->
 
 
-  <ul class="app-nav">
+  <ul class="app-nav time-wrapper ">
     <!--  <li class="dropdown mr-2" >
       <button class="btn btn_statistics" ><img src="assets/icons/mdi/telephone.png" alt="Voir" class="icon-btn" /> Numéro de telephone</button>
     </li>
@@ -42,7 +42,7 @@
       <button class="btn btn_statistics" routerLink="/admin/parametre/utilisateur" ><img src="assets/icons/mdi/parametre.png" alt="Voir" class="icon-btn" /></button>
     </li> -->
     <!-- Notifications -->
-    <li class="dropdown mr-3">
+    <li class="dropdown mr-3  time-displayG">
       <button class="btn btn_statistics " data-toggle="dropdown" aria-label="Show notifications">
         <img src="assets/icons/mdi/noti.png" alt="Voir" class="icon-btn" />
         <span class="count badge badge-danger">{{notifications.length}}</span>
@@ -54,15 +54,15 @@
         </li>
         <div class="app-notification__content">
           <li *ngFor="let notify of notifications; let i=index"
-            (click)="notify.statut === 'Vue'? '' : setNotifyVue(notify)">
+            (click)="notify?.statut === 'Vue'? '' : setNotifyVue(notify)">
             <a class="app-notification__item" href="javascript:void(0);">
               <i class="mdi mdi-bell-circle text-primary mr-2"></i>
               <div>
                 <p
-                  [class]="notify.statut=== 'Vue'? 'app-notification__message' : 'app-notification__message font-weight-bold'">
+                  [class]="notify?.statut=== 'Vue'? 'app-notification__message' : 'app-notification__message font-weight-bold'">
                   {{notify?.titre}}
                 </p>
-                <p class="app-notification__meta">{{notify.created_at | timeago}}</p>
+                <p class="app-notification__meta">{{notify?.created_at | timeago}}</p>
               </div>
             </a>
           </li>
@@ -74,7 +74,7 @@
     </li>
 
     <!-- User Menu-->
-    <li class="dropdown ml-5" style="margin-right: -20px;">
+    <li class="dropdown ml-5 time-displayG" style="margin-right: -20px;">
       <a class="app-nav__item lib-date-d cursor_p" data-toggle="dropdown" aria-label="Open Profile Menu">
         <div class="user_text d-flex align-items-center">
           <!-- 🟢 Conteneur de l'avatar avec badge -->
@@ -106,9 +106,7 @@
           </a>
         </li>
         <li>
-          <a [class]="roleManager.isDroitChangerPwdUtilisateur() ? 'dropdown-item' : 'dropdown-item inactiveLink'"
-            href="javascript:void(0);" *ngIf="roleManager.isDroitChangerPwdUtilisateur()" data-toggle="modal"
-            data-target="#modalChangeCenter" (click)="showChangePwd()">
+          <a href="javascript:void(0);" data-toggle="modal" data-target="#modalChangeCenter" (click)="showChangePwd()">
             <i class="mdi mdi-pencil-lock fa-lg text-info mr-1"></i>
             <span [class]="isDark ? 'c-white' : 'c-c-black'">{{ 'header.editPwd' | translate }}</span>
           </a>
@@ -214,95 +212,3 @@
     </div>
   </div>
 </div>
-
-<!-- generer statistique modal -->
-<div class="container demo">
-  <div class="modal right fade" id="genereStaticModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel2">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content" [style]="{'background-color': isDark ? '#1f1f1f' : '#FFFFFF'}">
-        <div class="modal-body">
-          <div class="row">
-            <div class="col-md-10 col-lg-10">
-              <label class="lab_static">{{'parametre.static' | translate}}</label>
-            </div>
-            <div class="col-md-2 col-lg-2">
-              <label class="lab_close" data-dismiss="modal" aria-label="Close" #closeStatisticsModal><img
-                  src="assets/images/close_x.png" alt=""></label>
-            </div>
-          </div>
-          <div class="row mb-l-20 mb-10 mt-3">
-            <div class="col-md-12 col-lg-12 p-right-0">
-              <div [class]="isDark? 'card cust_card_d':'card cust_card_w'">
-                <div class="card-block">
-                  <div class="row mb-3">
-                    <div class="col-lg-12 p-right-0"> <label
-                        [class]="isDark? 'lab_input clore_w' : 'lab_input clore_n'">Intervale de temps</label></div>
-                    <div class="col-lg-6 p-right-0 d-flex">
-                      <label
-                        [class]="isDark? 'lab_input clore_w lab_duau mr-1' : 'lab_input clore_n lab_duau mr-1'">Du</label>
-                      <p-calendar [(ngModel)]="searchParam.dateDebut" [showIcon]="true" inputId="icondisplayd" />
-                    </div>
-                    <div class="col-lg-6 d-flex">
-                      <label
-                        [class]="isDark? 'lab_input clore_w lab_duau mr-1' : 'lab_input clore_n lab_duau mr-1'">Du</label>
-                      <p-calendar [(ngModel)]="searchParam.dateFin" [showIcon]="true" inputId="icondisplayf" />
-                    </div>
-                  </div>
-
-                  <div class="row">
-                    <div class="col-lg-12 p-right-0">
-                      <label
-                        [class]="isDark? 'lab_input clore_w lab_duau mr-1' : 'lab_input clore_n lab_duau mr-1'">Type de
-                        statistique</label>
-                      <p-multiSelect [options]="criteriaList" [(ngModel)]="typeStatistiques" optionLabel="name"
-                        optionValue="id" placeholder="Statistique par" styleClass="wd_100">
-
-                        <ng-template let-value pTemplate="selectedItems">
-                          <div class="d-flex align-items-center" *ngFor="let option of value">
-                            <img src="assets/images/dot_blue.png" alt="">
-                            <div>{{ option.name }},</div>
-                          </div>
-                          <div *ngIf="!value || value.length === 0" style="margin-top: -5px;">Choisissez les types</div>
-                        </ng-template>
-                        <ng-template let-country pTemplate="item">
-                          <div class="d-flex align-items-center ">
-                            <img src="assets/images/dot_blue.png" alt="">
-                            <div class="ml-2 lab_input clore_b">{{ country.name }}</div>
-                          </div>
-                        </ng-template>
-                        <ng-template let-country pTemplate="footer">
-                          <div class="py-2 px-3">
-                            <b> {{ typeStatistiques ? typeStatistiques.length : 0 }} </b>
-                            element{{ (typeStatistiques ? typeStatistiques.length : 0) > 1 ? 's' : '' }} sectionné{{
-                            (typeStatistiques ? typeStatistiques.length : 0) > 1 ? 's' : '' }}.
-                          </div>
-                        </ng-template>
-                      </p-multiSelect>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <br />
-          <div class="row">
-            <div class="col-md-12 mb-2" *ngIf="">
-              <button class="btn btn_suivant btn-sm">
-                <label class="label_btn">{{'parametre.next' | translate}}</label>
-              </button>
-            </div>
-            <div class="col-md-12 ta-center">
-              <button class="btn btn_suivant btn-sm" [disabled]="typeStatistiques?.length<=0" (click)="genereStatic()">
-                <label class="label_btn">
-                  <img src="assets/images/pdf.png" alt="" style="width: 15px;margin-right: 5px;">
-                  {{'parametre.generepdf' | translate}}
-                </label>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-<!-- /add type infraction modal -->

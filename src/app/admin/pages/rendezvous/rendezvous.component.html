@@ -2,22 +2,8 @@
 <div class="row">
   <div class="col-md-12">
     <!-- list -->
-    <div [class]="isDark? 'tile theme-dark' : 'tile theme-light'" *ngIf="currentView !== 'detail'">
-      <div class="row">
-        <div class="col-md-6">
-          <div class="toolbar-btn" *ngIf="isSearch">
-            <b [class]="isDark? 'c-white ff_calibre' : 'c-black ff_calibre'">Rendez-vous</b>
-            <div class="btn-group mb-3" style="margin-left: 20px;">
-              <button id="user_all" class="btn btn_active" (click)="onChangeCode(0)">Tous</button>
-              <button id="user_active" class="btn btn_not_active" (click)="onChangeCode(1)">En cours</button>
-              <button id="user_block" class="btn btn_not_active" (click)="onChangeCode(2)">Terminées</button>
-              <button id="user_delete" class="btn btn_not_active" (click)="onChangeCode(3)">Supprimées</button>
-            </div>
-          </div>
-        </div>
-
-      </div>
-
+    <div [class]="isDark? 'tile theme-dark' : 'tile theme-light'"
+      *ngIf="currentView === 'list' || currentView === 'signature'">
       <div class="user-header d-flex justify-content-between align-items-center p-3 shadow-sm rounded-3">
         <!-- 🔹 Titre -->
         <div class="d-flex align-items-center gap-2">
@@ -33,7 +19,7 @@
             }}
           </span>
         </div>
-        <div class="btn-group mb-3" *ngIf="!isSearch">
+        <div class="btn-group mb-3">
           <button id="user_all" class="btn btn_active" (click)="onChangeCode(0)">Tous</button>
           <button id="user_active" class="btn btn_not_active" (click)="onChangeCode(1)">En cours</button>
           <button id="user_block" class="btn btn_not_active" (click)="onChangeCode(2)">Terminées</button>
@@ -54,34 +40,6 @@
             <i class="mdi mdi-filter-variant text-dark"></i>
             <span class="text-dark">Filtres</span>
           </button>
-          <div class="row gx-1 align-items-center" *ngIf="isSearch">
-            <div class="col-auto d-flex align-items-center">
-              <label class="lab_input me-1" [class]="isDark? 'c-white' : 'c-black'">Du</label>
-              <p-calendar [(ngModel)]="searchParam.dateDebut" [showIcon]="true"></p-calendar>
-            </div>
-
-            <div class="col-auto d-flex align-items-center">
-              <label class="lab_input me-1" [class]="isDark? 'c-white' : 'c-black'">Au</label>
-              <p-calendar [(ngModel)]="searchParam.dateFin" [showIcon]="true"></p-calendar>
-            </div>
-
-            <div class="col-auto">
-              <p-dropdown [options]="criteriaList" [(ngModel)]="searchParam.criteria" optionLabel="name"
-                placeholder="Critère"></p-dropdown>
-            </div>
-
-            <div class="col-auto">
-              <button class="btn_refresh" (click)="search()" title="Rafraichir">
-                <i class="mdi mdi-refresh fs-20"></i>
-              </button>
-            </div>
-
-            <div class="col-auto" style="margin-right: 10px;">
-              <button class="btn_refresh text-danger" (click)="isSearch = false" title="Fermer">
-                <i class="mdi mdi-close fs-20"></i>
-              </button>
-            </div>
-          </div>
           <!-- ➕ Bouton ajout -->
           <button *ngIf="true" class="btn btn-dark d-flex align-items-center gap-1 px-3" data-backdrop="static"
             data-toggle="modal" data-target="#addUserModal" (click)="showAddForm()">
@@ -89,6 +47,124 @@
             <span>Créer un rendez-vous</span>
           </button>
         </div>
+      </div>
+      <div class="row g-3 align-items-end" *ngIf="isSearch" style="padding-top: 10px;">
+       
+        <!-- Date début -->
+        <div class="col-lg-2 col-md-2 col-sm-2">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Date début</mat-label>
+            <input matInput [matDatepicker]="dateDebut" [(ngModel)]="searchParam.dateDebut" name="dateDebut" readonly>
+            <mat-datepicker-toggle matSuffix [for]="dateDebut"></mat-datepicker-toggle>
+            <mat-datepicker #dateDebut></mat-datepicker>
+          </mat-form-field>
+        </div>
+        <!-- Date fin -->
+        <div class="col-lg-2 col-md-2 col-sm-2">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Date fin</mat-label>
+            <input matInput [matDatepicker]="dateFin" [(ngModel)]="searchParam.dateFin" name="dateFin" readonly>
+            <mat-datepicker-toggle matSuffix [for]="dateFin"></mat-datepicker-toggle>
+            <mat-datepicker #dateFin></mat-datepicker>
+          </mat-form-field>
+        </div>
+
+        <!-- Critère -->
+        <div class="col-lg-2 col-md-2 col-sm-2">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Recherche par</mat-label>
+            <mat-select name="criteria" [(ngModel)]="searchParam.criteria" (selectionChange)="onChangeCritere()">
+              <mat-option value="1">Tous</mat-option>
+              <mat-option value="2">Statut</mat-option>
+              <mat-option value="3">Siège</mat-option>
+              <mat-option value="4">Parquet</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <!-- Recherche Action -->
+        <div class="col-lg-2 col-md-2 col-sm-2" *ngIf="searchParam.criteria === '2'">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Statut</mat-label>
+            <mat-select [(ngModel)]="searchParam.query" name="statut">
+
+              <!-- Champ recherche interne -->
+              <div class="select-search-box">
+                <input matInput autocomplete="off" placeholder="Rechercher...">
+                <i class="mdi mdi-magnify search-icon"></i>
+              </div>
+              <mat-divider></mat-divider>
+              <mat-option [value]="">Désélectionner</mat-option>
+              <!-- Liste statut -->
+              <mat-option *ngFor="let st of statutOptions" [value]="st.value">
+                {{ st.label }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <!-- Sélection service -->
+        <div class="col-lg-2 col-md-2 col-sm-2" *ngIf="searchParam.criteria === '3'">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Siège (Cabinet d’instruction)</mat-label>
+            <mat-select [(ngModel)]="searchParam.id" name="service">
+              <!-- Champ recherche interne -->
+              <div class="select-search-box">
+                <input matInput autocomplete="off" [(ngModel)]="serviceFilter.designation" placeholder="Rechercher...">
+                <i class="mdi mdi-magnify search-icon"></i>
+              </div>
+              <mat-divider></mat-divider>
+              <mat-option [value]="">Désélectionner</mat-option>
+              <!-- Liste services -->
+              <mat-option *ngFor="let ca of cabinets | filterBy: cabinetFilter" [value]="ca.id">
+                {{ ca.designation }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <!-- Sélection service -->
+        <div class="col-lg-2 col-md-2 col-sm-2" *ngIf="searchParam.criteria === '4'">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Choisir le Parquet</mat-label>
+            <mat-select [(ngModel)]="searchParam.id" name="service">
+              <!-- Champ recherche interne -->
+              <div class="select-search-box">
+                <input matInput autocomplete="off" [(ngModel)]="serviceFilter.designation" placeholder="Rechercher...">
+                <i class="mdi mdi-magnify search-icon"></i>
+              </div>
+              <mat-divider></mat-divider>
+              <mat-option [value]="">Désélectionner</mat-option>
+              <!-- Liste services -->
+              <mat-option *ngFor="let s of services | filterBy: serviceFilter" [value]="s.id">
+                {{ s.designation }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+      <!--   <div class="col-lg-2 col-md-3 col-sm-6">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Recherche ... </mat-label>
+            <input matInput [(ngModel)]="searchFilterText" (input)="updatePaginatedList()"name="searchTerm">
+          </mat-form-field>
+        </div> -->
+
+        <!-- Bouton recherche -->
+        <div class="col-lg-2 col-md-2 col-sm-2">
+          <div class="d-flex align-items-center gap-2" style="margin-top: -70px;">
+            <!-- Bouton Actualiser -->
+            <button class="btn btn-info d-flex align-items-center gap-1 px-3" data-backdrop="static" data-toggle="modal"
+              style="margin-right: 10px;" data-target="#addVisiteurModal" (click)="search()" title="Rafraichir">
+              <i class="mdi mdi-cached" style="font-size: 20px;"></i>
+              <span>Actualiser</span>
+            </button>
+            <!-- Bouton Ajouter -->
+            <button  class="btn btn-danger d-flex align-items-center gap-1 px-3" data-backdrop="static" data-toggle="modal"
+              data-target="#addVisiteurModal" (click)="isSearch = false" title="Fermer">
+              <i class="mdi mdi-close" style="font-size: 20px;"></i>
+              <span>Ferner</span>
+            </button>
+          </div>
+        </div>
+
       </div>
       <div class="table-card">
         <div class="table-responsive">
@@ -142,9 +218,13 @@
                     <img *ngIf="!demande.image" src="assets/images/profile/avatar.jpeg" alt="Not"
                       class="img-avatar me-2" />
                     <img *ngIf="demande.image" [src]="demande.image" alt="User" class="img-avatar me-2" />
-                    <div>
-                      <label class="fw-semibold">{{ demande.service?.designation}}</label><br />
+                    <div *ngIf="this.demande.isDepartement === 'PARQUET'">
+                      <label class="fw-semibold">{{ demande.isDepartement}}</label><br />
                       <div class="desc-prof text-muted small">{{ demande.service?.designation }}</div>
+                    </div>
+                    <div *ngIf="this.demande.isDepartement === 'SIEGE'">
+                      <label class="fw-semibold">{{ demande.isDepartement}}</label><br />
+                      <div class="desc-prof text-muted small">{{ demande.cabinet?.designation }}</div>
                     </div>
                   </div>
                 </td>
@@ -172,20 +252,13 @@
                       data-target="#addUserModal" (click)="showEditForm(demande)">
                       <img src="assets/icons/mdi/edit.png" alt="Modifier" class="icon-btn" />
                     </button>
-                    <!-- 
-                    <button class="btn btn-light btn-icon" title="Changer le statut" data-backdrop="static"
-                      data-toggle="modal" data-target="#userConfirmModal" (click)="showConfirmDialog(demande)">
-                      <i class="mdi mdi-progress-clock fs-5"></i>
-                    </button> -->
-
                     <button class="btn btn-light btn-icon" title="Supprimer" data-backdrop="static" data-toggle="modal"
                       data-target="#deleteConfirmModal" (click)="showDeleteDialog(demande)">
                       <img src="assets/icons/mdi/delete.png" alt="Supprimer" class="icon-btn" />
                     </button>
-                    <button *ngIf="false" class="btn btn-primary btn-sm fw-semibold" title="Changer le statut"
-                      data-backdrop="static" data-toggle="modal" data-target="#demandeConfirmModal"
-                      (click)="showConfirmDialog(demande)">Changer
-                      statut</button>
+                    <button title="Passer à la signature" data-backdrop="static" data-toggle="modal"
+                      data-target="#SignatureVisiteurModal" (click)="showSignature(demande)"
+                      class="btn btn-primary btn-sm fw-semibold" data-backdrop="static">Signature</button>
                   </div>
                 </td>
               </tr>
@@ -652,521 +725,26 @@
       </div>
     </div>
     <!-- ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±± -->
-    <!-- add user modal -->
-    <div class="container demo" *ngIf="currentView === 'edit'">
-      <div class="modal right fade" id="addUserModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel2">
-        <div class="modal-dialog" role="document">
-          <div class="modal-content" [style]="{'background-color': isDark ? '#1f1f1f' : '#FFFFFF'}">
-            <div class="d-flex" style="margin-top: 15px;">
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="margin-left: 10px;"
-                #closeAddElementDialog>
-                <span aria-hidden="true">
-                  <i
-                    [class]="isDark? 'txt-title-d mdi mdi-arrow-left-bold-circle' : 'mdi mdi-arrow-left-bold-circle'"></i>
-                </span>
-                <label [class]="isDark? 'txt-title-d ml-2': 'ml-1'" style="font-size: 14px;"> Modification de la
-                  demande</label>
-              </button>
-            </div>
-            <div class="modal-body">
-              <form #formAddUser="ngForm">
-                <div class="progress-container mb-4">
-                  <div class="step" [class.active]="step >= 1">
-                    <div class="circle">1</div>
-                    <span>Informations</span>
-                  </div>
-                  <div class="line" [class.filled]="step >= 2"></div>
-                  <div class="step" [class.active]="step >= 2">
-                    <div class="circle">2</div>
-                    <span>Signature</span>
-                  </div>
-                  <div class="line" [class.filled]="step >= 3"></div>
-                  <div class="step" [class.active]="step >= 3">
-                    <div class="circle">3</div>
-                    <span>Récapitulatif</span>
-                  </div>
-                </div>
-                <!-- Étape 1 : Informations du visiteur -->
-                <div *ngIf="step === 1" class="step-form fade-in">
-                  <div class="col-md-12 col-lg-12 p-right-0">
-                    <div [class]="isDark? 'card cust_card_d':'card cust_card_w'">
-                      <div class="card-block">
-                        <div class="row mb-l20" *ngIf="isNumberPhone || currentView === 'edit'">
-                          <div class="col-md-6 col-lg-6">
-                            <div class="form-group has-success align-left ft-w-b d-flex">
-                              <label [class]="isDark ? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
-                                for="sexe">
-                                Sexe *
-                              </label>
-                              <div class="flex ta-center mr-3">
-                                <p-radioButton name="homme" value="Homme" [(ngModel)]="demande.visiteur.sexe"
-                                  inputId="male" />
-                                <label for="male" class="ml-2 mb-0"> Homme </label>
-                              </div>
-                              <div class="flex align-items-center">
-                                <p-radioButton name="femme" value="Femme" [(ngModel)]="demande.visiteur.sexe"
-                                  inputId="female" />
-                                <label for="female" class="ml-2 mb-0"> Femme </label>
-                              </div>
-                            </div>
-                          </div>
-                          <div class="col-lg-6 p-right-0 mb-3">
-                            <div class="form-group has-success align-left ft-w-b">
-                              <label [class]="isDark ? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
-                                for="dateVisite">
-                                Date du jour *
-                              </label>
-                              <div class="select select-add">
-                                <p-calendar [(ngModel)]="demande.dateVisite" readonly name="dateVisite"
-                                  dateFormat="dd/mm/yy" yearRange="1950:2030" placeholder="Date de la visite"
-                                  styleClass="wd_100 initialwd">
-                                </p-calendar>
-                                <div class="arrow" [class]="isDark ? 'option-select-d' : 'option-select-w'"></div>
-                              </div>
-                            </div>
-                          </div>
-                          <div class="col-lg-12 p-right-0">
-                            <div class="form-group has-success align-left ft-w-b">
-                              <label [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
-                                for="nomComplet">Non Complet *</label>
-                              <input
-                                [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'"
-                                id="nomComplet" name="nomComplet" type="text" [(ngModel)]="demande.visiteur.nomComplet"
-                                required>
-                            </div>
-                          </div>
-                          <div class="col-md-12 col-lg-12 p-right-0">
-                            <div class="form-group has-success align-left ft-w-b">
-                              <label [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'">Pièce
-                                d’identité *</label><br />
-                              <div class="d-flex">
-                                <div class="flex ta-center mr-3">
-                                  <p-radioButton name="CNI" value="CNI" [(ngModel)]="demande.visiteur.typePiece"
-                                    inputId="CNI" />
-                                  <label for="CNI" class="ml-2 mb-0"> Carte d’identité </label>
-                                </div>
-                                <div class="flex ta-center mr-3">
-                                  <p-radioButton name="permis" value="Permis" [(ngModel)]="demande.visiteur.typePiece"
-                                    inputId="permis" />
-                                  <label for="permis" class="ml-2 mb-0"> Permis </label>
-                                </div>
-
-
-                                <div class="flex ta-center">
-                                  <p-radioButton name="passeport" value="Passeport"
-                                    [(ngModel)]="demande.visiteur.typePiece" inputId="passeport" />
-                                  <label for="passeport" class="ml-2 mb-0"> Passeport </label>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                          <div class="col-lg-6 p-right-0">
-                            <div class="form-group has-success align-left ft-w-b">
-                              <label [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
-                                for="numeroPiece">N° Pièce *</label>
-                              <input
-                                [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'"
-                                id="numeroPiece" name="numeroPiece" type="text"
-                                [(ngModel)]="demande.visiteur.numeroPiece" required>
-                            </div>
-                          </div>
-                          <div class="col-lg-6 p-right-0">
-                            <div class="form-group has-success align-left ft-w-b">
-                              <label [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
-                                for="numeroTelephone">Téléphone *</label>
-                              <input
-                                [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'"
-                                id="numeroTelephone" name="numeroTelephone" type="text"
-                                [(ngModel)]="demande.visiteur.numeroTelephone" required>
-                            </div>
-                          </div>
-                          <div class="col-lg-6 p-right-0">
-                            <div class="form-group has-success align-left ft-w-b">
-                              <label [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
-                                for="fonction">Fonction *</label>
-                              <input
-                                [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'"
-                                id="fonction" name="fonction" type="text" [(ngModel)]="demande.visiteur.fonction"
-                                required>
-                            </div>
-                          </div>
-                          <div class="col-lg-6 p-right-0">
-                            <div class="form-group has-success align-left ft-w-b">
-                              <label [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
-                                for="adresse">Adresse *</label>
-                              <textarea
-                                [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'"
-                                id="adresse" name="adresse" type="adresse" [(ngModel)]="demande.visiteur.adresse"
-                                required></textarea>
-                            </div>
-                          </div>
-                          <div class="col-lg-6 p-right-0 mb-3">
-                            <div class="form-group has-success align-left ft-w-b">
-                              <label [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
-                                for="service_id">Choisir un service</label>
-                              <div class="select select-add">
-                                <p-dropdown [options]="services" [(ngModel)]="demande.service_id" [showClear]="true"
-                                  [filter]="true" name="service_id" filterBy="designation" optionLabel="designation"
-                                  optionValue="id" placeholder="Choisir un type" styleClass="wd_100 initialwd" />
-                                <div class="arrow" [class]="isDark? 'option-select-d' : 'option-select-w'"></div>
-                              </div>
-                            </div>
-                          </div>
-                          <div class="col-lg-6 p-right-0">
-                            <div class="form-group has-success align-left ft-w-b">
-                              <label [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
-                                for="cabinetUser">Choisir un cabinet</label>
-                              <div class="select select-add">
-                                <p-dropdown [options]="cabinets" [(ngModel)]="demande.cabinet_id" [showClear]="true"
-                                  [filter]="true" name="cabinetUser" filterBy="designation" optionLabel="designation"
-                                  optionValue="id" placeholder="Choisir un cabinet" styleClass="wd_100 initialwd" />
-                                <div class="arrow" [class]="isDark? 'option-select-d' : 'option-select-w'"></div>
-                              </div>
-                            </div>
-                          </div>
-
-                          <div class="col-lg-12 p-right-0">
-                            <div class="form-group has-success align-left ft-w-b">
-                              <label [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
-                                for="raisonVisite">Raison de la Visite</label>
-                              <textarea
-                                [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'"
-                                id="raisonVisite" name="raisonVisite" type="raisonVisite"
-                                [(ngModel)]="demande.raisonVisite"></textarea>
-                            </div>
-                          </div>
-
-                          <div class="col-lg-6 p-right-0">
-                            <div class="form-group has-success align-left ft-w-b">
-                              <label [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
-                                for="nom">Heure arrivée *</label>
-                              <input
-                                [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'"
-                                id="heureArrive" name="heureArrive" type="time" [(ngModel)]="demande.heureArrive"
-                                required>
-                            </div>
-                          </div>
-                          <div class="col-lg-16 p-right-0">
-                            <div class="form-group has-success align-left ft-w-b">
-                              <label [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
-                                for="heureVisite">Heure visite *</label>
-                              <input
-                                [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'"
-                                id="heureVisite" name="heureVisite" type="time" [(ngModel)]="demande.heureVisite"
-                                required>
-                            </div>
-                          </div>
-
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="text-end mt-4">
-                    <button type="button" class="btn btn-login btn-block btnn_save" [disabled]="!formAddUser.valid"
-                      (click)="step = 2"> Passer à la signature <i class="mdi mdi-arrow-right ms-2"></i></button>
-                  </div>
-                </div>
-                <!-- Étape 2 : Signature -->
-                <div *ngIf="step === 2" class="step-form fade-in">
-                  <div [class]="isDark ? 'card cust_card_d' : 'card cust_card_w'">
-                    <div class="col-lg-12 p-right-0">
-                      <div class="col-lg-12 p-right-0">
-                        <div class="form-group align-left ft-w-b">
-                          <div class="form-section">
-                            <label class="form-title">
-                              <i class="mdi mdi-package-variant-closed"></i>
-                              Objet(s) retiré à l'accueil
-                            </label>
-
-                            <div class="form-check">
-                              <input type="checkbox" class="form-check-input"
-                                (change)="toggleObjetRetire('Téléphone portable')" />
-                              <label class="form-check-label">Téléphone portable</label>
-                            </div>
-
-                            <div class="form-check">
-                              <input type="checkbox" class="form-check-input"
-                                (change)="toggleObjetRetire('Pièce d\'identité')" />
-                              <label class="form-check-label">Pièce d'identité</label>
-                            </div>
-
-                            <div class="form-check">
-                              <input type="checkbox" class="form-check-input"
-                                (change)="toggleObjetRetire('Ordinateur / Tablette')" />
-                              <label class="form-check-label">Ordinateur / Tablette</label>
-                            </div>
-
-                            <div class="form-check">
-                              <input type="checkbox" class="form-check-input"
-                                (change)="toggleObjetRetire('Objets dangereux')" />
-                              <label class="form-check-label">Objets dangereux</label>
-                            </div>
-
-                            <div class="form-check">
-                              <input type="checkbox" class="form-check-input"
-                                (change)="toggleObjetRetire('Autres objets')" />
-                              <label class="form-check-label">Autres objets</label>
-                            </div>
-                          </div>
-
-                        </div>
-                      </div>
-                      <div class="col-lg-12 p-right-0">
-                        <div class="form-group has-success align-left ft-w-b">
-                          <label [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
-                            for="nom">Heure du Départ *</label>
-                          <input
-                            [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'"
-                            id="heureDepart" name="heureDepart" type="time" [(ngModel)]="demande.heureDepart" required>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="card-block p-4 text-center">
-                      <h4 class="mb-4 fw-bold" style="text-align: center;color: rgb(44, 44, 184);">
-                        <i class="mdi mdi-gesture-tap me-2"></i> Signature du visiteur
-                      </h4>
-                      <canvas src="assets/images/scan.png" #canvas width="700" height="300"
-                        class="signature-pad"></canvas>
-                      <!-- Aperçu -->
-                      <!-- <div *ngIf="signatureImage" class="mt-3">
-                        <h6 class="text-muted mb-2">Aperçu de la signature :</h6>
-                        <img src="assets/images/scan.png" alt="Signature preview" class="signature-preview shadow-sm" />
-                      </div> -->
-                    </div>
-                  </div>
-                  <div class="d-flex justify-content-center gap-3 mt-4">
-                    <button type="button" class="btn btn-outline-danger" (click)="step = 1">
-                      <i class="mdi mdi-arrow-left me-1"></i> Retour
-                    </button>
-
-                    <button class="btn btn-login btn-block btnn_save" (click)="goToRecap()">
-                      Passer à la récaptulatif <i class="mdi mdi-arrow-right ms-2"></i> </button>
-                  </div>
-
-                </div>
-
-                <!-- Étape 3 : Recap -->
-                <div *ngIf="step === 3" class="step-form fade-in">
-                  <div [class]="isDark ? 'card cust_card_d' : 'card cust_card_w'">
-                    <div class="card-block">
-                      <div class="row mb-l20">
-                        <div class="col-md-6 col-lg-12">
-                          <div class="form-group has-success align-left ft-w-b d-flex">
-                            <div class="flex ta-center mr-3">
-                              <p-radioButton name="homme" value="Homme" [(ngModel)]="demande.visiteur.sexe"
-                                inputId="male" />
-                              <label for="male" class="ml-2 mb-0"> Homme </label>
-                            </div>
-                            <div class="flex align-items-center">
-                              <p-radioButton name="femme" value="Femme" [(ngModel)]="demande.visiteur.sexe"
-                                inputId="female" />
-                              <label for="female" class="ml-2 mb-0"> Femme </label>
-                            </div>
-                          </div>
-                        </div>
-                        <div class="col-lg-12 p-right-0 mb-3">
-                          <div class="form-group has-success align-left ft-w-b">
-                            <label [class]="isDark ? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
-                              for="dateVisite">
-                              Date du jour *
-                            </label>
-                            <div class="select select-add">
-                              <p-calendar [(ngModel)]="demande.dateVisite" readonly name="dateVisite"
-                                dateFormat="dd/mm/yy" yearRange="1950:2030" placeholder="Date de la date visite"
-                                styleClass="wd_100 initialwd">
-                              </p-calendar>
-                              <div class="arrow" [class]="isDark ? 'option-select-d' : 'option-select-w'"></div>
-                            </div>
-                          </div>
-                        </div>
-                        <div class="col-lg-12 p-right-0">
-                          <div class="form-group has-success align-left ft-w-b">
-                            <label [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
-                              for="nomComplet">Non Complet *</label>
-                            <input
-                              [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'"
-                              id="nomComplet" name="nomComplet" type="text" [(ngModel)]="demande.visiteur.nomComplet"
-                              required>
-                          </div>
-                        </div>
-                        <div class="col-md-12 col-lg-12 p-right-0">
-                          <div class="form-group has-success align-left ft-w-b">
-                            <label [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'">Pièce
-                              d’identité *</label><br />
-                            <div class="d-flex">
-                              <div class="flex ta-center mr-3">
-                                <p-radioButton name="CNI" value="CNI" [(ngModel)]="demande.visiteur.typePiece"
-                                  inputId="CNI" />
-                                <label for="CNI" class="ml-2 mb-0"> Carte d’identité </label>
-                              </div>
-                              <div class="flex ta-center mr-3">
-                                <p-radioButton name="permis" value="Permis" [(ngModel)]="demande.visiteur.typePiece"
-                                  inputId="permis" />
-                                <label for="permis" class="ml-2 mb-0"> Permis </label>
-                              </div>
-
-                              <div class="flex ta-center">
-                                <p-radioButton name="passeport" value="Passeport"
-                                  [(ngModel)]="demande.visiteur.typePiece" inputId="passeport" />
-                                <label for="passeport" class="ml-2 mb-0"> Passeport </label>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        <div class="col-lg-12 p-right-0">
-                          <div class="form-group has-success align-left ft-w-b">
-                            <label [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
-                              for="numeroPiece">Numéro de la pièce *</label>
-                            <input
-                              [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'"
-                              id="numeroPiece" name="numeroPiece" type="text" [(ngModel)]="demande.visiteur.numeroPiece"
-                              required>
-                          </div>
-                        </div>
-                        <div class="col-lg-12 p-right-0">
-                          <div class="form-group has-success align-left ft-w-b">
-                            <label [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
-                              for="numeroTelephone">Numéro de téléphone *</label>
-                            <input
-                              [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'"
-                              id="numeroTelephone" name="numeroTelephone" type="text"
-                              [(ngModel)]="demande.visiteur.numeroTelephone" required>
-                          </div>
-                        </div>
-                        <div class="col-lg-12 p-right-0">
-                          <div class="form-group has-success align-left ft-w-b">
-                            <label [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
-                              for="fonction">Fonction *</label>
-                            <input
-                              [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'"
-                              id="fonction" name="fonction" type="text" [(ngModel)]="demande.visiteur.fonction"
-                              required>
-                          </div>
-                        </div>
-                        <div class="col-lg-6 p-right-0">
-                          <div class="form-group has-success align-left ft-w-b">
-                            <label [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
-                              for="adresse">Adresse *</label>
-                            <textarea
-                              [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'"
-                              id="adresse" name="adresse" type="adresse" [(ngModel)]="demande.visiteur.adresse"
-                              required></textarea>
-                          </div>
-                        </div>
-                        <div class="col-lg-12 p-right-0">
-                          <div class="form-group has-success align-left ft-w-b">
-                            <label [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
-                              for="raisonVisite">Raison de la Visite *</label>
-                            <textarea
-                              [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'"
-                              id="raisonVisite" name="raisonVisite" type="raisonVisite"
-                              [(ngModel)]="demande.raisonVisite"></textarea>
-                          </div>
-                        </div>
-                        <div class="col-lg-12 p-right-0 mb-3">
-                          <div class="form-group has-success align-left ft-w-b">
-                            <label [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
-                              for="service">Choisir un service</label>
-                            <div class="select select-add">
-                              <p-dropdown [options]="services" [(ngModel)]="demande.service_id" [showClear]="true"
-                                [filter]="true" name="service" filterBy="designation" optionLabel="designation"
-                                optionValue="id" placeholder="Choisir un type" styleClass="wd_100 initialwd" />
-                              <div class="arrow" [class]="isDark? 'option-select-d' : 'option-select-w'"></div>
-                            </div>
-                          </div>
-                        </div>
-                        <div class="col-lg-12 p-right-0">
-                          <div class="form-group has-success align-left ft-w-b">
-                            <label [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
-                              for="cabinetUser">Choisir un cabinet</label>
-                            <div class="select select-add">
-                              <p-dropdown [options]="cabinets" [(ngModel)]="demande.service_id" [showClear]="true"
-                                [filter]="true" name="cabinetUser" filterBy="designation" optionLabel="designation"
-                                optionValue="id" placeholder="Choisir un cabinet" styleClass="wd_100 initialwd" />
-                              <div class="arrow" [class]="isDark? 'option-select-d' : 'option-select-w'"></div>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div class="col-lg-12 p-right-0">
-                          <div class="form-group has-success align-left ft-w-b">
-                            <label [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
-                              for="nom">Heure arrivée *</label>
-                            <input
-                              [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'"
-                              id="heureArrive" name="heureArrive" type="time" [(ngModel)]="demande.heureArrive"
-                              required>
-                          </div>
-                        </div>
-
-                        <div class="col-lg-12 p-right-0">
-                          <div class="form-group has-success align-left ft-w-b">
-                            <label [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
-                              for="heureVisite">Heure visite *</label>
-                            <input
-                              [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'"
-                              id="heureVisite" name="heureVisite" type="time" [(ngModel)]="demande.heureVisite"
-                              required>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div [class]="isDark ? 'card cust_card_d' : 'card cust_card_w'">
-                    <div class="col-lg-12 p-right-0">
-                      <div class="form-group align-left ft-w-b">
-                        <div class="form-section">
-                          <label class="form-title">
-                            <i class="mdi mdi-package-variant-closed"></i>
-                            Objet(s) retiré à l'accueil
-                          </label>
-                          <div class="form-check" *ngFor="let obj of demande.objet_retirer">
-                            <label class="form-check-label">{{obj}}</label>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="card-block p-4 text-center">
-                      <!-- Aperçu -->
-                      <div *ngIf="signatureImage" class="mt-3">
-                        <h6 class="text-muted mb-2">Aperçu de la signature :</h6>
-                        <img src="assets/images/signature.png" alt="Signature preview"
-                          class="signature-preview shadow-sm" />
-                      </div>
-                    </div>
-                  </div>
-                  <div class="d-flex justify-content-center gap-3 mt-4">
-                    <button type="button" class="btn btn-outline-danger" (click)="step = 1">
-                      <i class="mdi mdi-arrow-left me-1"></i> Retour
-                    </button>
-
-                    <button class="btn btn-login btn-block btnn_save" [disabled]="!formAddUser.valid"
-                      (click)="Update()"><i class="mdi mdi-check-circle me-2"></i> Modifier </button>
-                  </div>
-                </div>
-              </form>
-            </div>
-
-          </div>
+    <!-- ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±± -->
+    <!-- ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±± -->
+    <div *ngIf="currentView === 'add'" [style]="{'background-color': isDark ? '#1f1f1f' : '#FFFFFF'}">
+      <div class="row">
+        <div class="col-md-2"></div>
+        <div class="col-md-8 ta-center" style="margin-top: 30px;margin-bottom: 20px;">
+          <label class="title_headtx titre_traitement mt-2" style="font-size: 20px;">Nouveau rendez-vous </label>
         </div>
       </div>
-    </div>
-    <!-- /add user modal -->
-    <!-- add user modal -->
-    <div class="container demo" *ngIf="currentView ==='add'">
-      <div class="modal right fade" id="addUserModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel2">
-        <div class="modal-dialog" role="document">
+      <div class="row" style="padding-bottom: 420px;">
+        <div class="col-md-2"></div>
+        <div class="col-md-8">
           <div class="modal-content" [style]="{'background-color': isDark ? '#1f1f1f' : '#FFFFFF'}">
             <div class="d-flex" style="margin-top: 15px;">
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="margin-left: 10px;"
-                #closeAddElementDialog>
+              <button type="button" class="close" (click)="showList()" style="margin-left: 10px;">
                 <span aria-hidden="true">
                   <i
                     [class]="isDark? 'txt-title-d mdi mdi-arrow-left-bold-circle' : 'mdi mdi-arrow-left-bold-circle'"></i>
                 </span>
-                <label [class]="isDark? 'txt-title-d ml-2': 'ml-1'" style="font-size: 14px;"> Créer un
-                  rendez-vous</label>
+                <label [class]="isDark? 'txt-title-d ml-2': 'ml-1'" style="font-size: 14px;"> Retour</label>
               </button>
             </div>
             <div class="modal-body">
@@ -1174,16 +752,21 @@
                 <div class="progress-container mb-4">
                   <div class="step" [class.active]="step >= 1">
                     <div class="circle">1</div>
-                    <span>Informations</span>
+                    <span>Informations personnelles</span>
                   </div>
                   <div class="line" [class.filled]="step >= 2"></div>
                   <div class="step" [class.active]="step >= 2">
                     <div class="circle">2</div>
-                    <span>Pièces jointes</span>
+                    <span>Contacts et Pièces d’identité</span>
                   </div>
                   <div class="line" [class.filled]="step >= 3"></div>
                   <div class="step" [class.active]="step >= 3">
                     <div class="circle">3</div>
+                    <span>Informations générales</span>
+                  </div>
+                  <div class="line" [class.filled]="step >= 4"></div>
+                  <div class="step" [class.active]="step >= 4">
+                    <div class="circle">4</div>
                     <span>Récapitulatif</span>
                   </div>
                 </div>
@@ -1200,13 +783,9 @@
                               <form #elementForm="ngForm">
                                 <div class="col-lg-12 p-right-0">
                                   <div class="form-group has-success align-left ft-w-b">
-                                    <label
-                                      [class]="isDark ? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'">
-                                      Numéro de téléphone *
-                                    </label>
                                     <div class="phone-input-container">
                                       <!-- Dropdown indicatif -->
-                                      <p-dropdown [options]="indicatifsNums" [(ngModel)]="demande.indicatif"
+                                      <p-dropdown [options]="indicatifsNums" name="indicatif" [(ngModel)]="indicatif1"
                                         optionLabel="label" placeholder="Indicatif" [filter]="true" [showClear]="false"
                                         [filterBy]="'label'" styleClass="wd_100">
                                         <!-- Champ sélectionné : drapeau + indicatif -->
@@ -1219,24 +798,18 @@
                                         </ng-template>
                                       </p-dropdown>
                                       <!-- Input numéro -->
-                                      <input [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'"
-                                        (keyup.enter)="searchVisiteurByNumber(searchParam.query)" id="numeroTelephone" name="numeroTelephone" type="tel"
-                                        placeholder="Ex: 0707070707" [(ngModel)]="searchParam.query" required>
+                                      <input
+                                        [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'"
+                                        (keyup.enter)="searchVisiteurByNumber(searchParam.query)" id="numeroTelephone"
+                                        name="numeroTelephone" type="tel" placeholder="Ex: 0707070707"
+                                        [(ngModel)]="searchParam.query" required>
                                     </div>
                                   </div>
-                                </div>
-
-                                <div class="input-group input-group-lg mb-4" *ngIf="">
-                                  <input (keyup.enter)="searchVisiteurByNumber(searchParam.query)" type="text"
-                                    name="query" [(ngModel)]="searchParam.query"
-                                    placeholder="Saisissez le numéro à rechercher" class="form-control text-center"
-                                    required>
                                 </div>
                               </form>
                               <!-- Boutons en bas -->
                               <div class="d-flex justify-content-center gap-3 mt-4">
-                                <button data-dismiss="modal" aria-label="Close" #closeAddElementDialog
-                                  class="btn btn-outline-danger btn-sm rounded-pill">
+                                <button (click)="showList()" class="btn btn-outline-danger btn-sm rounded-pill">
                                   <i class="mdi mdi-close"></i> Fermer
                                 </button>
 
@@ -1252,35 +825,6 @@
                           </div>
                         </div>
                         <div class="row mb-l20" *ngIf="isNumberPhone">
-                          <legend style="text-align: center; color: #073272;"> Informations personnelles</legend>
-                          <div class="col-lg-12 p-right-0">
-                            <div class="form-group has-success align-left ft-w-b">
-                              <label [class]="isDark ? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'">
-                                Numéro de téléphone *
-                              </label>
-                              <div class="phone-input-container">
-                                <!-- Dropdown indicatif -->
-                                <p-dropdown [options]="indicatifsNums" [(ngModel)]="demande.indicatif"
-                                  optionLabel="label" placeholder="Indicatif" [filter]="true" [showClear]="false"
-                                  [filterBy]="'label'" styleClass="wd_100">
-                                  <!-- Champ sélectionné : drapeau + indicatif -->
-                                  <ng-template let-item pTemplate="selectedItem">
-                                    <span *ngIf="item">{{item.flag}} {{item.value}}</span>
-                                  </ng-template>
-                                  <!-- Menu déroulant : drapeau + pays + indicatif -->
-                                  <ng-template let-item pTemplate="item">
-                                    <span>{{item.flag}} {{item.label}} ({{item.value}})</span>
-                                  </ng-template>
-                                </p-dropdown>
-                                <!-- Input numéro -->
-                                <input
-                                  [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'"
-                                  id="numeroTelephone" name="numeroTelephone" type="tel" placeholder="Ex: 0707070707"
-                                  [(ngModel)]="demande.numeroTelephone" required>
-                              </div>
-                            </div>
-                          </div>
-
                           <div class="col-lg-6 p-right-0">
                             <div class="form-group has-success align-left ft-w-b">
                               <label [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
@@ -1300,24 +844,16 @@
                             </div>
                           </div>
 
-                          <div class="col-lg-6 p-right-0">
-                            <div class="form-group has-success align-left ft-w-b">
-                              <label [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
-                                for="fonction">Fonction *</label>
-                              <input
-                                [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'"
-                                id="fonction" name="fonction" type="text" [(ngModel)]="demande.fonction" required>
-                            </div>
-                          </div>
                           <div class="col-md-6 col-lg-6 p-right-0">
                             <div class="form-group has-success align-left ft-w-b">
                               <label [class]="isDark ? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'">
-                                Nationalité(e) *
+                                Nationalité *
                               </label>
                               <div class="select select-add mt-1">
-                                <p-dropdown [options]="nationalites" [(ngModel)]="demande.nationalite"
-                                  optionLabel="label" optionValue="value" [filter]="true" filterBy="label"
-                                  placeholder="Nationalité" [showClear]="true" styleClass="wd_100 initialwd">
+                                <p-dropdown [options]="nationalites" name="nationalite"
+                                  [(ngModel)]="demande.nationalite" optionLabel="label" optionValue="value"
+                                  [filter]="true" filterBy="label" placeholder="Nationalité" [showClear]="true"
+                                  styleClass="wd_100 initialwd">
                                   <!-- Template option -->
                                   <ng-template let-item pTemplate="item">
                                     <div class="d-flex align-items-center">
@@ -1339,11 +875,11 @@
                           <div class="col-lg-6 p-right-0 mb-3">
                             <div class="form-group has-success align-left ft-w-b">
                               <label [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
-                                for="service">Sexe *</label>
+                                for="service">Genre / Sexe *</label>
                               <div class="select select-add">
-                                <p-dropdown [options]="sexeOptions" [(ngModel)]="demande.sexe" [showClear]="true"
-                                  [filter]="false" name="sexe" optionLabel="label" optionValue="value"
-                                  placeholder="Choisir le sexe" styleClass="wd_100 initialwd">
+                                <p-dropdown [options]="sexeOptions" name="sexe" [(ngModel)]="demande.sexe"
+                                  [showClear]="true" [filter]="false" name="sexe" optionLabel="label"
+                                  optionValue="value" placeholder="Choisir le sexe" styleClass="wd_100 initialwd">
                                 </p-dropdown>
                                 <div class="arrow" [class]="isDark? 'option-select-d' : 'option-select-w'"></div>
                               </div>
@@ -1353,7 +889,7 @@
                             <div class="form-group has-success align-left ft-w-b">
                               <label [class]="isDark ? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
                                 for="dateVisite">
-                                Date de Naissance *
+                                Date de naissance *
                               </label>
                               <div class="select select-add">
                                 <p-calendar [(ngModel)]="demande.dateNaissance" readonly name="dateNaissance"
@@ -1365,15 +901,122 @@
                             </div>
                           </div>
 
+
+                          <div class="col-lg-6 p-right-0">
+                            <div class="form-group has-success align-left ft-w-b">
+                              <label [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
+                                for="lieu_naissance">Lieu de naissance *</label>
+                              <input
+                                [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'"
+                                id="lieu_naissance" name="lieu_naissance" type="text"
+                                [(ngModel)]="demande.lieu_naissance" required>
+                            </div>
+                          </div>
+
+                          <div class="col-lg-6 p-right-0">
+                            <div class="form-group has-success align-left ft-w-b">
+                              <label>Adresse complète *</label>
+                              <input
+                                [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'"
+                                id="adresse" name="adresse" type="adresse" [(ngModel)]="demande.adresse" required>
+                            </div>
+                          </div>
+                          <div class="col-lg-6 p-right-0">
+                            <div class="form-group has-success align-left ft-w-b">
+                              <label [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
+                                for="fonction">Fonction *</label>
+                              <input
+                                [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'"
+                                id="fonction" name="fonction" type="text" [(ngModel)]="demande.fonction" required>
+                            </div>
+                          </div>
+
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div *ngIf="isNumberPhone" class="d-flex justify-content-center gap-3 mt-4">
+                    <button (click)="showList()" class="btn btn-outline-danger btn-sm rounded-pill">
+                      <i class="mdi mdi-close"></i> Fermer
+                    </button>
+                    <button [disabled]="!formAddUser.valid" type="button"
+                      class="btn btn-dark d-flex align-items-center gap-1 px-3" (click)="step = 2">
+                      <i class="mdi mdi-arrow-right me-1"></i> Suivant
+                    </button>
+                  </div>
+                </div>
+                <!-- Étape 2 : Informations du visiteur -->
+                <div *ngIf="step === 2" class="step-form fade-in">
+                  <div class="col-md-12 col-lg-12 p-right-0">
+                    <div [class]="isDark? 'card cust_card_d':'card cust_card_w'">
+                      <div class="card-block">
+
+                        <div class="row mb-l20" *ngIf="isNumberPhone">
+
+                          <div class="col-lg-6 p-right-0">
+                            <div class="form-group has-success align-left ft-w-b">
+                              <label [class]="isDark ? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'">
+                                Numéro de téléphone principal *
+                              </label>
+                              <div class="phone-input-container">
+                                <!-- Dropdown indicatif -->
+                                <p-dropdown [options]="indicatifsNums" name="indicatif" [(ngModel)]="demande.indicatif"
+                                  optionLabel="label" placeholder="Indicatif" [filter]="true" [showClear]="false"
+                                  [filterBy]="'label'" styleClass="wd_100">
+                                  <!-- Champ sélectionné : drapeau + indicatif -->
+                                  <ng-template let-item pTemplate="selectedItem">
+                                    <span *ngIf="item">{{item.flag}} {{item.value}}</span>
+                                  </ng-template>
+                                  <!-- Menu déroulant : drapeau + pays + indicatif -->
+                                  <ng-template let-item pTemplate="item">
+                                    <span>{{item.flag}} {{item.label}} ({{item.value}})</span>
+                                  </ng-template>
+                                </p-dropdown>
+                                <!-- Input numéro -->
+                                <input
+                                  [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'"
+                                  id="numeroTelephone" name="numeroTelephone" type="tel" placeholder="Ex: 0707070707"
+                                  [(ngModel)]="demande.numeroTelephone" required>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="col-lg-6 p-right-0">
+                            <div class="form-group has-success align-left ft-w-b">
+                              <label [class]="isDark ? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'">
+                                Numéro secondaire
+                              </label>
+                              <div class="phone-input-container">
+                                <!-- Dropdown indicatif -->
+                                <p-dropdown [options]="indicatifsNums" name="indicatif" [(ngModel)]="indicatif2"
+                                  optionLabel="label" placeholder="Indicatif" [filter]="true" [showClear]="false"
+                                  [filterBy]="'label'" styleClass="wd_100">
+                                  <!-- Champ sélectionné : drapeau + indicatif -->
+                                  <ng-template let-item pTemplate="selectedItem">
+                                    <span *ngIf="item">{{item.flag}} {{item.value}}</span>
+                                  </ng-template>
+                                  <!-- Menu déroulant : drapeau + pays + indicatif -->
+                                  <ng-template let-item pTemplate="item">
+                                    <span>{{item.flag}} {{item.label}} ({{item.value}})</span>
+                                  </ng-template>
+                                </p-dropdown>
+                                <!-- Input numéro -->
+                                <input
+                                  [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'"
+                                  id="telephone_secondaire" name="telephone_secondaire" type="tel"
+                                  placeholder="Ex: 0707070707" [(ngModel)]="demande.telephone_secondaire">
+                              </div>
+                            </div>
+                          </div>
                           <div class="col-md-6 col-lg-6 p-right-0">
                             <div class="form-group has-success align-left ft-w-b">
                               <label [class]="isDark ? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'">
-                                Pièce d’identité *
+                                Type de pièce d’identité *
                               </label>
                               <div class="select select-add mt-1">
-                                <p-dropdown [options]="typePieceOptions" [(ngModel)]="demande.typePiece"
-                                  placeholder="Choisir le type de pièce" optionLabel="label" optionValue="value"
-                                  [showClear]="true" styleClass="wd_100 initialwd">
+                                <p-dropdown [options]="typePieceOptions" name="typePiece"
+                                  [(ngModel)]="demande.typePiece" placeholder="Choisir le type de pièce"
+                                  optionLabel="label" optionValue="value" [showClear]="true"
+                                  styleClass="wd_100 initialwd">
                                 </p-dropdown>
                                 <div class="arrow" [class]="isDark ? 'option-select-d' : 'option-select-w'"></div>
                               </div>
@@ -1382,7 +1025,7 @@
                           <div class="col-lg-6 p-right-0">
                             <div class="form-group has-success align-left ft-w-b">
                               <label [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
-                                for="numeroPiece">N° de la Pièce *</label>
+                                for="numeroPiece">Numéro de la pièce *</label>
                               <input
                                 [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'"
                                 id="numeroPiece" name="numeroPiece" type="text" [(ngModel)]="demande.numeroPiece"
@@ -1418,15 +1061,114 @@
                             </div>
                           </div>
 
-                          <div class="col-lg-6 p-right-0">
+                          <div class="col-md-6 col-lg-6 p-right-0">
                             <div class="form-group has-success align-left ft-w-b">
-                              <label>Adresse *</label>
-                              <input
-                                [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'"
-                                id="adresse" name="adresse" type="adresse" [(ngModel)]="demande.adresse" required>
+                              <label [class]="isDark ? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'">
+                                Pays de délivrance *
+                              </label>
+                              <div class="select select-add mt-1">
+                                <p-dropdown [options]="nationalites" name="nationalite"
+                                  [(ngModel)]="demande.nationalite" optionLabel="label" optionValue="value"
+                                  [filter]="true" filterBy="label" placeholder="Pays de délivrance" [showClear]="true"
+                                  styleClass="wd_100 initialwd">
+                                  <!-- Template option -->
+                                  <ng-template let-item pTemplate="item">
+                                    <div class="d-flex align-items-center">
+                                      <span class="mr-2">{{ item.flag }}</span>
+                                      <span>{{ item.label }}</span>
+                                    </div>
+                                  </ng-template>
+                                  <!-- Template selected item -->
+                                  <ng-template let-item pTemplate="selectedItem">
+                                    <div *ngIf="item" class="d-flex align-items-center">
+                                      <span class="mr-2">{{ item.flag }}</span>
+                                      <span>{{ item.label }}</span>
+                                    </div>
+                                  </ng-template>
+                                </p-dropdown>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="mb-3">
+                            <div class="form-group col-sm-12 col-md-12" *ngIf="!demande.scan_piece_verso">
+                              <span style="text-align: center; font-size: 20px; font-family: inherit;">Upload de la
+                                pièce
+                                –
+                                Recto - Verso (PDF)</span>
+                              <button style="margin-left:30%;background-color: #0851b7" mat-mini-fab color="primary"
+                                title="Ajouter un fichier PDF" (click)="selectPicture()">
+                                <i class="mdi mdi-upload"></i> </button>
+                            </div>
+                            <!-- PDF déjà existant (si modification) -->
+                            <div *ngIf="demande?.scan_piece_verso && !filePDF" class="mt-3 p-3 border rounded bg-light">
+                              <i class="mdi mdi-file-pdf text-danger fs-3"></i>
+                              <span class="fw-bold">Pièce justificative scannée – Titulaire :
+                                {{demande.nomComplet}}</span>
+
+                              <div class="d-flex gap-2 mt-2">
+                                <a class="btn btn-sm btn-danger" (click)="removePDF()">
+                                  <i class="mdi mdi-delete"></i> Supprimer
+                                </a>
+
+                                <button class="btn btn-sm btn-primary"
+                                  (click)="previewURLPDF(demande.scan_piece_verso)">
+                                  <i class="mdi mdi-eye"></i> Voir
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="mb-3">
+                            <div class="form-group col-sm-12 col-md-12" *ngIf="!demande.scan_piece_rectro">
+                              <span style="text-align: center; font-size: 20px; font-family: inherit;">Upload de la
+                                pièce
+                                –
+                                Recto - Verso (PDF)</span>
+                              <button style="margin-left:30%;background-color: #0851b7" mat-mini-fab color="primary"
+                                title="Ajouter un fichier PDF" (click)="selectPicture()">
+                                <i class="mdi mdi-upload"></i> </button>
+                            </div>
+                            <!-- PDF déjà existant (si modification) -->
+                            <div *ngIf="demande?.scan_piece_rectro && !filePDF"
+                              class="mt-3 p-3 border rounded bg-light">
+                              <i class="mdi mdi-file-pdf text-danger fs-3"></i>
+                              <span class="fw-bold">Pièce justificative scannée – Titulaire :
+                                {{demande.nomComplet}}</span>
+
+                              <div class="d-flex gap-2 mt-2">
+                                <a class="btn btn-sm btn-danger" (click)="removePDF()">
+                                  <i class="mdi mdi-delete"></i> Supprimer
+                                </a>
+
+                                <button class="btn btn-sm btn-primary"
+                                  (click)="previewURLPDF(demande.scan_piece_rectro)">
+                                  <i class="mdi mdi-eye"></i> Voir
+                                </button>
+                              </div>
                             </div>
                           </div>
 
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="d-flex justify-content-between mt-4">
+                    <button type="button" class="btn btn-dark d-flex align-items-center gap-1 px-3" (click)="step = 1">
+                      <i class="mdi mdi-arrow-left me-1"></i> Précédent
+                    </button>
+
+                    <button [disabled]="!formAddUser.valid" type="button"
+                      class="btn btn-dark d-flex align-items-center gap-1 px-3" (click)="step = 3">
+                      <i class="mdi mdi-arrow-right me-1"></i> Suivant
+                    </button>
+                  </div>
+
+                </div>
+                <div *ngIf="step === 3" class="step-form fade-in">
+                  <div class="col-md-12 col-lg-12 p-right-0">
+                    <div [class]="isDark? 'card cust_card_d':'card cust_card_w'">
+                      <div class="card-block">
+
+                        <div class="row mb-l20" *ngIf="isNumberPhone">
                           <div class="col-lg-6 p-right-0 mb-3">
                             <div class="form-group has-success align-left ft-w-b">
                               <label [class]="isDark ? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
@@ -1442,10 +1184,27 @@
                               </div>
                             </div>
                           </div>
-                          <div class="col-lg-6 p-right-0 mb-3">
+                          <div class="col-md-12 col-lg-12">
+                            <div class="form-group has-success align-left ft-w-b d-flex">
+                              <label [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
+                                for="numeroTelephone">Service / Departement *</label>
+                              <div class="flex ta-center mr-3">
+                                <p-radioButton name="siege" value="SIEGE" [(ngModel)]="demande.isDepartement"
+                                  inputId="siege" />
+                                <label for="siege" class="ml-2 mb-0"> Siège </label>
+                              </div>
+                              <div class="flex align-items-center">
+                                <p-radioButton name="parquet" value="PARQUET" [(ngModel)]="demande.isDepartement"
+                                  inputId="parquet" />
+                                <label for="parquet" class="ml-2 mb-0"> Parquet </label>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div class="col-lg-6 p-right-0 mb-3" *ngIf="this.demande.isDepartement ==='PARQUET'">
                             <div class="form-group has-success align-left ft-w-b">
                               <label [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
-                                for="service">Service / Departement</label>
+                                for="service">Choisir le Parquet</label>
                               <div class="select select-add">
                                 <p-dropdown [options]="services" [(ngModel)]="demande.service_id" [showClear]="true"
                                   [filter]="true" name="service" filterBy="designation" optionLabel="designation"
@@ -1454,10 +1213,10 @@
                               </div>
                             </div>
                           </div>
-                          <div class="col-lg-6 p-right-0">
+                          <div class="col-lg-6 p-right-0" *ngIf="this.demande.isDepartement ==='SIEGE'">
                             <div class="form-group has-success align-left ft-w-b">
                               <label [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
-                                for="cabinet_id">Cabinet</label>
+                                for="cabinet_id">Siège (Cabinet d’instruction)</label>
                               <div class="select select-add">
                                 <p-dropdown [options]="cabinets" [(ngModel)]="demande.cabinet_id" [showClear]="true"
                                   [filter]="true" name="cabinet_id" filterBy="designation" optionLabel="designation"
@@ -1474,54 +1233,27 @@
                                   <i class="mdi mdi-package-variant-closed"></i>
                                   Objet(s) remis à l'accueil
                                 </label>
-
-                                <div class="form-check">
-                                  <input type="checkbox" class="form-check-input"
-                                    (change)="toggleObjet('Téléphone portable')" />
-                                  <label class="form-check-label">Téléphone portable</label>
-                                </div>
-
-                                <div class="form-check">
-                                  <input type="checkbox" class="form-check-input"
-                                    (change)="toggleObjet('Pièce d\'identité')" />
-                                  <label class="form-check-label">Pièce d'identité</label>
-                                </div>
-
-                                <div class="form-check">
-                                  <input type="checkbox" class="form-check-input"
-                                    (change)="toggleObjet('Ordinateur / Tablette')" />
-                                  <label class="form-check-label">Ordinateur / Tablette</label>
-                                </div>
-
-                                <div class="form-check">
-                                  <input type="checkbox" class="form-check-input"
-                                    (change)="toggleObjet('Objets dangereux')" />
-                                  <label class="form-check-label">Objets dangereux</label>
-                                </div>
-
-                                <div class="form-check">
-                                  <input type="checkbox" class="form-check-input"
-                                    (change)="toggleObjet('Autres objets')" />
-                                  <label class="form-check-label">Autres objets</label>
+                                <div class="form-check" *ngFor="let item of objetOptions">
+                                  <input class="form-check-input" type="checkbox" [(ngModel)]="item.checked"
+                                    (change)="toggleSelection(item)" name="objet{{item.id}}" id="chk{{item.id}}">
+                                  <label class="form-check-label" for="chk{{item.id}}">
+                                    {{ item.label }}
+                                  </label>
                                 </div>
                               </div>
 
                             </div>
                           </div>
-                          <!--     <div class="col-lg-12 p-right-0" >
-                          <div class="form-group align-left ft-w-b">
-                            <label [class]="isDark ? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
-                              for="heureVisite">Objets saisis lors de la visite<span class="text-danger">*</span>
-                            </label>
-                            <ngx-editor-menu [editor]="editor1"></ngx-editor-menu>
-                            <ngx-editor name="contenu" outputFormat="html" [spellcheck]="true" [editor]="editor1"
-                              [(ngModel)]="demande.objet_saisie" placeholder="Objets saisis lors de la visite" required>
-                            </ngx-editor>
-                            <div *ngIf="!demande.objet_saisie" class="text-danger mt-1">
-                              Objets saisis est obligatoire.
+                          <div class="col-lg-12 p-right-0">
+                            <div class="form-group align-left ft-w-b">
+                              <!-- Champ texte si "Autres objets" est coché -->
+                              <div *ngIf="objetOptions[4].checked" class="mt-2">
+                                <label>Précisez :</label>
+                                <input type="text" [(ngModel)]="demande.autreObjet" class="form-control"
+                                  placeholder="Saisir l’objet…">
+                              </div>
                             </div>
                           </div>
-                        </div> -->
 
 
                           <div class="col-lg-6 p-right-0">
@@ -1554,7 +1286,7 @@
                               <!-- Barre d'outils -->
                               <ngx-editor-menu [editor]="editor"></ngx-editor-menu>
                               <!-- Éditeur de texte riche -->
-                              <ngx-editor name="contenu" outputFormat="html" [spellcheck]="true" [editor]="editor"
+                              <ngx-editor name="raisonVisite" outputFormat="html" [spellcheck]="true" [editor]="editor"
                                 [(ngModel)]="demande.raisonVisite" placeholder="Décrivez ici le motif de la visite"
                                 required>
                               </ngx-editor>
@@ -1564,68 +1296,939 @@
                               </div>
                             </div>
                           </div>
-
-
                         </div>
                       </div>
                     </div>
                   </div>
-                  <div class="d-flex justify-content-center gap-3 mt-4">
-                    <button *ngIf="isNumberPhone" type="button" class="btn btn-outline-danger" data-dismiss="modal"
-                      aria-label="Close" #closeAddElementDialog>
-                      <i class="mdi mdi-arrow-left me-1"></i> Retour
+                  <div class="d-flex justify-content-between mt-4">
+                    <button type="button" class="btn btn-dark d-flex align-items-center gap-1 px-3" (click)="step = 2">
+                      <i class="mdi mdi-arrow-left me-1"></i> Précédent
                     </button>
-                    <button *ngIf="isNumberPhone" type="button" class="btn btn-login btn-block btnn_save"
-                      [disabled]="!formAddUser.valid || !demande.numeroTelephone" (click)="step = 2"> Jointe la pièce
-                      d'identité <i class="mdi mdi-arrow-right ms-2"></i></button>
+
+                    <button [disabled]="!formAddUser.valid" type="button"
+                      class="btn btn-dark d-flex align-items-center gap-1 px-3" (click)="step = 4">
+                      Suivant <i class="mdi mdi-arrow-right me-1"></i>
+                    </button>
                   </div>
 
                 </div>
-                <!-- Étape 2 : Signature -->
-                <div *ngIf="step === 2" class="step-form fade-in">
-                  <div [class]="isDark ? 'card cust_card_d' : 'card cust_card_w'">
-                    <!-- ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±± -->
 
-                    <!-- ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±± -->
-                    <div class="mb-3">
-                      <div class="form-group col-sm-12 col-md-12" *ngIf="!demande.scan_piece">
-                        <span style="text-align: center; font-size: 20px; font-family: inherit;">Joindre la pièce
-                          justificative (PDF)</span>
-                        <button style="margin-left:30%;background-color: #0851b7" mat-mini-fab color="primary"
-                          title="Ajouter un fichier PDF" (click)="selectPicture()">
-                          <i class="mdi mdi-upload"></i> </button>
-                      </div>
-                      <!-- PDF déjà existant (si modification) -->
-                      <div *ngIf="demande?.scan_piece && !filePDF" class="mt-3 p-3 border rounded bg-light">
-                        <i class="mdi mdi-file-pdf text-danger fs-3"></i>
-                        <span class="fw-bold">Pièce justificative scannée – Titulaire : {{demande.nomComplet}}</span>
-
-                        <div class="d-flex gap-2 mt-2">
-                          <a class="btn btn-sm btn-danger" (click)="removePDF()">
-                            <i class="mdi mdi-delete"></i> Supprimer
-                          </a>
-
-                          <button class="btn btn-sm btn-primary" (click)="previewURLPDF(demande.scan_piece)">
-                            <i class="mdi mdi-eye"></i> Voir
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-
-
-
-                  </div>
-                  <div class="d-flex justify-content-center gap-3 mt-4">
-                    <button type="button" class="btn btn-outline-danger" (click)="step = 1">
-                      <i class="mdi mdi-arrow-left me-1"></i> Retour
-                    </button>
-                    <button class="btn btn-login btn-block btnn_save" (click)="goToRecap()">
-                      Passer à la récaptulatif <i class="mdi mdi-arrow-right ms-2"></i> </button>
-                  </div>
-
-                </div>
                 <!-- Étape 3: Recap -->
+                <div *ngIf="step === 4" class="step-form fade-in">
+                  <div [class]="isDark ? 'card cust_card_d' : 'card cust_card_w'">
+                    <div class="card-block">
+                      <div class="row mb-l20" *ngIf="isNumberPhone">
+                        <div class="col-lg-6 p-right-0">
+                          <div class="form-group has-success align-left ft-w-b">
+                            <label [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
+                              for="prenom">Prénom *</label>
+                            <input
+                              [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'"
+                              id="prenom" name="prenom" type="text" [(ngModel)]="demande.prenom" required>
+                          </div>
+                        </div>
+                        <div class="col-lg-6 p-right-0">
+                          <div class="form-group has-success align-left ft-w-b">
+                            <label [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
+                              for="nom">Non *</label>
+                            <input
+                              [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'"
+                              id="nom" name="nom" type="text" [(ngModel)]="demande.nom" required>
+                          </div>
+                        </div>
+
+                        <div class="col-md-6 col-lg-6 p-right-0">
+                          <div class="form-group has-success align-left ft-w-b">
+                            <label [class]="isDark ? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'">
+                              Nationalité *
+                            </label>
+                            <div class="select select-add mt-1">
+                              <p-dropdown [options]="nationalites" name="nationalite" [(ngModel)]="demande.nationalite"
+                                optionLabel="label" optionValue="value" [filter]="true" filterBy="label"
+                                placeholder="Nationalité" [showClear]="true" styleClass="wd_100 initialwd">
+                                <!-- Template option -->
+                                <ng-template let-item pTemplate="item">
+                                  <div class="d-flex align-items-center">
+                                    <span class="mr-2">{{ item.flag }}</span>
+                                    <span>{{ item.label }}</span>
+                                  </div>
+                                </ng-template>
+                                <!-- Template selected item -->
+                                <ng-template let-item pTemplate="selectedItem">
+                                  <div *ngIf="item" class="d-flex align-items-center">
+                                    <span class="mr-2">{{ item.flag }}</span>
+                                    <span>{{ item.label }}</span>
+                                  </div>
+                                </ng-template>
+                              </p-dropdown>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-lg-6 p-right-0 mb-3">
+                          <div class="form-group has-success align-left ft-w-b">
+                            <label [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
+                              for="service">Genre / Sexe *</label>
+                            <div class="select select-add">
+                              <p-dropdown [options]="sexeOptions" name="sexe" [(ngModel)]="demande.sexe"
+                                [showClear]="true" [filter]="false" name="sexe" optionLabel="label" optionValue="value"
+                                placeholder="Choisir le sexe" styleClass="wd_100 initialwd">
+                              </p-dropdown>
+                              <div class="arrow" [class]="isDark? 'option-select-d' : 'option-select-w'"></div>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-lg-6 p-right-0 mb-3">
+                          <div class="form-group has-success align-left ft-w-b">
+                            <label [class]="isDark ? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
+                              for="dateVisite">
+                              Date de naissance *
+                            </label>
+                            <div class="select select-add">
+                              <p-calendar [(ngModel)]="demande.dateNaissance" readonly name="dateNaissance"
+                                dateFormat="dd/mm/yy" yearRange="1950:2030" placeholder="Date de Naissance"
+                                styleClass="wd_100 initialwd">
+                              </p-calendar>
+                              <div class="arrow" [class]="isDark ? 'option-select-d' : 'option-select-w'"></div>
+                            </div>
+                          </div>
+                        </div>
+
+
+                        <div class="col-lg-6 p-right-0">
+                          <div class="form-group has-success align-left ft-w-b">
+                            <label [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
+                              for="lieu_naissance">Lieu de naissance *</label>
+                            <input
+                              [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'"
+                              id="lieu_naissance" name="lieu_naissance" type="text" [(ngModel)]="demande.lieu_naissance"
+                              required>
+                          </div>
+                        </div>
+
+                        <div class="col-lg-6 p-right-0">
+                          <div class="form-group has-success align-left ft-w-b">
+                            <label>Adresse complète *</label>
+                            <input
+                              [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'"
+                              id="adresse" name="adresse" type="adresse" [(ngModel)]="demande.adresse" required>
+                          </div>
+                        </div>
+                        <div class="col-lg-6 p-right-0">
+                          <div class="form-group has-success align-left ft-w-b">
+                            <label [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
+                              for="fonction">Fonction *</label>
+                            <input
+                              [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'"
+                              id="fonction" name="fonction" type="text" [(ngModel)]="demande.fonction" required>
+                          </div>
+                        </div>
+
+                      </div>
+                      <div class="row mb-l20" *ngIf="isNumberPhone">
+
+                        <div class="col-lg-6 p-right-0">
+                          <div class="form-group has-success align-left ft-w-b">
+                            <label [class]="isDark ? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'">
+                              Numéro de téléphone principal *
+                            </label>
+                            <div class="phone-input-container">
+                              <!-- Dropdown indicatif -->
+                              <p-dropdown [options]="indicatifsNums" name="indicatif" [(ngModel)]="demande.indicatif"
+                                optionLabel="label" placeholder="Indicatif" [filter]="true" [showClear]="false"
+                                [filterBy]="'label'" styleClass="wd_100">
+                                <!-- Champ sélectionné : drapeau + indicatif -->
+                                <ng-template let-item pTemplate="selectedItem">
+                                  <span *ngIf="item">{{item.flag}} {{item.value}}</span>
+                                </ng-template>
+                                <!-- Menu déroulant : drapeau + pays + indicatif -->
+                                <ng-template let-item pTemplate="item">
+                                  <span>{{item.flag}} {{item.label}} ({{item.value}})</span>
+                                </ng-template>
+                              </p-dropdown>
+                              <!-- Input numéro -->
+                              <input
+                                [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'"
+                                id="numeroTelephone" name="numeroTelephone" type="tel" placeholder="Ex: 0707070707"
+                                [(ngModel)]="demande.numeroTelephone" required>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-lg-6 p-right-0">
+                          <div class="form-group has-success align-left ft-w-b">
+                            <label [class]="isDark ? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'">
+                              Numéro secondaire
+                            </label>
+                            <div class="phone-input-container">
+                              <!-- Dropdown indicatif -->
+                              <p-dropdown [options]="indicatifsNums" name="indicatif" [(ngModel)]="demande.indicatif"
+                                optionLabel="label" placeholder="Indicatif" [filter]="true" [showClear]="false"
+                                [filterBy]="'label'" styleClass="wd_100">
+                                <!-- Champ sélectionné : drapeau + indicatif -->
+                                <ng-template let-item pTemplate="selectedItem">
+                                  <span *ngIf="item">{{item.flag}} {{item.value}}</span>
+                                </ng-template>
+                                <!-- Menu déroulant : drapeau + pays + indicatif -->
+                                <ng-template let-item pTemplate="item">
+                                  <span>{{item.flag}} {{item.label}} ({{item.value}})</span>
+                                </ng-template>
+                              </p-dropdown>
+                              <!-- Input numéro -->
+                              <input
+                                [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'"
+                                id="telephone_secondaire" name="telephone_secondaire" type="tel"
+                                placeholder="Ex: 0707070707" [(ngModel)]="demande.telephone_secondaire">
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-md-6 col-lg-6 p-right-0">
+                          <div class="form-group has-success align-left ft-w-b">
+                            <label [class]="isDark ? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'">
+                              Type de pièce d’identité *
+                            </label>
+                            <div class="select select-add mt-1">
+                              <p-dropdown [options]="typePieceOptions" name="typePiece" [(ngModel)]="demande.typePiece"
+                                placeholder="Choisir le type de pièce" optionLabel="label" optionValue="value"
+                                [showClear]="true" styleClass="wd_100 initialwd">
+                              </p-dropdown>
+                              <div class="arrow" [class]="isDark ? 'option-select-d' : 'option-select-w'"></div>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-lg-6 p-right-0">
+                          <div class="form-group has-success align-left ft-w-b">
+                            <label [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
+                              for="numeroPiece">Numéro de la pièce *</label>
+                            <input
+                              [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'"
+                              id="numeroPiece" name="numeroPiece" type="text" [(ngModel)]="demande.numeroPiece"
+                              required>
+                          </div>
+                        </div>
+                        <div class="col-lg-6 p-right-0 mb-3">
+                          <div class="form-group has-success align-left ft-w-b">
+                            <label [class]="isDark ? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
+                              for="dateVisite">
+                              Date de delivrance *
+                            </label>
+                            <div class="select select-add">
+                              <p-calendar [(ngModel)]="demande.dateDelivrance" readonly name="dateDelivrance"
+                                dateFormat="dd/mm/yy" yearRange="1950:2040" placeholder="Date delivrance"
+                                styleClass="wd_100 initialwd">
+                              </p-calendar>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-lg-6 p-right-0 mb-3">
+                          <div class="form-group has-success align-left ft-w-b">
+                            <label [class]="isDark ? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
+                              for="dateVisite">
+                              Date d'expiration *
+                            </label>
+                            <div class="select select-add">
+                              <p-calendar [(ngModel)]="demande.dateExepiration" readonly name="dateExepiration"
+                                dateFormat="dd/mm/yy" yearRange="1950:2040" placeholder="Date Expiration"
+                                styleClass="wd_100 initialwd">
+                              </p-calendar>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div class="col-md-6 col-lg-6 p-right-0">
+                          <div class="form-group has-success align-left ft-w-b">
+                            <label [class]="isDark ? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'">
+                              Pays de délivrance *
+                            </label>
+                            <div class="select select-add mt-1">
+                              <p-dropdown [options]="nationalites" name="nationalite" [(ngModel)]="demande.nationalite"
+                                optionLabel="label" optionValue="value" [filter]="true" filterBy="label"
+                                placeholder="Pays de délivrance" [showClear]="true" styleClass="wd_100 initialwd">
+                                <!-- Template option -->
+                                <ng-template let-item pTemplate="item">
+                                  <div class="d-flex align-items-center">
+                                    <span class="mr-2">{{ item.flag }}</span>
+                                    <span>{{ item.label }}</span>
+                                  </div>
+                                </ng-template>
+                                <!-- Template selected item -->
+                                <ng-template let-item pTemplate="selectedItem">
+                                  <div *ngIf="item" class="d-flex align-items-center">
+                                    <span class="mr-2">{{ item.flag }}</span>
+                                    <span>{{ item.label }}</span>
+                                  </div>
+                                </ng-template>
+                              </p-dropdown>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="mb-3">
+                          <div class="form-group col-sm-12 col-md-12" *ngIf="!demande.scan_piece_verso">
+                            <span style="text-align: center; font-size: 20px; font-family: inherit;">Upload de la
+                              pièce
+                              –
+                              Recto - Verso (PDF)</span>
+                            <button style="margin-left:30%;background-color: #0851b7" mat-mini-fab color="primary"
+                              title="Ajouter un fichier PDF" (click)="selectPicture()">
+                              <i class="mdi mdi-upload"></i> </button>
+                          </div>
+                          <!-- PDF déjà existant (si modification) -->
+                          <div *ngIf="demande?.scan_piece_verso && !filePDF" class="mt-3 p-3 border rounded bg-light">
+                            <i class="mdi mdi-file-pdf text-danger fs-3"></i>
+                            <span class="fw-bold">Pièce justificative scannée – Titulaire :
+                              {{demande.nomComplet}}</span>
+
+                            <div class="d-flex gap-2 mt-2">
+                              <a class="btn btn-sm btn-danger" (click)="removePDF()">
+                                <i class="mdi mdi-delete"></i> Supprimer
+                              </a>
+
+                              <button class="btn btn-sm btn-primary" (click)="previewURLPDF(demande.scan_piece_verso)">
+                                <i class="mdi mdi-eye"></i> Voir
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="mb-3">
+                          <div class="form-group col-sm-12 col-md-12" *ngIf="!demande.scan_piece_rectro">
+                            <span style="text-align: center; font-size: 20px; font-family: inherit;">Upload de la
+                              pièce
+                              –
+                              Recto - Verso (PDF)</span>
+                            <button style="margin-left:30%;background-color: #0851b7" mat-mini-fab color="primary"
+                              title="Ajouter un fichier PDF" (click)="selectPicture()">
+                              <i class="mdi mdi-upload"></i> </button>
+                          </div>
+                          <!-- PDF déjà existant (si modification) -->
+                          <div *ngIf="demande?.scan_piece_rectro && !filePDF" class="mt-3 p-3 border rounded bg-light">
+                            <i class="mdi mdi-file-pdf text-danger fs-3"></i>
+                            <span class="fw-bold">Pièce justificative scannée – Titulaire :
+                              {{demande.nomComplet}}</span>
+
+                            <div class="d-flex gap-2 mt-2">
+                              <a class="btn btn-sm btn-danger" (click)="removePDF()">
+                                <i class="mdi mdi-delete"></i> Supprimer
+                              </a>
+
+                              <button class="btn btn-sm btn-primary" (click)="previewURLPDF(demande.scan_piece_rectro)">
+                                <i class="mdi mdi-eye"></i> Voir
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+
+                      </div>
+                      <div class="row mb-l20" *ngIf="isNumberPhone">
+                        <div class="col-lg-6 p-right-0 mb-3">
+                          <div class="form-group has-success align-left ft-w-b">
+                            <label [class]="isDark ? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
+                              for="dateVisite">
+                              Date de visite *
+                            </label>
+                            <div class="select select-add">
+                              <p-calendar [(ngModel)]="demande.dateVisite" readonly name="dateVisite"
+                                dateFormat="dd/mm/yy" yearRange="1950:2030" placeholder="Date de la visite"
+                                styleClass="wd_100 initialwd">
+                              </p-calendar>
+                              <div class="arrow" [class]="isDark ? 'option-select-d' : 'option-select-w'"></div>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-md-12 col-lg-12">
+                          <div class="form-group has-success align-left ft-w-b d-flex">
+                            <label [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
+                              for="numeroTelephone">Service / Departement *</label>
+                            <div class="flex ta-center mr-3">
+                              <p-radioButton name="siege" value="SIEGE" [(ngModel)]="demande.isDepartement"
+                                inputId="siege" />
+                              <label for="siege" class="ml-2 mb-0"> Siège </label>
+                            </div>
+                            <div class="flex align-items-center">
+                              <p-radioButton name="parquet" value="PARQUET" [(ngModel)]="demande.isDepartement"
+                                inputId="parquet" />
+                              <label for="parquet" class="ml-2 mb-0"> Parquet </label>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div class="col-lg-6 p-right-0 mb-3" *ngIf="this.demande.isDepartement ==='PARQUET'">
+                          <div class="form-group has-success align-left ft-w-b">
+                            <label [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
+                              for="service">Choisir le Parquet</label>
+                            <div class="select select-add">
+                              <p-dropdown [options]="services" [(ngModel)]="demande.service_id" [showClear]="true"
+                                [filter]="true" name="service" filterBy="designation" optionLabel="designation"
+                                optionValue="id" placeholder="Choisir un type" styleClass="wd_100 initialwd" />
+                              <div class="arrow" [class]="isDark? 'option-select-d' : 'option-select-w'"></div>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-lg-6 p-right-0" *ngIf="this.demande.isDepartement ==='SIEGE'">
+                          <div class="form-group has-success align-left ft-w-b">
+                            <label [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
+                              for="cabinet_id">Siège (Cabinet d’instruction)</label>
+                            <div class="select select-add">
+                              <p-dropdown [options]="cabinets" [(ngModel)]="demande.cabinet_id" [showClear]="true"
+                                [filter]="true" name="cabinet_id" filterBy="designation" optionLabel="designation"
+                                optionValue="id" placeholder="Choisir un cabinet" styleClass="wd_100 initialwd" />
+                              <div class="arrow" [class]="isDark? 'option-select-d' : 'option-select-w'"></div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div class="col-lg-12 p-right-0">
+                          <div class="form-group align-left ft-w-b">
+                            <div class="form-section">
+                              <label class="form-title">
+                                <i class="mdi mdi-package-variant-closed"></i>
+                                Objet(s) remis à l'accueil
+                              </label>
+                              <div class="form-check" *ngFor="let item of objetOptions">
+                                <input class="form-check-input" type="checkbox" [(ngModel)]="item.checked"
+                                  (change)="toggleSelection(item)" name="objet{{item.id}}" id="chk{{item.id}}">
+                                <label class="form-check-label" for="chk{{item.id}}">
+                                  {{ item.label }}
+                                </label>
+                              </div>
+                            </div>
+
+                          </div>
+                        </div>
+                        <div class="col-lg-12 p-right-0">
+                          <div class="form-group align-left ft-w-b">
+                            <!-- Champ texte si "Autres objets" est coché -->
+                            <div *ngIf="objetOptions[4].checked" class="mt-2">
+                              <label>Précisez :</label>
+                              <input type="text" [(ngModel)]="demande.autreObjet" class="form-control"
+                                placeholder="Saisir l’objet…">
+                            </div>
+                          </div>
+                        </div>
+
+
+                        <div class="col-lg-6 p-right-0">
+                          <div class="form-group has-success align-left ft-w-b">
+                            <label [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
+                              for="nom">Heure arrivée *</label>
+                            <input
+                              [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'"
+                              id="heureArrive" name="heureArrive" type="time" [(ngModel)]="demande.heureArrive"
+                              required>
+                          </div>
+                        </div>
+                        <div class="col-lg-6 p-right-0">
+                          <div class="form-group has-success align-left ft-w-b">
+                            <label [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
+                              for="nom">Heure Visite *</label>
+                            <input
+                              [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'"
+                              id="heureVisite" name="heureVisite" type="time" [(ngModel)]="demande.heureVisite"
+                              required>
+                          </div>
+                        </div>
+                        <div class="col-lg-12 p-right-0">
+                          <div class="form-group align-left ft-w-b">
+                            <!-- Label avec style sombre/claire -->
+                            <label [class]="isDark ? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
+                              for="heureVisite">
+                              Motif de la visite <span class="text-danger">*</span>
+                            </label>
+                            <!-- Barre d'outils -->
+                            <ngx-editor-menu [editor]="editor"></ngx-editor-menu>
+                            <!-- Éditeur de texte riche -->
+                            <ngx-editor name="raisonVisite" outputFormat="html" [spellcheck]="true" [editor]="editor"
+                              [(ngModel)]="demande.raisonVisite" placeholder="Décrivez ici le motif de la visite"
+                              required>
+                            </ngx-editor>
+                            <!-- Message d'erreur si vide -->
+                            <div *ngIf="!demande.raisonVisite" class="text-danger mt-1">
+                              Le motif de la visite est obligatoire.
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="d-flex justify-content-center gap-3 mt-4">
+                    <button type="button" class="btn btn-outline-danger" (click)="step = 3">
+                      <i class="mdi mdi-arrow-left me-1"></i> Précédent
+                    </button>
+
+                    <button class="btn btn-login btn-block btnn_save" [disabled]="!formAddUser.valid"
+                      (click)="Save()"><i class="mdi mdi-check-circle me-2"></i>
+                      Enregistrer et terminer </button>
+                  </div>
+                </div>
+              </form>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±± -->
+    <!-- ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±± -->
+    <!-- ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±± -->
+    <div *ngIf="currentView === 'edit'" [style]="{'background-color': isDark ? '#1f1f1f' : '#FFFFFF'}">
+      <div class="row">
+        <div class="col-md-2"></div>
+        <div class="col-md-8 ta-center">
+          <label class="title_headtx titre_traitement mt-2" style="font-size: 20px;">Nouveau rendez-vous </label>
+        </div>
+      </div>
+      <div class="row" style="padding-bottom: 420px;">
+        <div class="col-md-2"></div>
+        <div class="col-md-7 ml-4">
+          <div class="modal-content" [style]="{'background-color': isDark ? '#1f1f1f' : '#FFFFFF'}">
+            <div class="d-flex" style="margin-top: 15px;">
+              <button type="button" class="close" (click)="showList()" style="margin-left: 10px;">
+                <span aria-hidden="true">
+                  <i
+                    [class]="isDark? 'txt-title-d mdi mdi-arrow-left-bold-circle' : 'mdi mdi-arrow-left-bold-circle'"></i>
+                </span>
+                <label [class]="isDark? 'txt-title-d ml-2': 'ml-1'" style="font-size: 14px;"> Retour</label>
+              </button>
+            </div>
+            <div class="modal-body">
+              <form #formAddUser="ngForm">
+                <div class="progress-container mb-4">
+                  <div class="step" [class.active]="step >= 1">
+                    <div class="circle">1</div>
+                    <span>Informations personnelles</span>
+                  </div>
+                  <div class="line" [class.filled]="step >= 2"></div>
+                  <div class="step" [class.active]="step >= 2">
+                    <div class="circle">2</div>
+                    <span>Contacts et Pièces d’identité</span>
+                  </div>
+                  <div class="line" [class.filled]="step >= 3"></div>
+                  <div class="step" [class.active]="step >= 3">
+                    <div class="circle">3</div>
+                    <span>Informations générales</span>
+                  </div>
+                  <div class="line" [class.filled]="step >= 4"></div>
+                  <div class="step" [class.active]="step >= 4">
+                    <div class="circle">4</div>
+                    <span>Récapitulatif</span>
+                  </div>
+                </div>
+
+                <!-- Étape 1 : Informations du visiteur -->
+                <div *ngIf="step === 1" class="step-form fade-in">
+                  <div class="col-md-12 col-lg-12 p-right-0">
+                    <div [class]="isDark? 'card cust_card_d':'card cust_card_w'">
+                      <div class="card-block">
+                        <div class="row mb-l20">
+                          <div class="col-lg-12 p-right-0">
+                            <div class="form-group has-success align-left ft-w-b">
+                              <label [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
+                                for="prenom">Prénom Et Nom *</label>
+                              <input
+                                [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'"
+                                id="prenom" name="prenom" type="text" [(ngModel)]="demande.visiteur.nomComplet"
+                                required>
+                            </div>
+                          </div>
+
+
+                          <div class="col-md-6 col-lg-6 p-right-0">
+                            <div class="form-group has-success align-left ft-w-b">
+                              <label [class]="isDark ? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'">
+                                Nationalité *
+                              </label>
+                              <div class="select select-add mt-1">
+                                <p-dropdown [options]="nationalites" name="nationalite"
+                                  [(ngModel)]="demande.visiteur.nationalite" optionLabel="label" optionValue="value"
+                                  [filter]="true" filterBy="label" placeholder="Nationalité" [showClear]="true"
+                                  styleClass="wd_100 initialwd">
+                                  <!-- Template option -->
+                                  <ng-template let-item pTemplate="item">
+                                    <div class="d-flex align-items-center">
+                                      <span class="mr-2">{{ item.flag }}</span>
+                                      <span>{{ item.label }}</span>
+                                    </div>
+                                  </ng-template>
+                                  <!-- Template selected item -->
+                                  <ng-template let-item pTemplate="selectedItem">
+                                    <div *ngIf="item" class="d-flex align-items-center">
+                                      <span class="mr-2">{{ item.flag }}</span>
+                                      <span>{{ item.label }}</span>
+                                    </div>
+                                  </ng-template>
+                                </p-dropdown>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="col-lg-6 p-right-0 mb-3">
+                            <div class="form-group has-success align-left ft-w-b">
+                              <label [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
+                                for="service">Genre / Sexe *</label>
+                              <div class="select select-add">
+                                <p-dropdown [options]="sexeOptions" name="sexe" [(ngModel)]="demande.visiteur.sexe"
+                                  [showClear]="true" [filter]="false" name="sexe" optionLabel="label"
+                                  optionValue="value" placeholder="Choisir le sexe" styleClass="wd_100 initialwd">
+                                </p-dropdown>
+                                <div class="arrow" [class]="isDark? 'option-select-d' : 'option-select-w'"></div>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="col-lg-6 p-right-0 mb-3">
+                            <div class="form-group has-success align-left ft-w-b">
+                              <label [class]="isDark ? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
+                                for="dateVisite">
+                                Date de naissance *
+                              </label>
+                              <div class="select select-add">
+                                <p-calendar [(ngModel)]="demande.visiteur.dateNaissance" readonly name="dateNaissance"
+                                  dateFormat="dd/mm/yy" yearRange="1950:2030" placeholder="Date de Naissance"
+                                  styleClass="wd_100 initialwd">
+                                </p-calendar>
+                                <div class="arrow" [class]="isDark ? 'option-select-d' : 'option-select-w'"></div>
+                              </div>
+                            </div>
+                          </div>
+
+
+                          <div class="col-lg-6 p-right-0">
+                            <div class="form-group has-success align-left ft-w-b">
+                              <label [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
+                                for="lieu_naissance">Lieu de naissance *</label>
+                              <input
+                                [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'"
+                                id="lieu_naissance" name="lieu_naissance" type="text"
+                                [(ngModel)]="demande.visiteur.lieu_naissance" required>
+                            </div>
+                          </div>
+
+                          <div class="col-lg-6 p-right-0">
+                            <div class="form-group has-success align-left ft-w-b">
+                              <label>Adresse complète *</label>
+                              <input
+                                [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'"
+                                id="adresse" name="adresse" type="adresse" [(ngModel)]="demande.visiteur.adresse"
+                                required>
+                            </div>
+                          </div>
+                          <div class="col-lg-6 p-right-0">
+                            <div class="form-group has-success align-left ft-w-b">
+                              <label [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
+                                for="fonction">Fonction *</label>
+                              <input
+                                [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'"
+                                id="fonction" name="fonction" type="text" [(ngModel)]="demande.visiteur.fonction"
+                                required>
+                            </div>
+                          </div>
+
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="d-flex justify-content-center gap-3 mt-4">
+                    <button [disabled]="!formAddUser.valid" type="button"
+                      class="btn btn-dark d-flex align-items-center gap-1 px-3" (click)="step = 2">
+                      <i class="mdi mdi-arrow-right me-1"></i> Suivant
+                    </button>
+
+                  </div>
+                </div>
+                <!-- Étape 2 : Informations du visiteur -->
+                <div *ngIf="step === 2" class="step-form fade-in">
+                  <div class="col-md-12 col-lg-12 p-right-0">
+                    <div [class]="isDark? 'card cust_card_d':'card cust_card_w'">
+                      <div class="card-block">
+
+                        <div class="row mb-l20">
+
+                          <div class="col-lg-6 p-right-0">
+                            <div class="form-group has-success align-left ft-w-b">
+                              <label [class]="isDark ? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'">
+                                Numéro de téléphone principal *
+                              </label>
+                              <div class="phone-input-container">
+                                <!-- Dropdown indicatif -->
+                                <p-dropdown [options]="indicatifsNums" name="indicatif" [(ngModel)]="demande.indicatif"
+                                  optionLabel="label" placeholder="Indicatif" [filter]="true" [showClear]="false"
+                                  [filterBy]="'label'" styleClass="wd_100">
+                                  <!-- Champ sélectionné : drapeau + indicatif -->
+                                  <ng-template let-item pTemplate="selectedItem">
+                                    <span *ngIf="item">{{item.flag}} {{item.value}}</span>
+                                  </ng-template>
+                                  <!-- Menu déroulant : drapeau + pays + indicatif -->
+                                  <ng-template let-item pTemplate="item">
+                                    <span>{{item.flag}} {{item.label}} ({{item.value}})</span>
+                                  </ng-template>
+                                </p-dropdown>
+                                <!-- Input numéro -->
+                                <input
+                                  [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'"
+                                  id="numeroTelephone" name="numeroTelephone" type="tel" placeholder="Ex: 0707070707"
+                                  [(ngModel)]="demande.visiteur.numeroTelephone" required>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="col-lg-6 p-right-0">
+                            <div class="form-group has-success align-left ft-w-b">
+                              <label [class]="isDark ? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'">
+                                Numéro secondaire
+                              </label>
+                              <div class="phone-input-container">
+                                <!-- Dropdown indicatif -->
+                                <p-dropdown [options]="indicatifsNums" name="indicatif" [(ngModel)]="demande.indicatif"
+                                  optionLabel="label" placeholder="Indicatif" [filter]="true" [showClear]="false"
+                                  [filterBy]="'label'" styleClass="wd_100">
+                                  <!-- Champ sélectionné : drapeau + indicatif -->
+                                  <ng-template let-item pTemplate="selectedItem">
+                                    <span *ngIf="item">{{item.flag}} {{item.value}}</span>
+                                  </ng-template>
+                                  <!-- Menu déroulant : drapeau + pays + indicatif -->
+                                  <ng-template let-item pTemplate="item">
+                                    <span>{{item.flag}} {{item.label}} ({{item.value}})</span>
+                                  </ng-template>
+                                </p-dropdown>
+                                <!-- Input numéro -->
+                                <input
+                                  [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'"
+                                  id="telephone_secondaire" name="telephone_secondaire" type="tel"
+                                  placeholder="Ex: 0707070707" [(ngModel)]="demande.visiteur.telephone_secondaire">
+                              </div>
+                            </div>
+                          </div>
+                          <div class="col-md-6 col-lg-6 p-right-0">
+                            <div class="form-group has-success align-left ft-w-b">
+                              <label [class]="isDark ? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'">
+                                Type de pièce d’identité *
+                              </label>
+                              <div class="select select-add mt-1">
+                                <p-dropdown [options]="typePieceOptions" name="typePiece"
+                                  [(ngModel)]="demande.visiteur.typePiece" placeholder="Choisir le type de pièce"
+                                  optionLabel="label" optionValue="value" [showClear]="true"
+                                  styleClass="wd_100 initialwd">
+                                </p-dropdown>
+                                <div class="arrow" [class]="isDark ? 'option-select-d' : 'option-select-w'"></div>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="col-lg-6 p-right-0">
+                            <div class="form-group has-success align-left ft-w-b">
+                              <label [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
+                                for="numeroPiece">Numéro de la pièce *</label>
+                              <input
+                                [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'"
+                                id="numeroPiece" name="numeroPiece" type="text"
+                                [(ngModel)]="demande.visiteur.numeroPiece" required>
+                            </div>
+                          </div>
+                          <div class="col-lg-6 p-right-0 mb-3">
+                            <div class="form-group has-success align-left ft-w-b">
+                              <label [class]="isDark ? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
+                                for="dateVisite">
+                                Date de delivrance *
+                              </label>
+                              <div class="select select-add">
+                                <p-calendar [(ngModel)]="demande.visiteur.dateDelivrance" readonly name="dateDelivrance"
+                                  dateFormat="dd/mm/yy" yearRange="1950:2040" placeholder="Date delivrance"
+                                  styleClass="wd_100 initialwd">
+                                </p-calendar>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="col-lg-6 p-right-0 mb-3">
+                            <div class="form-group has-success align-left ft-w-b">
+                              <label [class]="isDark ? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
+                                for="dateVisite">
+                                Date d'expiration *
+                              </label>
+                              <div class="select select-add">
+                                <p-calendar [(ngModel)]="demande.visiteur.dateExepiration" readonly
+                                  name="dateExepiration" dateFormat="dd/mm/yy" yearRange="1950:2040"
+                                  placeholder="Date Expiration" styleClass="wd_100 initialwd">
+                                </p-calendar>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div class="col-md-6 col-lg-6 p-right-0">
+                            <div class="form-group has-success align-left ft-w-b">
+                              <label [class]="isDark ? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'">
+                                Pays de délivrance *
+                              </label>
+                              <div class="select select-add mt-1">
+                                <p-dropdown [options]="nationalites" name="nationalite"
+                                  [(ngModel)]="demande.visiteur.nationalite" optionLabel="label" optionValue="value"
+                                  [filter]="true" filterBy="label" placeholder="Pays de délivrance" [showClear]="true"
+                                  styleClass="wd_100 initialwd">
+                                  <!-- Template option -->
+                                  <ng-template let-item pTemplate="item">
+                                    <div class="d-flex align-items-center">
+                                      <span class="mr-2">{{ item.flag }}</span>
+                                      <span>{{ item.label }}</span>
+                                    </div>
+                                  </ng-template>
+                                  <!-- Template selected item -->
+                                  <ng-template let-item pTemplate="selectedItem">
+                                    <div *ngIf="item" class="d-flex align-items-center">
+                                      <span class="mr-2">{{ item.flag }}</span>
+                                      <span>{{ item.label }}</span>
+                                    </div>
+                                  </ng-template>
+                                </p-dropdown>
+                              </div>
+                            </div>
+                          </div>
+
+
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="d-flex justify-content-between mt-4">
+                    <button type="button" class="btn btn-dark d-flex align-items-center gap-1 px-3" (click)="step = 1">
+                      <i class="mdi mdi-arrow-left me-1"></i> Précédent
+                    </button>
+
+                    <button [disabled]="!formAddUser.valid" type="button"
+                      class="btn btn-dark d-flex align-items-center gap-1 px-3" (click)="step = 3">
+                      <i class="mdi mdi-arrow-right me-1"></i> Suivant
+                    </button>
+                  </div>
+
+                </div>
                 <div *ngIf="step === 3" class="step-form fade-in">
+                  <div class="col-md-12 col-lg-12 p-right-0">
+                    <div [class]="isDark? 'card cust_card_d':'card cust_card_w'">
+                      <div class="card-block">
+
+                        <div class="row mb-l20">
+                          <div class="col-lg-6 p-right-0 mb-3">
+                            <div class="form-group has-success align-left ft-w-b">
+                              <label [class]="isDark ? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
+                                for="dateVisite">
+                                Date de visite *
+                              </label>
+                              <div class="select select-add">
+                                <p-calendar [(ngModel)]="demande.dateVisite" readonly name="dateVisite"
+                                  dateFormat="dd/mm/yy" yearRange="1950:2030" placeholder="Date de la visite"
+                                  styleClass="wd_100 initialwd">
+                                </p-calendar>
+                                <div class="arrow" [class]="isDark ? 'option-select-d' : 'option-select-w'"></div>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div class="col-lg-6 p-right-0 mb-3" *ngIf="this.demande.isDepartement ==='PARQUET'">
+                            <div class="form-group has-success align-left ft-w-b">
+                              <label [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
+                                for="service">Choisir le Parquet</label>
+                              <div class="select select-add">
+                                <p-dropdown [options]="services" [(ngModel)]="demande.service_id" [showClear]="true"
+                                  [filter]="true" name="service" filterBy="designation" optionLabel="designation"
+                                  optionValue="id" placeholder="Choisir un type" styleClass="wd_100 initialwd" />
+                                <div class="arrow" [class]="isDark? 'option-select-d' : 'option-select-w'"></div>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="col-lg-6 p-right-0" *ngIf="this.demande.isDepartement ==='SIEGE'">
+                            <div class="form-group has-success align-left ft-w-b">
+                              <label [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
+                                for="cabinet_id">Siège (Cabinet d’instruction)</label>
+                              <div class="select select-add">
+                                <p-dropdown [options]="cabinets" [(ngModel)]="demande.cabinet_id" [showClear]="true"
+                                  [filter]="true" name="cabinet_id" filterBy="designation" optionLabel="designation"
+                                  optionValue="id" placeholder="Choisir un cabinet" styleClass="wd_100 initialwd" />
+                                <div class="arrow" [class]="isDark? 'option-select-d' : 'option-select-w'"></div>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div class="col-lg-12 p-right-0">
+                            <div class="form-group align-left ft-w-b">
+                              <div class="form-section">
+                                <label class="form-title">
+                                  <i class="mdi mdi-package-variant-closed"></i>
+                                  Objet(s) remis à l'accueil
+                                </label>
+                                <div class="form-check" *ngFor="let item of objetOptions">
+                                  <input class="form-check-input" type="checkbox" [(ngModel)]="item.checked"
+                                    (change)="toggleSelection(item)" name="objet{{item.id}}" id="chk{{item.id}}">
+                                  <label class="form-check-label" for="chk{{item.id}}">
+                                    {{ item.label }}
+                                  </label>
+                                </div>
+                              </div>
+
+                            </div>
+                          </div>
+                          <div class="col-lg-12 p-right-0">
+                            <div class="form-group align-left ft-w-b">
+                              <!-- Champ texte si "Autres objets" est coché -->
+                              <div *ngIf="objetOptions[4].checked" class="mt-2">
+                                <label>Précisez :</label>
+                                <input type="text" [(ngModel)]="demande.autreObjet" class="form-control"
+                                  placeholder="Saisir l’objet…">
+                              </div>
+                            </div>
+                          </div>
+
+
+                          <div class="col-lg-6 p-right-0">
+                            <div class="form-group has-success align-left ft-w-b">
+                              <label [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
+                                for="nom">Heure arrivée *</label>
+                              <input
+                                [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'"
+                                id="heureArrive" name="heureArrive" type="time" [(ngModel)]="demande.heureArrive"
+                                required>
+                            </div>
+                          </div>
+                          <div class="col-lg-6 p-right-0">
+                            <div class="form-group has-success align-left ft-w-b">
+                              <label [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
+                                for="nom">Heure Visite *</label>
+                              <input
+                                [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'"
+                                id="heureVisite" name="heureVisite" type="time" [(ngModel)]="demande.heureVisite"
+                                required>
+                            </div>
+                          </div>
+                          <div class="col-lg-12 p-right-0">
+                            <div class="form-group align-left ft-w-b">
+                              <!-- Label avec style sombre/claire -->
+                              <label [class]="isDark ? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
+                                for="heureVisite">
+                                Motif de la visite <span class="text-danger">*</span>
+                              </label>
+                              <!-- Barre d'outils -->
+                              <ngx-editor-menu [editor]="editor"></ngx-editor-menu>
+                              <!-- Éditeur de texte riche -->
+                              <ngx-editor name="raisonVisite" outputFormat="html" [spellcheck]="true" [editor]="editor"
+                                [(ngModel)]="demande.raisonVisite" placeholder="Décrivez ici le motif de la visite"
+                                required>
+                              </ngx-editor>
+                              <!-- Message d'erreur si vide -->
+                              <div *ngIf="!demande.raisonVisite" class="text-danger mt-1">
+                                Le motif de la visite est obligatoire.
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="d-flex justify-content-between mt-4">
+                    <button type="button" class="btn btn-dark d-flex align-items-center gap-1 px-3" (click)="step = 2">
+                      <i class="mdi mdi-arrow-left me-1"></i> Précédent
+                    </button>
+
+                    <button [disabled]="!formAddUser.valid" type="button"
+                      class="btn btn-dark d-flex align-items-center gap-1 px-3" (click)="step = 4">
+                      <i class="mdi mdi-arrow-right me-1"></i> Suivant
+                    </button>
+                  </div>
+
+                </div>
+
+                <!-- Étape 3: Recap -->
+                <div *ngIf="step === 4" class="step-form fade-in">
                   <div [class]="isDark ? 'card cust_card_d' : 'card cust_card_w'">
                     <div class="card-block">
                       <div class="row mb-l20">
@@ -1745,8 +2348,12 @@
                                 <i class="mdi mdi-package-variant-closed"></i>
                                 Objet(s) remis à l'accueil
                               </label>
-                              <div class="form-check" *ngFor="let obj of demande.objet_saisie">
-                                <label class="form-check-label">{{obj}}</label>
+                              <div class="form-check" *ngFor="let item of objetOptions">
+                                <input class="form-check-input" type="checkbox" [(ngModel)]="item.checked"
+                                  (change)="toggleSelection(item)" name="objet{{item.id}}" id="chk{{item.id}}">
+                                <label class="form-check-label" for="chk{{item.id}}">
+                                  {{ item.label }}
+                                </label>
                               </div>
                             </div>
                           </div>
@@ -1765,6 +2372,7 @@
                             </div>
                           </div>
                         </div> -->
+
                         <div class="col-lg-6 p-right-0 mb-3">
                           <div class="form-group has-success align-left ft-w-b">
                             <label [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
@@ -1830,12 +2438,12 @@
                             </div>
                           </div>
                         </div>
-                        <div *ngIf="demande?.scan_piece && !filePDF" class="mt-3 p-3 border rounded bg-light">
+                        <div *ngIf="demande?.scan_piece_verso && !filePDF" class="mt-3 p-3 border rounded bg-light">
                           <i class="mdi mdi-file-pdf text-danger fs-3"></i>
                           <span class="fw-bold">Pièce justificative scannée – Titulaire : {{demande.nomComplet}}</span>
 
                           <div class="d-flex gap-2 mt-2">
-                            <button class="btn btn-sm btn-primary" (click)="previewURLPDF(demande.scan_piece)">
+                            <button class="btn btn-sm btn-primary" (click)="previewURLPDF(demande.scan_piece_verso)">
                               <i class="mdi mdi-eye"></i> Voir
                             </button>
                           </div>
@@ -1845,8 +2453,8 @@
                   </div>
 
                   <div class="d-flex justify-content-center gap-3 mt-4">
-                    <button type="button" class="btn btn-outline-danger" (click)="step = 1">
-                      <i class="mdi mdi-arrow-left me-1"></i> Retour
+                    <button type="button" class="btn btn-outline-danger" (click)="step = 3">
+                      <i class="mdi mdi-arrow-left me-1"></i> Précédent
                     </button>
 
                     <button class="btn btn-login btn-block btnn_save" [disabled]="!formAddUser.valid"
@@ -1861,30 +2469,124 @@
         </div>
       </div>
     </div>
-    <!-- /add user modal -->
+    <!-- ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±± -->
+
   </div>
-</div>
 
 
-<!-- ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±± -->
-<!-- Modal PDF -->
-<div class="modal fade" id="pdfModal" tabindex="-1">
-  <div class="modal-dialog modal-xl">
-    <div class="modal-content">
+  <!-- ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±± -->
+  <!-- Modal PDF -->
+  <div class="modal fade" id="pdfModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+      <div class="modal-content">
 
-      <div class="modal-header">
-        <h5 class="modal-title">Prévisualisation du document</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        <div class="modal-header">
+          <h5 class="modal-title">Prévisualisation du document</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+
+        <div class="modal-body p-0">
+          <iframe [src]="pdfURL" width="100%" height="600px"></iframe>
+        </div>
+
       </div>
-
-      <div class="modal-body p-0">
-        <iframe [src]="pdfURL" width="100%" height="600px"></iframe>
-      </div>
-
     </div>
   </div>
-</div>
 
-<!-- ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±± -->
-<input type="file" #fileInput style="visibility: hidden; height: 0px" name="fichiers[]"
-  (change)="processWebImage($event)" />
+  <!-- ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±± -->
+
+  <!-- ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±± -->
+  <div class="container demo" *ngIf="currentView === 'signature'">
+    <div class="modal right fade" id="SignatureVisiteurModal" tabindex="-1" role="dialog"
+      aria-labelledby="myModalLabel2">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content" [style]="{'background-color': isDark ? '#1f1f1f' : '#FFFFFF'}">
+          <div class="d-flex" style="margin-top: 15px;">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="margin-left: 10px;"
+              (click)="showList()">
+              <label [class]="isDark? 'txt-title-d ml-2': 'ml-1'" style="font-size: 14px;">
+                <i class="fa fa-chevron-left mr-2"></i> Signature du visiteur
+                {{demande?.visiteur?.nomComplet}}
+              </label>
+            </button>
+          </div>
+
+          <div class="modal-body">
+            <div class="row mb-l-20 mb-10">
+              <div class="col-md-12 col-lg-12">
+                <form #formAddUser="ngForm">
+                  <div class="col-lg-12 p-right-0">
+                    <div class="form-group align-left ft-w-b">
+                      <div class="form-section">
+                        <label class="form-title">
+                          <i class="mdi mdi-package-variant-closed"></i>
+                          Objet(s) remis à l'accueil
+                        </label>
+                        <div class="form-check" *ngFor="let item of objetOptions">
+                          <input class="form-check-input" type="checkbox" [(ngModel)]="item.checked"
+                            (change)="toggleSelectionObjet(item)" name="objet{{item.id}}" id="chk{{item.id}}">
+                          <label class="form-check-label" for="chk{{item.id}}">
+                            {{ item.label }}
+                          </label>
+                        </div>
+                      </div>
+
+                    </div>
+                  </div>
+                  <div class="col-lg-12 p-right-0">
+                    <div class="form-group align-left ft-w-b">
+                      <!-- Champ texte si "Autres objets" est coché -->
+                      <div *ngIf="objetOptions[4].checked" class="mt-2">
+                        <label>Précisez :</label>
+                        <input type="text" [(ngModel)]="demande.autreObjet" class="form-control"
+                          placeholder="Saisir l’objet…">
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-lg-12 p-right-0">
+                    <div class="form-group has-success align-left ft-w-b">
+                      <label [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
+                        for="nom">Heure
+                        du Départ *</label>
+                      <input
+                        [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'"
+                        id="heureDepart" name="heureDepart" type="time" [(ngModel)]="demande.heureDepart" required>
+                    </div>
+                  </div>
+                  <div class="card-block p-4 text-center">
+                    <h4 class="mb-4 fw-bold" style="text-align: center;color: rgb(44, 44, 184);">
+                      <i class="mdi mdi-gesture-tap me-2"></i> Signature du visiteur
+                    </h4>
+                    <canvas src="assets/images/scan.png" #canvas width="700" height="300"
+                      class="signature-pad"></canvas>
+                    <!-- Aperçu -->
+                    <!-- <div *ngIf="signatureImage" class="mt-3">
+                        <h6 class="text-muted mb-2">Aperçu de la signature :</h6>
+                        <img src="assets/images/scan.png" alt="Signature preview" class="signature-preview shadow-sm" />
+                      </div> -->
+                  </div>
+
+                  <div class="d-flex justify-content-center gap-3 mt-4">
+                    <button type="button" class="btn btn-outline-danger" data-dismiss="modal" aria-label="Close"
+                      (click)="showList()">
+                      <i class="mdi mdi-close me-1"></i> Fermer
+                    </button>
+
+                    <button class="btn btn-login btn-block btnn_save" [disabled]="!formAddUser.valid"
+                      (click)="SaveSignature()"><i class="mdi mdi-check-circle me-2"></i>
+                      Valider </button>
+                  </div>
+
+                </form>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±± -->
+  <!-- ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±± -->
+  <input type="file" #fileInput style="visibility: hidden; height: 0px" name="fichiers[]"
+    (change)="processWebImage($event)" />

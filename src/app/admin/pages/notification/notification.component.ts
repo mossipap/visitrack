@@ -62,34 +62,6 @@ export class NotificationComponent implements OnInit {
       }
     }
     this.InitNotifications();
-     this.notifications = [
-    {
-      title: 'Nouvel utilisateur inscrit',
-      message: 'Mr Coulibaly vient de créer un compte sur la plateforme.',
-      time: 'Il y a 5 minutes',
-      icon: 'mdi-account-plus',
-      type: 'success',
-      read: false
-    },
-    {
-      title: 'Demande en attente',
-      message: 'Une nouvelle demande doit être validée.',
-      time: 'Il y a 1 heure',
-      icon: 'mdi-clock-outline',
-      type: 'warning',
-      read: false
-    },
-    {
-      title: 'Erreur de synchronisation',
-      message: 'Le serveur n’a pas pu se connecter à la base de données.',
-      time: 'Hier',
-      icon: 'mdi-alert-circle-outline',
-      type: 'danger',
-      read: true
-    }
-  ];
-
-
   }
 
   onPageChange(number: number) {
@@ -100,7 +72,7 @@ export class NotificationComponent implements OnInit {
   }
 
   InitNotifications() {
-    this.notifyService.findByEventUser(this.currentUser.id).subscribe(ret => {
+    this.notifyService.findAll().subscribe(ret => {
       if (ret['code'] === 200) {
         const events = ret['data'];
         const notifs = ret['Notification'];

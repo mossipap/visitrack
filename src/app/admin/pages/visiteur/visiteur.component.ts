@@ -16,6 +16,8 @@ import { Service } from 'src/app/shared/models/service';
 import { Modal } from 'bootstrap';
 import { DomSanitizer } from '@angular/platform-browser';
 import html2canvas from 'html2canvas';
+import { Editor } from 'ngx-editor';
+import { Indicatifs, Nationalites } from 'src/app/shared/models/nationalite';
 declare var bootstrap: any;
 @Component({
   selector: 'app-visiteur',
@@ -26,6 +28,8 @@ export class VisiteurComponent implements OnInit {
   public visiteurs: Visiteur[] = [];
   public selectedUsers: Demande[][];
  public visiteur: Visiteur = new Visiteur();
+   public demande: Demande = new Demande();
+
   public cabinets: Cabinet[] = [];
   public cabinetFilter = { designation: '' };
   public services: Service[] = [];
@@ -57,7 +61,7 @@ export class VisiteurComponent implements OnInit {
   @ViewChild('openConfirmDialog') openConfirmDialog: any;
   @ViewChild('deleteConfirmDialog') deleteConfirmDialog: any;
   @ViewChild('closeAddElementDialog') closeAddElementDialog: any;
-  @ViewChild('fileInputUpload', { static: false }) fileInputUpload: ElementRef;
+  @ViewChild('fileInput', { static: false }) fileInput!: ElementRef;
   searchValue: any;
   paginatedList: any[] = []; // la portion affichée
   filteredVisiteurs: any[] = []; // la portion affichée
@@ -67,6 +71,40 @@ export class VisiteurComponent implements OnInit {
   indicatifs: any = {};
   public deleteModal?: Modal;
   previewUrl: any | null = null;
+ public isNumberPhone: boolean;
+  modalInstance: any;
+  editor!: Editor;
+  editor1!: Editor;
+  indicatifsJson: any = {};
+  indicatifsAdds: { country: string, dial: string, flag: string }[] = [];
+  selectedIndicatif: { country: string, dial: string, flag: string };
+  phoneNumber: string = '';
+  isDepartement: string = '';
+  // Liste des objets possibles
+  objetOptions = [
+    { id: 1, label: 'Téléphone portable',checked: false },
+    { id: 2, label: 'Pièce d\'identité',checked: false },
+    { id: 3, label: 'Ordinateur / Tablette',checked: false },
+    { id: 4, label: 'Objets dangereux',checked: false },
+    { id: 5, label: 'Autres objets',checked: false }
+  ];
+  sexeOptions = [
+  { label: 'Homme', value: 'Homme' },
+  { label: 'Femme', value: 'Femme' }
+];
+  servicesOptions = [
+  { label: 'Siège', value: 'SIEGE' },
+  { label: 'Parquet', value: 'PARQUET' }
+];
+typePieceOptions = [
+  { label: 'Carte d’identité', value: 'CNI' },
+  { label: 'Permis', value: 'Permis' },
+  { label: 'Passeport', value: 'Passeport' },
+  { label: 'Catre Scolaire', value: 'Carte Scolaire' }
+];
+nationalites = Nationalites;
+indicatifsNums = Indicatifs;
+  public step: number = 1;
 
 
   constructor(
@@ -89,6 +127,17 @@ export class VisiteurComponent implements OnInit {
     this.search();
     this.loadIndicatifs();
     
+   this.editor = new Editor();
+    this.editor1 = new Editor();
+    this.search();
+    this.loadIndicatifs();
+
+
+  }
+  // make sure to destory the editor
+  ngOnDestroy(): void {
+    this.editor.destroy();
+    this.editor1.destroy();
   }
   loadIndicatifs() {
     this.http.get('assets/indicatifs.json').subscribe(
@@ -369,12 +418,12 @@ search() {
   Update() {
     this.loading = true;
     /* this.visiteur.cabinet_id = this.visiteur.cabinet.id;
-    this.visiteur.typeUser_id = this.visiteur.typeUser.id;
-    this.visiteur.visiteur_id = this.visiteur.visiteur.id; */
+    this.visiteur.typeUser_id = this.visiteur.typeUser.id;*/
+    this.visiteur.user_id = this.currentUser.id; 
     this.visiteurService.updateVisiteur(this.visiteur).subscribe(ret => {
       if (ret['code'] === 200) {
         this.visiteur = ret['data'];
-       // this.closeAddElementDialog.nativeElement.click();
+        this.closeAddElementDialog.nativeElement.click();
         this.toast.success("Visiteur modifié avec succès");
         this.loading = false;
         this.showList();
@@ -388,8 +437,6 @@ search() {
       this.loading = false;
     });
   }
-
-
 
   findCabinets() {
     this.cabinetService.findAll().subscribe(ret => {
@@ -431,31 +478,32 @@ search() {
 
 
   /* *********************Upload Photo************** */
+ /* ======================== Ulpoad Image ================================= */
   selectPicture() {
-    this.fileInputUpload.nativeElement.click();
-  }
-  deleteImageVisiteure() {
-  }
-  onFileUploadChange(event) {
-    if (event.target.files.length <= 0) {
-      return;
-    }
-    let file = event.target.files[0];
-    if (!file.type.includes("image")) {
-      this.toast.info("Veuilez choisir une image!");
-      return;
-    }
-    if ((file.size / 1024) > 1024 * 1024 * 5) {
-      this.toast.info("La taille à dépasser 5 Mo");
-      return;
-    }
-    let reader = new FileReader();
-    reader.onload = readerEvent => {
-      //this.imageVisiteure = (readerEvent.target as any).result;
-    };
-    reader.readAsDataURL(event.target.files[0]);
+    // la methode de selection du media
+    this.fileInput.nativeElement.click();
   }
 
+  processWebImage(medias: any) {
+    const file = medias.target.files[0];
+
+    if (!file) return;
+
+    const isPdf = file.type === 'application/pdf';
+
+    if (!isPdf) {
+      this.toast.error('Veuillez sélectionner uniquement un fichier PDF.');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (readermedias) => {
+      const pdfData = (readermedias.target as any).result;
+      this.demande.scan_piece_verso = pdfData;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  /* +++++++++++++++++++++++++ new code for signature++++++++++++++++++ */
   /* +++++++++++++++++++++++++ new code for signature++++++++++++++++++ */
   @ViewChild('canvas', { static: true }) canvasRef!: ElementRef<HTMLCanvasElement>;
   private ctx!: CanvasRenderingContext2D;
@@ -466,7 +514,6 @@ search() {
     this.ctx = canvas.getContext('2d')!;
     this.ctx.lineWidth = 2;
     this.ctx.strokeStyle = '#000';
-
     canvas.addEventListener('mousedown', this.startDrawing);
     canvas.addEventListener('mouseup', this.stopDrawing);
     canvas.addEventListener('mouseout', this.stopDrawing);
@@ -505,4 +552,54 @@ search() {
     }
     return numero;
   }
+  toggleSelection(item: any) {
+  if (item.checked) {
+    if (!this.demande.objet_saisie.includes(item.label)) {
+      this.demande.objet_saisie.push(item.label);
+    }
+  } else {
+    this.demande.objet_saisie = this.demande.objet_saisie.filter(x => x !== item.label);
+
+    // Si "Autres objets" est décoché, vider le champ texte
+    if (item.id === 5) {
+      this.demande.autreObjet = '';
+    }
+  }
+
+  console.log('Objets sélectionnés:', this.demande.objet_saisie);
+  console.log('Autre objet:', this.demande.autreObjet);
+}
+filePDF!: File | null;
+  pdfURL: any = null;
+
+  onFileSelected(event: any) {
+    this.filePDF = event.target.files[0];
+
+    if (this.filePDF) {
+      this.pdfURL = URL.createObjectURL(this.filePDF);
+    }
+  }
+
+  previewPDF() {
+    if (this.filePDF) {
+      const url = URL.createObjectURL(this.filePDF);
+      this.pdfURL = this.sanitizer.bypassSecurityTrustResourceUrl(url);
+
+      const modal = new bootstrap.Modal(document.getElementById('pdfModal'));
+      modal.show();
+    }
+  }
+
+  previewURLPDF(url: string) {
+    this.pdfURL = this.sanitizer.bypassSecurityTrustResourceUrl(url);
+
+    const modal = new bootstrap.Modal(document.getElementById('pdfModal'));
+    modal.show();
+  }
+
+  removePDF() {
+    this.filePDF = null;
+    this.pdfURL = null;
+  }
+
 }

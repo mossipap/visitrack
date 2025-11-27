@@ -64,6 +64,8 @@ export class MyIntl extends TimeagoIntl {
       DropdownModule,
       CalendarModule,
       RadioButtonModule,
+      MatStepperModule,
+      NgxEditorModule,
      // TranslateModule.forChild(),
       TimeagoModule.forRoot({
         clock: { provide: TimeagoClock, useClass: MyClock },

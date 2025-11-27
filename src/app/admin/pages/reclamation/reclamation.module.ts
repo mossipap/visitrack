@@ -21,6 +21,7 @@ import { CalendarModule } from 'primeng/calendar';
 import { DropdownModule } from 'primeng/dropdown';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { TabViewModule } from 'primeng/tabview';
+import { RadioButtonModule } from 'primeng/radiobutton';
 export class MyClock extends TimeagoClock {
   tick(then: number): Observable<number> {
     return of(0)
@@ -60,6 +61,8 @@ export class MyIntl extends TimeagoIntl {
        MultiSelectModule,
        DropdownModule,
        CalendarModule,
+       RadioButtonModule,
+       NgxEditorModule,
       // TranslateModule.forChild(),
     TimeagoModule.forRoot({
       clock: { provide: TimeagoClock, useClass: MyClock },

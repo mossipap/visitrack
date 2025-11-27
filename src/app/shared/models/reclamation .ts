@@ -9,6 +9,8 @@ export class Reclamation implements Deserializable<Reclamation> {
   public user_id!: number ;
   public texte!: string;
   public statut!: string;
+  public niveauxGravite: string = 'Faible';
+  public typeIncident: string = 'Problème administratif';
   public visiteur!: Visiteur;
   public dateCreation!: Date;
   public dateModification!: Date;
