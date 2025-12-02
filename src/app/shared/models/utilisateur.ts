@@ -30,7 +30,7 @@ export class Utilisateur implements Deserializable<Utilisateur> {
   public updated_at: Date;
   public created_at: Date;
   public dateNaissance: Date;
-  public enabled: boolean;
+  public enabled: boolean = true;
   public statut: string;
   public groupeName: string = 'ppef';
   public image: string;

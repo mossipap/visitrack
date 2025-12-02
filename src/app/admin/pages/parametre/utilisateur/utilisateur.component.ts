@@ -385,6 +385,7 @@ toggleSelectOne() {
   }
  // ✅ Ferme le modal après mise à jour
   ActiverUtilisateur(): void {
+    console.log("++++++++++++++++++++ users+++++++++++++++",this.utilisateur)
     this.loading = true;
     this.utilisateurService.activer(this.utilisateur).subscribe({
       next: (ret) => {
@@ -414,12 +415,14 @@ toggleSelectOne() {
   }
  // ✅ Ferme le modal après mise à jour
   DesactiverUtilisateur(): void {
+    console.log("++++++++++++++++++++ users+++++++++++++++",this.utilisateur)
     this.loading = true;
     this.utilisateurService.desactiver(this.utilisateur).subscribe({
       next: (ret) => {
         this.loading = false;
         if (ret['code'] === 200) {
           this.utilisateur = ret['data'];
+          this.showList();
           // Met à jour la liste
           this.utilisateurs.forEach(u => {
             if (u.id === this.utilisateur.id) u.statut = this.utilisateur.statut;

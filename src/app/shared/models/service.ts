@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 @Injectable()
 export class Service implements Deserializable<Service> {
   id: number;
+  public user_id: number;
   designation: string;
   description: string;
   statut: string;

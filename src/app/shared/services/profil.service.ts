@@ -34,8 +34,14 @@ export class ProfileService {
     public update(profil: Profil) {
         return this.http.put(this.serviceURL + '/Profil/'+profil.id, profil, this.httpOptions);
     }
+    public desactiver(profil: Profil) {
+        return this.http.get(this.serviceURL + '/DesactiveProfil/'+profil.id, this.httpOptions);
+    }
+    public activer(profil: Profil) {
+        return this.http.get(this.serviceURL + '/ActiveProfil/'+profil.id, this.httpOptions);
+    }
     public delete(profil: Profil) {
-        return this.http.delete(this.serviceURL + '/Profil_droit/'+profil.id, this.httpOptions);
+        return this.http.put(this.serviceURL + '/DeleteProfil/'+profil.id, profil, this.httpOptions);
     }
     /* droit */
     public findAllDroit() {

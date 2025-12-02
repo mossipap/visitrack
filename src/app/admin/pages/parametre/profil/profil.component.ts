@@ -193,12 +193,17 @@ ngAfterViewInit(): void {
   }
 DeleteProfile() {
   this.loading = true;
+  this.profil.user_id = this.currentUser.id
+  //console.log('+++++++++++++ profile ++++++++++++',this.profil)
     this.profilService.delete(this.profil).subscribe(ret => {
       if (ret['code'] === 200) {
         this.profil = ret['data'];
         this.profils.filter(pr => { return pr.id !== this.profil.id});
         this.closeDeleteDialog();
+        this.Search();
         this.toast.success("Profil supprimé avec succès");
+         // console.log('+++++++++++++ profile ++++++++++++',this.profil)
+
         this.loading = false;
       } else {
         this.toast.error(ret['message']);
@@ -307,6 +312,7 @@ toggleSelectOne() {
       return
     }
     this.loading = true;
+    this.profil.user_id = this.currentUser.id
     this.profilService.save(this.profil).subscribe(ret => {
       if (ret['code'] === 200) {
         this.profil = ret['data'];
@@ -340,6 +346,7 @@ toggleSelectOne() {
       return
     }
     this.loading = true;
+    this.profil.user_id = this.currentUser.id
     this.profilService.update(this.profil).subscribe(ret => {
       if (ret['code'] === 200) {
         this.profil = ret['data'];
@@ -362,10 +369,35 @@ toggleSelectOne() {
       this.loading = false;
     });
   }
-  UpdateStatut(statut: string) {
+  Activer() {
     this.loading = true;
+    this.profil.user_id = this.currentUser.id
     this.profil.statut;
-    this.profilService.update(this.profil).subscribe(ret => {
+    this.profilService.activer(this.profil).subscribe(ret => {
+      if (ret['code'] === 200) {
+        this.profil = ret['data'];
+        this.profils.forEach(user => {
+          if(user.id === this.profil.id){
+            user.statut = this.profil.statut;
+          }
+        });
+        this.openConfirmDialog.nativeElement.click();
+        this.toast.success("Profil statut changé avec succès");
+        this.loading = false;
+      } else {
+        this.toast.error(ret['message']);
+        this.loading = false;
+      }
+    }, error => {
+      this.toast.error(environment.erreur_connexion_message);
+      this.loading = false;
+    });
+  }
+  Desactiver() {
+    this.loading = true;
+    this.profil.user_id = this.currentUser.id
+    this.profil.statut;
+    this.profilService.desactiver(this.profil).subscribe(ret => {
       if (ret['code'] === 200) {
         this.profil = ret['data'];
         this.profils.forEach(user => {

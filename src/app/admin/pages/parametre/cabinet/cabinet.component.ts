@@ -210,6 +210,7 @@ toggleSelectOne() {
     this.cabinet.statut = "Activé";
    // this.cabinet.nombregreffier = 0;
     this.loading = true;
+    this.cabinet.user_id = this.currentUser.id
     this.cabinetService.save(this.cabinet).subscribe(ret => {
       if (ret['code'] === 200) {
         this.cabinet = ret['data'];
@@ -229,6 +230,7 @@ toggleSelectOne() {
   }
   Update() {
     this.loading = true;
+     this.cabinet.user_id = this.currentUser.id
     this.cabinetService.update(this.cabinet).subscribe(ret => {
       if (ret['code'] === 200) {
         this.cabinet = ret['data'];
@@ -255,7 +257,7 @@ toggleSelectOne() {
  UpdateStatut(statut: string) {
     this.loading = true;
     this.cabinet.statut = statut;
-
+     this.cabinet.user_id = this.currentUser.id
     this.cabinetService.updateStatut(this.cabinet).subscribe({
       next: (ret) => {
         this.loading = false;
@@ -310,6 +312,7 @@ toggleSelectOne() {
      onDeleted(): void {
      // console.log("=++++++++++++++++ cabinet.id ++++++++++++", this.cabinet)
      this.loading = true;
+     this.cabinet.user_id = this.currentUser.id
      this.cabinetService.delete(this.cabinet).subscribe((ret:any) => {
       if (ret['code'] == 200) {
         this.cabinet = ret['data'];

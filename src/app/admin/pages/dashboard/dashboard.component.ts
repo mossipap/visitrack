@@ -31,6 +31,7 @@ export class DashboardComponent implements OnInit {
   public nbrVisiteTermine: number = 0;
   public nbrRendezVous: number = 0;
   public nbrIncidents: number = 0;
+  public nbrUsers: number = 0;
   public detentionEnAlertes: any[] = [];
   public detentionHorsDelais: any[] = [];
   public alertActeDossiers: any[] = [];
@@ -72,7 +73,8 @@ export class DashboardComponent implements OnInit {
     { label: 'Visites terminées', value: this.nbrVisiteTermine = 34, icon: 'mdi mdi-check-circle-outline', colorBg: 'bg-success-soft' },
     { label: 'Total des rendez-vous', value: this.nbrRendezVous = 50, icon: 'mdi mdi-calendar', colorBg: 'bg-info-soft' },
     { label: 'Réclamations ouvertes', value: this.nbrIncidents = 2, icon: 'mdi mdi-alert-circle-outline', colorBg: 'bg-danger-soft' },
-  ];
+/*     { label: 'Utilisateurs', value: this.nbrUsers = 2, icon: 'mdi mdi-account', colorBg: 'bg-danger-soft' },
+ */  ];
   totalVisites: number = 0;
   constructor(
     private dashboardService: DashboardService,
@@ -319,7 +321,7 @@ export class DashboardComponent implements OnInit {
   visiteurs2 = [
     { photo: 'assets/images/profile/avatar.jpeg', nom: 'KONE',prenom:'Ibrahim', id: '12459', dest: 'Progô', service: 'Carlbis', heure: '9:20', status: 'En attente' },
     { photo: 'assets/images/profile/avatar.jpeg', nom: 'Traore.',prenom:'Karin', id: '45050', dest: 'Groffe', service: 'Greffe',heure: '11:20', status: 'En attente', },
-    { photo: 'assets/images/profile/avatar.jpeg', nom: 'Allassane Thera',prenom:'Ibrahim', id: '45050', dest: 'Groffe', service: 'Greffe',heure: '10:20', status: 'En attente', },
+    { photo: 'assets/images/profile/avatar.jpeg', nom: 'Thera',prenom:'Allassane', id: '45050', dest: 'Groffe', service: 'Greffe',heure: '10:20', status: 'En attente', },
   ];
 
   prochains = [

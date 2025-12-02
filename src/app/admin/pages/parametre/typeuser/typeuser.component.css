@@ -41,6 +41,10 @@
 .cust_card_w .form-control-w {
     background-color: #fff !important;
 }
+.cust_card_w .form-control-w2 {
+    background-color: #fff !important;
+    height: 200px;
+}
 .div_separate_d {
     width: 100%;
     height: 25px;

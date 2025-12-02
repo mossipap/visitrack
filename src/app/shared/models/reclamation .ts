@@ -6,10 +6,11 @@ import { Visiteur } from './visiteur';
 export class Reclamation implements Deserializable<Reclamation> {
   public id!: number;
   public visiteur_id!: number;
+  public demande_id!: number;
   public user_id!: number ;
   public texte!: string;
   public statut!: string;
-  public niveauxGravite: string = 'Faible';
+  public niveauxGravite: any = 1;
   public typeIncident: string = 'Problème administratif';
   public visiteur!: Visiteur;
   public dateCreation!: Date;

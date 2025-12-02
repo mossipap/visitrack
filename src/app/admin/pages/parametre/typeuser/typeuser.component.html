@@ -181,10 +181,11 @@
                                 <input [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'" id="designation" name="designation" type="text" [(ngModel)]="service.designation" required>
                               </div>
                             </div>
+                            
                             <div class="col-lg-12 p-right-0">
                               <div class="form-group has-success align-left ft-w-500">
                                 <label [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'" for="description">{{'typeUser.description' | translate}}</label>
-                                <textarea [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'" placeholder="Taper la description ici ..." id="description" name="description" type="text" [(ngModel)]="service.description" rows="10" required></textarea>
+                                <textarea [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w2 is-valid'" placeholder="Taper la description ici ..." id="description" name="description" type="text" [(ngModel)]="service.description" rows="10" required></textarea>
                               </div>
                             </div>
                           </div>

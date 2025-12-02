@@ -89,106 +89,159 @@
   </div>
   <!-- Visitors List -->
   <div class="grid-2">
-    <div class="card">
+    <div class="card visitors-card">
       <h3>Visiteurs actuellement présents</h3>
 
-      <table class="table">
-        <thead>
-          <tr>
-<!--             <th>ID visite</th>
- -->            <th>Prénom</th>
-            <th>Nom</th>
-            <th>Destination</th>
-            <th>Service visité</th>
-            <th>Heure d’arrivée</th>
-            <th>Statut</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let v of visiteurs2">
-<!--             <td>{{ v.id }}</td>
- -->            <td> <img [src]="v.photo" class="avatar">{{ v.prenom }}</td>
-            <td>{{ v.nom }}</td>
-            <td>{{ v.dest }}</td>
-            <td>{{ v.service }}</td>
-            <td>{{ v.heure }}</td>
-            <td>{{ v.status }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+      <div class="table-responsive">
+        <table class="table visitors-table">
+          <thead>
+            <tr>
+              <th>Prénom</th>
+              <th>Nom</th>
+              <th>Destination</th>
+              <th>Service visité</th>
+              <th>Heure d’arrivée</th>
+              <th>Statut</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let v of visiteurs2">
+              <td>
+                <div class="avatar-row">
+                  <img [src]="v.photo" class="avatar" />
+                  <span>{{ v.prenom }}</span>
+                </div>
+              </td>
+              <td>{{ v.nom }}</td>
+              <td>{{ v.dest }}</td>
+              <td>{{ v.service }}</td>
+              <td>{{ v.heure }}</td>
+              <td class="status">{{ v.status }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
+      <!-- ✅ Version cartes juste en mobile -->
+      <div class="mobile-cards" *ngFor="let v of visiteurs2">
+        <div class="mobile-card">
+          <div class="header">
+            <img [src]="v.photo" class="avatar" />
+            <div>
+              <h4>{{ v.prenom }} {{ v.nom }}</h4>
+              <p>{{ v.status }}</p>
+            </div>
+          </div>
+
+          <div class="body">
+            <p><strong>Destination :</strong> {{ v.dest }}</p>
+            <p><strong>Service :</strong> {{ v.service }}</p>
+            <p><strong>Arrivée :</strong> {{ v.heure }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
     <!-- Next appointments -->
-    <div class="card">
+    <div class="card rendezvous-card">
       <h3>Prochains rendez-vous</h3>
-      <table class="table">
-        <thead>
-          <tr>
-<!--             <th>ID</th>
- -->            <th>Visiteur</th>
-            <th>Motif</th>
-            <th>Date</th>
-            <th>Heure</th>
-            <th>Service / Agent concerné</th>
-            <th>Statut</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let p of prochains">
-<!--             <td>{{ p.id_rendez_vous }}</td>
- -->            <td> <img [src]="p.photo" class="avatar">{{ p.nom }}</td>
-            <td>{{ p.forme }}</td>
-            <td>{{ p.date }}</td>
-            <td>{{ p.heure }}</td>
-            <td>{{ p.service_agent }}</td>
-            <td>{{ p.status }}</td>
-          </tr>
-        </tbody>
-      </table>
+
+      <!-- TABLEAU DESKTOP -->
+      <div class="table-responsive">
+        <table class="table rdv-table">
+          <thead>
+            <tr>
+              <th>Visiteur</th>
+              <th>Motif</th>
+              <th>Date</th>
+              <th>Heure</th>
+              <th>Service / Agent concerné</th>
+              <th>Statut</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let p of prochains">
+              <td>
+                <div class="avatar-row">
+                  <img [src]="p.photo" class="avatar" />
+                  <span>{{ p.nom }}</span>
+                </div>
+              </td>
+              <td>{{ p.forme }}</td>
+              <td>{{ p.date }}</td>
+              <td>{{ p.heure }}</td>
+              <td>{{ p.service_agent }}</td>
+              <td class="status">{{ p.status }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- VERSION MOBILE (cartes) -->
+      <div class="mobile-cards" *ngFor="let p of prochains">
+        <div class="mobile-card">
+          <div class="header">
+            <img [src]="p.photo" class="avatar" />
+            <div>
+              <h4>{{ p.nom }}</h4>
+              <p class="status-mobile">{{ p.status }}</p>
+            </div>
+          </div>
+
+          <div class="body">
+            <p><strong>Motif :</strong> {{ p.forme }}</p>
+            <p><strong>Date :</strong> {{ p.date }}</p>
+            <p><strong>Heure :</strong> {{ p.heure }}</p>
+            <p><strong>Service / Agent :</strong> {{ p.service_agent }}</p>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
   <!-- Footer Buttons -->
   <!-- Footer Buttons -->
   <div class="footer-actions">
+  <div class="footer-card">
+    <div class="actions">
+      <button class="action-btn2" routerLink="/admin/visiteur">
+        <i class="mdi mdi-account-plus"></i>
+        <span>Ajouter un visiteur</span>
+      </button>
 
-    <div class="footer-card">
-      <div class="actions">
-        <button class="action-btn2">
-          <i class="mdi mdi-account-plus" style="font-size: 30px;"></i> Ajouter un visiteur
-        </button>
+      <button class="action-btn2" routerLink="/admin/parametre">
+        <i class="mdi mdi-cogs"></i>
+        <span>Gérer les paramètres</span>
+      </button>
 
-        <button class="action-btn2">
-          <i class="mdi mdi-calendar-plus"></i> Créer un rendez-vous
-        </button>
-
-        <button class="action-btn2">
-          <i class="mdi mdi-calendar-check"></i> Gérer les rendez-vous
-        </button>
-      </div>
+      <button class="action-btn2" routerLink="/admin/rendez-vous">
+        <i class="mdi mdi-calendar-check"></i>
+        <span>Gérer les rendez-vous</span>
+      </button>
     </div>
-
-    <div class="footer-card">
-      <div class="actions">
-
-        <button class="action-btn2">
-          <i class="mdi mdi-credit-card-scan"></i>
-          <span>Gérer les incidents / réclamations</span>
-        </button>
-
-        <button class="action-btn2">
-          <i class="mdi mdi-credit-card-search"></i>
-          <span>Vérifier une pièce d’identité</span>
-        </button>
-
-        <button class="action-btn2">
-          <i class="mdi mdi-file-document"></i>
-          <span>Consulter les rapports</span>
-        </button>
-
-      </div>
-    </div>
-
   </div>
+
+  <div class="footer-card">
+    <div class="actions">
+
+      <button class="action-btn2" routerLink="/admin/reclamation">
+        <i class="mdi mdi-credit-card-scan"></i>
+        <span>Gérer incidents / réclamations</span>
+      </button>
+
+      <button class="action-btn2">
+        <i class="mdi mdi-credit-card-search"></i>
+        <span>Vérifier une pièce d’identité</span>
+      </button>
+
+      <button class="action-btn2" routerLink="/admin/rapport">
+        <i class="mdi mdi-file-document"></i>
+        <span>Consulter les rapports</span>
+      </button>
+
+    </div>
+  </div>
+
+</div>
+
 
 
 

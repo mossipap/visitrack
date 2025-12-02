@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { trigger, state, style, transition, animate } from '@angular/animations';
 import { Router } from '@angular/router';
+import { RoleManager } from 'src/app/shared/utils/role-manager';
 @Component({
   selector: 'app-sidebar',
   templateUrl: './sidebar.component.html',
@@ -19,9 +20,12 @@ export class SidebarComponent implements OnInit {
   public settingsOpen: boolean = false;
   public isSidebarOpen: boolean = false;
   public isExpanded: boolean = true;
+  public roleManager:RoleManager
 
 
-  constructor(private router: Router) {}
+  constructor(private router: Router) {
+    this.roleManager = new RoleManager();
+  }
 
   ngOnInit(): void {
     this.loadTheme();

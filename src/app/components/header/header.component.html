@@ -79,11 +79,8 @@
         <div class="user_text d-flex align-items-center">
           <!-- 🟢 Conteneur de l'avatar avec badge -->
           <div class="position-relative me-2">
-            <img *ngIf="!currentUser.image" class="user-avatar"
-              [src]="(currentUser.service_name === 'siege') ? 'assets/images/presidente.png' : 'assets/images/procureur.png'"
-              alt="User">
+            <img *ngIf="!currentUser.image" class="user-avatar" [src]="'assets/images/presidente.png'" alt="User">
             <img *ngIf="currentUser.image" class="user-avatar" [src]="currentUser.image" alt="User">
-
             <!-- ✅ Petit point vert si connecté -->
             <span class="status-indicator pulse"></span>
           </div>
@@ -98,7 +95,7 @@
 
       <!-- 🔽 Menu déroulant -->
       <ul class="dropdown-menu settings-menu dropdown-menu-right minw-12"
-        style="margin-top: -8px;margin-left: 20px !important;">
+        style="margin-top: -8px;margin-left: 20px !important; background-color: aliceblue !important;">
         <li>
           <a class="dropdown-item" routerLink="/admin/mon-profil">
             <i class="mdi mdi-account-settings fa-lg text-success mr-1"></i>
@@ -197,16 +194,13 @@
       </div>
       <div class="modal-body">
         <div style="font-weight: bold;font-size: 13px;text-align: center;">
-          <span [class]="isDark? 'text-bold-600 c-cab-1' : 'text-bold-600 c-cab-2'">Voulez vous vraiment vous
-            déconnecter ? </span>
+          <span [class]="isDark? 'text-bold-600 c-cab-1' : 'text-bold-600 c-cab-2'">Voulez vous vraiment vous déconnecter ? </span>
         </div>
       </div>
       <div class="modal-footer">
         <div style="width: 100%; text-align: center;">
-          <button class="btn btn-secondary btn-nosession btn-sm mr-1" style="width: 45%;" type="button"
-            data-dismiss="modal"> Annuler</button>
-          <button class="btn btn-danger btn-session btn-sm" style="width: 45%;" type="button" (click)="logout()"> Se
-            déconnecter</button>
+          <button class="btn btn-secondary btn-nosession btn-sm mr-1" style="width: 45%;" type="button" data-dismiss="modal"> Annuler</button>
+          <button class="btn btn-danger btn-session btn-sm" style="width: 45%;" type="button" (click)="logout()"> Se déconnecter</button>
         </div>
       </div>
     </div>

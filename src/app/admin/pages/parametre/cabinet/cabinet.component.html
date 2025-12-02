@@ -56,7 +56,7 @@
           <!-- ➕ Bouton ajout -->
           <button *ngIf="true" class="btn btn-dark d-flex align-items-center gap-1 px-3" (click)="showAddForm()" type="button" data-backdrop="static" data-toggle="modal" data-target="#addCabinetModal">
             <i class="mdi mdi-plus"></i>
-            <span>{{'cabinet.addcabinet' | translate}}</span>
+            <span>Créer un Cabinet</span>
           </button>
         </div>
       </div>
@@ -74,7 +74,7 @@
                   </div>
                 </th>
                 <th>N°</th>
-                <th> Services</th>
+                <th> Cabinet</th>
                <th> Designation</th>
               <th> Statut </th>
               <th class="text-center action-buttons">Opérations</th>
@@ -158,7 +158,7 @@
                   <i [class]="isDark? 'txt-title-d mdi mdi-arrow-left-bold-circle' : 'mdi mdi-arrow-left-bold-circle'"></i>
                 </span>
                 <span [class]="isDark? 'txt-title-d ml-2': 'ml-1'" style="font-size: 12px;">
-                  {{'cabinet.addcabinet' | translate}}
+                  Création du cabinet
                 </span>
               </button>
             </div>

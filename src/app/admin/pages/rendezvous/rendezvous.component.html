@@ -11,19 +11,14 @@
             Liste des rendez-vous
           </h5>
           <span class="badge-count">
-            {{
-            (currentIndex === 0) ? allList.length :
-            (currentIndex === 1) ? activeList.length :
-            (currentIndex === 2) ? bloqueList.length :
-            suppriList.length
-            }}
+            {{paginatedList.length }}
           </span>
         </div>
         <div class="btn-group mb-3">
-          <button id="user_all" class="btn btn_active" (click)="onChangeCode(0)">Tous</button>
-          <button id="user_active" class="btn btn_not_active" (click)="onChangeCode(1)">En cours</button>
-          <button id="user_block" class="btn btn_not_active" (click)="onChangeCode(2)">Terminées</button>
-          <button id="user_delete" class="btn btn_not_active" (click)="onChangeCode(3)">Supprimées</button>
+          <button id="user_all" class="btn btn_active" (click)="onChangeCode(1)">Tous</button>
+          <button id="user_active" class="btn btn_not_active" (click)="onChangeCode(2)">En cours</button>
+          <button id="user_block" class="btn btn_not_active" (click)="onChangeCode(3)">Terminées</button>
+          <button id="user_delete" class="btn btn_not_active" (click)="onChangeCode(4)">Supprimées</button>
         </div>
 
         <!-- 🔹 Outils : recherche + boutons -->
@@ -49,7 +44,7 @@
         </div>
       </div>
       <div class="row g-3 align-items-end" *ngIf="isSearch" style="padding-top: 10px;">
-       
+
         <!-- Date début -->
         <div class="col-lg-2 col-md-2 col-sm-2">
           <mat-form-field appearance="outline" class="full-width">
@@ -140,7 +135,7 @@
             </mat-select>
           </mat-form-field>
         </div>
-      <!--   <div class="col-lg-2 col-md-3 col-sm-6">
+        <!--   <div class="col-lg-2 col-md-3 col-sm-6">
           <mat-form-field appearance="outline" class="full-width">
             <mat-label>Recherche ... </mat-label>
             <input matInput [(ngModel)]="searchFilterText" (input)="updatePaginatedList()"name="searchTerm">
@@ -157,8 +152,8 @@
               <span>Actualiser</span>
             </button>
             <!-- Bouton Ajouter -->
-            <button  class="btn btn-danger d-flex align-items-center gap-1 px-3" data-backdrop="static" data-toggle="modal"
-              data-target="#addVisiteurModal" (click)="isSearch = false" title="Fermer">
+            <button class="btn btn-danger d-flex align-items-center gap-1 px-3" data-backdrop="static"
+              data-toggle="modal" data-target="#addVisiteurModal" (click)="isSearch = false" title="Fermer">
               <i class="mdi mdi-close" style="font-size: 20px;"></i>
               <span>Ferner</span>
             </button>
@@ -192,7 +187,7 @@
             </thead>
 
             <tbody>
-              <tr *ngFor="let demande of paginatedList">
+              <tr *ngFor="let demande of paginatedList | paginate: {itemsPerPage: pageSize, totalItems: totalPages, currentPage: page}">
                 <td>
                   <div class="animated-checkbox">
                     <label>
@@ -215,10 +210,10 @@
                 <td [innerHTML]="demande.raisonVisite"></td>
                 <td [class]="isDark ? 'td-d' : 'td-w'">
                   <div class="d-flex align-items-center">
-                    <img *ngIf="!demande.image" src="assets/images/profile/avatar.jpeg" alt="Not"
+                    <img src="assets/images/profile/avatar.jpeg" alt="Not"
                       class="img-avatar me-2" />
-                    <img *ngIf="demande.image" [src]="demande.image" alt="User" class="img-avatar me-2" />
-                    <div *ngIf="this.demande.isDepartement === 'PARQUET'">
+<!--                     <img *ngIf="demande.image" [src]="demande.image" alt="User" class="img-avatar me-2" />
+ -->                    <div *ngIf="this.demande.isDepartement === 'PARQUET'">
                       <label class="fw-semibold">{{ demande.isDepartement}}</label><br />
                       <div class="desc-prof text-muted small">{{ demande.service?.designation }}</div>
                     </div>
@@ -231,12 +226,11 @@
 
                 <td [class]="isDark ? 'td-d' : 'td-w'">
                   <span [class]="(demande.statut === 'Termin\u00e9e') ? 'acces_active' : 'acces_block'">
-                    <i class="mdi"
-                      [ngClass]="(demande.statut === 'Termin\u00e9e') ? 'mdi-check-circle text-success' : 'mdi-timer-sand text-warning'"></i>
+                    <i class="mdi"[ngClass]="(demande.statut === 'Termin\u00e9e') ? 'mdi-check-circle text-success' : 'mdi-timer-sand text-warning'"></i>
                     {{ (demande.statut === 'Termin\u00e9e') ? 'Terminée' : 'En cours' }}
                   </span>
 
-                  <div *ngIf="demande?.statut === 'En cours'" class="mt-1 text-muted small">
+                  <div *ngIf="demande?.statut === 'En_attente'" class="mt-1 text-muted small">
                     <i class="mdi mdi-clock-outline me-1"> </i> {{ demande?.heureArrive }} - {{demande?.heureVisite}}
                   </div>
                 </td>
@@ -265,33 +259,14 @@
             </tbody>
           </table>
         </div>
-
         <!-- 🔹 PAGINATION -->
-        <!-- 🔹 PAGINATION DYNAMIQUE -->
-        <div class="pagination-wrapper d-flex justify-content-between align-items-center mt-3 p-2 border-top">
-          <div class="d-flex align-items-center gap-2">
-            <button class="btn btn-outline-secondary btn-sm" [disabled]="currentPage === 1" (click)="previousPage()">
-              <i class="mdi mdi-chevron-left"></i> Précédent
-            </button>
-
-            <ng-container *ngFor="let page of [].constructor(totalPages); let i = index">
-              <button class="btn btn-sm"
-                [ngClass]="currentPage === i + 1 ? 'btn-primary text-white' : 'btn-outline-secondary'"
-                (click)="currentPage = i + 1; updatePaginatedList()">
-                {{ i + 1 }}
-              </button>
-            </ng-container>
-
-            <button class="btn btn-outline-secondary btn-sm" [disabled]="currentPage === totalPages"
-              (click)="nextPage()">
-              Suivant <i class="mdi mdi-chevron-right"></i>
-            </button>
-          </div>
-
-          <div class="text-muted small">
-            Page {{ currentPage }} sur {{ totalPages }}
-          </div>
-        </div>
+          <!-- Pagination Bootstrap -->
+          <pagination-controls
+              (pageChange)="onPageChange($event)"
+              previousLabel="« Précédent"
+              nextLabel="Suivant »"
+              [autoHide]="true">
+          </pagination-controls>
       </div>
 
     </div>
@@ -841,6 +816,15 @@
                               <input
                                 [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'"
                                 id="nom" name="nom" type="text" [(ngModel)]="demande.nom" required>
+                            </div>
+                          </div>
+                          <div class="col-lg-12 p-right-0" *ngIf="isNumberPhone">
+                            <div class="form-group has-success align-left ft-w-b">
+                              <label [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
+                                for="nom">Non et Prenom *</label>
+                              <input
+                                [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'"
+                                id="nomComplet" name="nomComplet" type="text" [(ngModel)]="demande.nomComplet" required>
                             </div>
                           </div>
 
@@ -1539,9 +1523,10 @@
                               Pays de délivrance *
                             </label>
                             <div class="select select-add mt-1">
-                              <p-dropdown [options]="nationalites" name="nationalite" [(ngModel)]="demande.nationalite"
-                                optionLabel="label" optionValue="value" [filter]="true" filterBy="label"
-                                placeholder="Pays de délivrance" [showClear]="true" styleClass="wd_100 initialwd">
+                              <p-dropdown [options]="nationalites" name="paysDelivrance"
+                                [(ngModel)]="demande.paysDelivrance" optionLabel="label" optionValue="value"
+                                [filter]="true" filterBy="label" placeholder="Pays de délivrance" [showClear]="true"
+                                styleClass="wd_100 initialwd">
                                 <!-- Template option -->
                                 <ng-template let-item pTemplate="item">
                                   <div class="d-flex align-items-center">
@@ -2472,8 +2457,6 @@
     <!-- ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±± -->
 
   </div>
-
-
   <!-- ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±± -->
   <!-- Modal PDF -->
   <div class="modal fade" id="pdfModal" tabindex="-1">
@@ -2492,9 +2475,7 @@
       </div>
     </div>
   </div>
-
   <!-- ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±± -->
-
   <!-- ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±± -->
   <div class="container demo" *ngIf="currentView === 'signature'">
     <div class="modal right fade" id="SignatureVisiteurModal" tabindex="-1" role="dialog"
@@ -2517,22 +2498,32 @@
                 <form #formAddUser="ngForm">
                   <div class="col-lg-12 p-right-0">
                     <div class="form-group align-left ft-w-b">
+
                       <div class="form-section">
-                        <label class="form-title">
-                          <i class="mdi mdi-package-variant-closed"></i>
-                          Objet(s) remis à l'accueil
+                        <label class="form-title d-flex align-items-center mb-2">
+                          <i class="mdi mdi-package-variant-closed mr-2"></i>
+                          Objet(s) retiré à l'accueil
                         </label>
-                        <div class="form-check" *ngFor="let item of objetOptions">
-                          <input class="form-check-input" type="checkbox" [(ngModel)]="item.checked"
-                            (change)="toggleSelectionObjet(item)" name="objet{{item.id}}" id="chk{{item.id}}">
-                          <label class="form-check-label" for="chk{{item.id}}">
-                            {{ item.label }}
-                          </label>
+
+                        <!-- Cases alignées horizontalement -->
+                        <div class="d-flex flex-wrap" style="gap: 20px;">
+
+                          <div class="form-check" *ngFor="let item of objetRetireOptions">
+                            <input class="form-check-input" type="checkbox" [(ngModel)]="item.checked"
+                              (change)="toggleSelectionObjet(item)" name="objet{{item.id}}" id="chk{{item.id}}">
+
+                            <label class="form-check-label" for="chk{{item.id}}">
+                              {{ item.label }}
+                            </label>
+                          </div>
+
                         </div>
+
                       </div>
 
                     </div>
                   </div>
+
                   <div class="col-lg-12 p-right-0">
                     <div class="form-group align-left ft-w-b">
                       <!-- Champ texte si "Autres objets" est coché -->
@@ -2546,8 +2537,7 @@
                   <div class="col-lg-12 p-right-0">
                     <div class="form-group has-success align-left ft-w-b">
                       <label [class]="isDark? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
-                        for="nom">Heure
-                        du Départ *</label>
+                        for="nom">Heure du Départ *</label>
                       <input
                         [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'"
                         id="heureDepart" name="heureDepart" type="time" [(ngModel)]="demande.heureDepart" required>

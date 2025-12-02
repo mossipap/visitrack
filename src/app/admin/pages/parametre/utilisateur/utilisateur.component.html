@@ -67,14 +67,14 @@
                 <th [class]="isDark ? 'th-d th_brnone' : 'th-w th_brnone'">{{'parametre.fullName' | translate}}</th>
                 <th [class]="isDark ? 'th-d th_brnone' : 'th-w th_brnone'">{{'parametre.mail' | translate}}</th>
                 <th [class]="isDark ? 'th-d th_brnone' : 'th-w th_brnone'">{{'parametre.profession' | translate}}</th>
-                <th [class]="isDark ? 'th-d th_brnone' : 'th-w th_brnone'">{{'parametre.cabinet' | translate}}</th>
+                <th [class]="isDark ? 'th-d th_brnone' : 'th-w th_brnone'">Département</th>
+                <th [class]="isDark ? 'th-d th_brnone' : 'th-w th_brnone'">Profil</th>
                 <th [class]="isDark ? 'th-d th_brnone' : 'th-w th_brnone'">{{'parametre.acces' | translate}}</th>
                 <th [class]="isDark ? 'th-d th_brnone' : 'th-w th_brnone'">{{'parametre.statut' | translate}}</th>
                 <th class="text-center action-buttons" [class]="isDark ? 'th-d th_brnone' : 'th-w th_brnone'">
                   {{'parametre.operation' | translate}}</th>
               </tr>
             </thead>
-
             <tbody>
               <tr *ngFor="let user of paginatedList">
                 <td>
@@ -109,7 +109,8 @@
 
 
                 <td [class]="isDark ? 'td-d' : 'td-w'">{{user.profession}}</td>
-                <td [class]="isDark ? 'td-d' : 'td-w'">{{user.organisation}}</td>
+                <td [class]="isDark ? 'td-d' : 'td-w'">{{user.isDepartement}}</td>
+                <td [class]="isDark ? 'td-d' : 'td-w'">{{user.profil?.nom}}</td>
 
                 <td [class]="isDark ? 'td-d' : 'td-w'">
                   <span
@@ -481,8 +482,11 @@
           </div>
           <div class="modal-footer">
             <div style="width: 100%;">
-              <button class="btn btn-blocked btn-sm mr-3 ml-2"
-                (click)="UpdateStatut((dialogAction=== 'bloqued')? 'Bloqué' : 'Activé')">
+              <button class="btn btn-blocked btn-sm mr-3 ml-2" (click)="ActiverUtilisateur()" *ngIf="utilisateur.statut === 'Desactivé'">
+                <label class="txt_blocked">{{(dialogAction=== 'bloqued')? 'Bloquer' : 'Activer'}}</label>
+              </button>
+              <button class="btn btn-blocked btn-sm mr-3 ml-2" *ngIf="utilisateur.statut === 'Activé'"
+                (click)="DesactiverUtilisateur()">
                 <label class="txt_blocked">{{(dialogAction=== 'bloqued')? 'Bloquer' : 'Activer'}}</label>
               </button>
               <button class="btn btn-cancel btn-sm" data-dismiss="modal">
@@ -855,12 +859,12 @@
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body text-center">
-        <p>Souhaitez-vous vraiment {{ dialogAction === 'bloqued' ? 'bloquer' : 'activer' }} cet utilisateur ?</p>
+        <p>Souhaitez-vous vraiment {{ dialogAction === 'bloqued' ? 'bloquer' : 'activer' }} cet utilisateur  {{utilisateur.nomComplet}}?</p>
       </div>
       <div class="modal-footer justify-content-center border-0">
         <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annuler</button>
-        <button *ngIf="this.utilisateur.statut === 'Activé'" type="button" class="btn btn-warning" (click)="ActiverUtilisateur()">Confirmer</button>
-        <button *ngIf="this.utilisateur.statut === 'Desctivé'" type="button" class="btn btn-warning" (click)="ActiverUtilisateur()">Confirmer</button>
+        <button *ngIf="this.utilisateur.statut === 'D\u00e9sactiv\u00e9'" type="button" class="btn btn-warning" (click)="ActiverUtilisateur()"><i class="mdi mdi-check"></i> Valider</button>
+        <button *ngIf="this.utilisateur.statut === 'Activ\u00e9'" type="button" class="btn btn-warning" (click)="DesactiverUtilisateur()"><i class="mdi mdi-check"></i> Valider</button>
       </div>
     </div>
   </div>
@@ -889,7 +893,7 @@
         <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">
           <i class="mdi mdi-close"></i> Annuler
         </button>
-        <button type="button" class="btn btn-danger px-4" (click)="DeleteUtilisateur()">
+        <button type="button" class="btn btn-danger px-4" (click)="DesactiverUtilisateur()">
           <i class="mdi mdi-delete"></i> Supprimer
         </button>
       </div>

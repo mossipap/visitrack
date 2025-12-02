@@ -76,7 +76,17 @@ export class NotificationComponent implements OnInit {
       if (ret['code'] === 200) {
         const events = ret['data'];
         const notifs = ret['Notification'];
+          // 🔥 Filtrage conditionnel
+        if (this.currentUser.profil.id !== 1) {
+          this.notifications = this.notifications.filter((n: any) => {
+            return (
+              n.service_id === this.currentUser.service_id ||
+              n.cabinet_id === this.currentUser.cabinet_id
+            );
+          });
+        }
         this.notifications = events.concat(notifs);
+        
         console.log('notifs===', this.notifications);
         this.loading = false;
       } else {

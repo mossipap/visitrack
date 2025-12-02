@@ -12,6 +12,8 @@ import { DemandeService } from 'src/app/shared/services/demande.service';
 import { Visiteur } from 'src/app/shared/models/visiteur';
 import * as bootstrap from 'bootstrap';
 import { Editor } from 'ngx-editor';
+import { Indicatifs } from 'src/app/shared/models/nationalite';
+import { Demande } from 'src/app/shared/models/demande';
 
 
 @Component({
@@ -57,9 +59,18 @@ niveauxGravites = [
   { id: 3, libelle: 'Critique' }
 ];
   editor!: Editor;
-
+ page = 1;
+  //totalPages = 0;
+  pageSize = 10;// nombre d’éléments par page
+   public step: number = 1;
+  indicatifsNums = Indicatifs;
+  public isNumberPhone: boolean;
+  public indicatif1: any ;
+    public visiteur: Visiteur = new Visiteur();
+  
   constructor(
     private reclamationService: ReclamationService,
+    private demandeService: DemandeService,
     private visiteurService: DemandeService,
     private toast: AppToastService,
     private appConfig: AppConfig
@@ -79,10 +90,14 @@ niveauxGravites = [
   ngOnDestroy(): void {
     this.editor.destroy();
   }
+   showList() {
+    this.currentView = 'list';
+  }
   showAddForm() {
     this.reclamation = new Reclamation();
     this.currentView = 'add';
-    this.findVisiteurs()
+    this.indicatif1= this.indicatifsNums.find(i => i.value === '+225')  // ← valeur par défaut
+    //this.findVisiteurs()
   }
   showEditForm(reclamation: Reclamation) {
     this.reclamation = reclamation;
@@ -138,16 +153,20 @@ niveauxGravites = [
   }
 
   Save() {
+    // console.log("++++++++++++++ reclamation============>", this.reclamation);
     this.loading = true;
      this.reclamation.user_id = this.currentUser.id
+     this.reclamation.visiteur_id = this.visiteur.id
+    // this.reclamation.demande_id = this.demande.id
       this.reclamation.statut='EN_COURS'
     this.reclamationService.save(this.reclamation).subscribe(ret => {
       if (ret['code'] === 200) {
         this.reclamation = ret['data'];
         this.reclamations.push(this.reclamation);
-        this.closeAddElementDialog.nativeElement.click();
+        //this.closeAddElementDialog.nativeElement.click();
         this.loading = false;
         this.toast.success("Reclamation enregistré avec succès");
+        this.showList();
         this.Search();
       } else {
         this.loading = false;
@@ -255,11 +274,18 @@ Search() {
     next: (ret) => {
       this.loading = false;
       if (ret['code'] === 200) {
+         // 🔥 Filtrage conditionnel
+        if (this.currentUser.profil.id !== 1) {
+          this.reclamations = this.reclamations.filter((r: any) => {
+            return (
+              r.service_id === this.currentUser.service_id ||
+              r.cabinet_id === this.currentUser.cabinet_id
+            );
+          });
+        }
         // Ajouter selected et initialiser filteredReclamations
         this.reclamations = ret['data'].data.map((p: any) => ({ ...p, selected: false }));
         this.filteredReclamations = [...this.reclamations]; // ✅ important
-        this.totalPages = Math.ceil(this.filteredReclamations.length / this.itemsPerPage);
-        this.currentPage = 1;
         this.updatePaginatedList();
       } else {
         this.toast.error(ret['message']);
@@ -271,6 +297,9 @@ Search() {
     }
   });
 }
+onPageChange(page: number) {
+    this.page = page;
+  }
 // 🔹 Mettre à jour la liste paginée à partir de filteredReclamations
 updatePaginatedList() {
   if (!this.filteredReclamations || this.filteredReclamations.length === 0) {
@@ -282,21 +311,10 @@ updatePaginatedList() {
   this.totalPages = Math.ceil(this.filteredReclamations.length / this.itemsPerPage);
   const startIndex = (this.currentPage - 1) * this.itemsPerPage;
   const endIndex = startIndex + this.itemsPerPage;
-  this.paginatedList = this.filteredReclamations.slice(startIndex, endIndex);
+  this.paginatedList = this.filteredReclamations;
   //console.log("+++++ paginatedList reçues +++++", this.paginatedList);
 }
-  nextPage() {
-    if (this.currentPage < this.totalPages) {
-      this.currentPage++;
-      this.updatePaginatedList();
-    }
-  }
-  previousPage() {
-    if (this.currentPage > 1) {
-      this.currentPage--;
-      this.updatePaginatedList();
-    }
-  }
+ 
 toggleSelectAll() {
   this.selectAll = !this.selectAll;
   this.reclamations.forEach(item => item.selected = this.selectAll);
@@ -305,5 +323,46 @@ toggleSelectOne() {
   // si tous sont cochés, selectAll = true sinon false
   this.selectAll = this.reclamations.every(item => item.selected);
 }
+  searchVisiteurByNumber(numberPhone: string) {
+   // numberPhone = this.demande.indicatif + this.searchParam.query
+    // 1. Remplacer le "+" par "00"
+    const indicatifFormate = this.indicatif1.value.replace("+", "00");
+    // 2. Concaténer
+    numberPhone = indicatifFormate + this.searchParam.query;
+    this.searchParam .query= numberPhone
+    console.log(this.searchParam.query);
+    this.loading = true;
+    this.demandeService.findByNumero(this.searchParam).subscribe({
+      next: (ret) => {
+        this.loading = false;
+        if (ret['code'] === 200) {
+          // ✅ Numéro trouvé → on remplit le formulaire
+          this.visiteur = ret['data'];
+          this.toast.success("Visiteur trouvé avec succès");
+          this.goToEtap();
+          this.isNumberPhone = true; // On affiche le formulaire pré-rempli
+        }
+        else if (ret['code'] === 404) {
+          // ⚠️ Numéro non trouvé → on affiche le formulaire vide
+          this.toast.warning("Veuillez saisir un numéro valide. Ce numéro n’existe pas.");
+          this.isNumberPhone = false; // On affiche quand même le formulaire
+          //this.demande = new Demande(); // Formulaire vide avec numéro déjà saisi
+          this.showAddForm();
+        }
+        else {
+          this.toast.error(ret['message'] || "Erreur inconnue");
+          this.isNumberPhone = false;
+        }
+      },
+      error: () => {
+        this.toast.error(environment.erreur_connexion_message);
+        this.loading = false;
+        this.isNumberPhone = false;
+      }
+    });
+  }
 
+ goToEtap() {
+    this.step = 2;
+  }
 }

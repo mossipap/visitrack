@@ -205,6 +205,15 @@ export class HeaderComponent implements OnInit {
        // console.log('++++++++++++++++ ret===', ret['data']);
         const events = ret['data'];
         const notifs = ret['Notification'];
+          // 🔥 Filtrage conditionnel
+        if (this.currentUser.profil.id !== 1) {
+          this.notifications = this.notifications.filter((n: any) => {
+            return (
+              n.service_id === this.currentUser.service_id ||
+              n.cabinet_id === this.currentUser.cabinet_id
+            );
+          });
+        }
         this.notifications = events.concat(notifs);
       //  console.log('++++++++++++++++ notifs===', this.notifications);
         this.loading = false;
@@ -224,6 +233,15 @@ export class HeaderComponent implements OnInit {
     this.notifyService.updateStatut(notification).subscribe(ret => {
       if (ret['code'] === 200) {
         const notifRet = ret['data'];
+          // 🔥 Filtrage conditionnel
+        if (this.currentUser.profil.id !== 1) {
+          this.notifications = this.notifications.filter((n: any) => {
+            return (
+              n.service_id === this.currentUser.service_id ||
+              n.cabinet_id === this.currentUser.cabinet_id
+            );
+          });
+        }
         this.notifications.forEach(element => {
           if(element.id === notifRet.id) {
             element.statut = notifRet.statut;
@@ -275,82 +293,6 @@ export class HeaderComponent implements OnInit {
     footer.style.marginLeft = "0px"
   }
   /* ====================changer le theme================= */
-  onChangeTheme() {
-    this.isDark= !this.isDark;
-    if(this.isDark) {//dark
-      const menuLeft = document.getElementsByClassName("bg-cab-1");
-      for(var i = menuLeft.length - 1; i >= 0; --i) {
-        menuLeft[i].classList.replace('bg-cab-1', 'bg-cab-2');
-      }
-      const menuLeftColor = document.getElementsByClassName("c-cab-2");
-      for(var i = menuLeftColor.length - 1; i >= 0; --i) {
-        menuLeftColor[i].classList.replace('c-cab-2', 'c-cab-1');
-      }
-      const themeMap = document.getElementsByClassName("theme-light");
-      for(var i = themeMap.length - 1; i >= 0; --i) {
-        themeMap[i].classList.replace('theme-light', 'theme-dark');
-      }
-      const themeChart = document.getElementsByClassName("theme-light-login");
-      for(var i = themeChart.length - 1; i >= 0; --i) {
-        themeChart[i].classList.replace('theme-light-login', 'theme-dark-login');
-      }
-      const libMac = document.getElementsByClassName("c-black");
-      for(var i = libMac.length - 1; i >= 0; --i) {
-        libMac[i].classList.replace('c-black', 'c-white');
-      }
-      const libBlanc = document.getElementsByClassName("c-noir");
-      for(var i = libBlanc.length - 1; i >= 0; --i) {
-        libBlanc[i].classList.replace('c-noir', 'c-blanc');
-      }
-      const formInput = document.getElementsByClassName("form-control-w");
-      for(var i = formInput.length - 1; i >= 0; --i) {
-        formInput[i].classList.replace('form-control-w', 'form-control-d');
-      }
-    } else {//white
-      const menuLeft = document.getElementsByClassName("bg-cab-2");
-      for(var i = menuLeft.length - 1; i >= 0; --i) {
-        menuLeft[i].classList.replace('bg-cab-2', 'bg-cab-1');
-      }
-      const menuLeftColor = document.getElementsByClassName("c-cab-1");
-      for(var i = menuLeftColor.length - 1; i >= 0; --i) {
-        menuLeftColor[i].classList.replace('c-cab-1', 'c-cab-2');
-      }
-      const themeMap = document.getElementsByClassName("theme-dark");
-      for(var i = themeMap.length - 1; i >= 0; --i) {
-        themeMap[i].classList.replace('theme-dark', 'theme-light');
-      }
-      const themeChart = document.getElementsByClassName("theme-dark-login");
-      for(var i = themeChart.length - 1; i >= 0; --i) {
-        themeChart[i].classList.replace('theme-dark-login', 'theme-light-login');
-      }
-      const libMac = document.getElementsByClassName("c-white");
-      for(var i = libMac.length - 1; i >= 0; --i) {
-        libMac[i].classList.replace('c-white', 'c-black');
-      }
-      const libNoir = document.getElementsByClassName("c-blanc");
-      for(var i = libNoir.length - 1; i >= 0; --i) {
-        libNoir[i].classList.replace('c-blanc', 'c-noir');
-      }
-      const formInput = document.getElementsByClassName("form-control-d");
-      for(var i = formInput.length - 1; i >= 0; --i) {
-        formInput[i].classList.replace('form-control-d', 'form-control-w');
-      }
-    }
-    const ls = new SecureLS({
-      encodingType: "aes",
-      encryptionSecret: "MyAdminApp",
-    });
-    ls.set("current_theme", this.isDark);
-    window.location.reload();
-  }
-  setThemeDark() {
-    this.isDark = true;
-    const ls = new SecureLS({
-      encodingType: "aes",
-      encryptionSecret: "MyAdminApp",
-    });
-    ls.set("current_theme", this.isDark);
-    window.location.reload();
-  }
+
   
 }

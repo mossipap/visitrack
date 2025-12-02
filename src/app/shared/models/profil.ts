@@ -4,6 +4,7 @@ import { Droit } from './droit';
 @Injectable()
 export class Profil implements Deserializable<Profil> {
   public id: number;
+  public user_id: number;
   public nom: string;
   public description: string;
   public droits: Droit[];

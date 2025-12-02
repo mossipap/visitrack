@@ -11,7 +11,7 @@
 
   <ul class="app-menu">
     <!-- Tableau de bord -->
-    <li class="menu-item" [ngClass]="{ active: activeMenu === 'dashboard' }" (click)="clickLi('dashboard')">
+    <li class="menu-item" [ngClass]="{ active: activeMenu === 'dashboard' }" (click)="clickLi('dashboard')" *ngIf="(roleManager.isDroitVoirMenuTableauBord())">
       <a routerLink="/admin/dashboard" class="menu-link">
         <div class="icon-box"><i class="mdi mdi-view-dashboard"></i></div>
         <span class="menu-label">Accueil</span>
@@ -19,14 +19,14 @@
     </li>
 
     <!-- Gestion des visiteurs -->
-    <li class="menu-item" [ngClass]="{ active: activeMenu === 'visiteur' }" (click)="clickLi('visiteur')">
+    <li class="menu-item" [ngClass]="{ active: activeMenu === 'visiteur' }" (click)="clickLi('visiteur')" *ngIf="(roleManager.isDroitVoirMenuVisiteur())">
       <a routerLink="/admin/visiteur" class="menu-link">
         <div class="icon-box"><i class="mdi mdi-account-box-multiple"></i></div>
         <span class="menu-label">Gestion des visiteurs</span>
       </a>
     </li>
     <!-- Rendez-vous -->
-    <li class="menu-item" [ngClass]="{ active: activeMenu === 'rendezvous' }" (click)="clickLi('rendezvous')">
+    <li class="menu-item" [ngClass]="{ active: activeMenu === 'rendezvous' }" (click)="clickLi('rendezvous')" *ngIf="(roleManager.isDroitVoirMenuRendezVous())">
       <a routerLink="/admin/rendez-vous" class="menu-link">
         <div class="icon-box"><i class="mdi mdi-calendar-clock"></i></div>
         <span class="menu-label">Gestion des rendez-vous</span>
@@ -34,14 +34,14 @@
     </li>
  
     <!-- Gestion du personnel / services -->
-    <li *ngIf="false" class="menu-item" [ngClass]="{ active: activeMenu === 'agent' }" (click)="clickLi('agent')">
+    <li *ngIf="false" class="menu-item" [ngClass]="{ active: activeMenu === 'agent' }" (click)="clickLi('agent')" >
       <a routerLink="/admin/parametre/agent" class="menu-link">
         <div class="icon-box"><i class="mdi mdi-account-group"></i></div>
         <span class="menu-label">Gestion du personnel</span>
       </a>
     </li>
     <!-- Rapports et statistiques -->
-    <li class="menu-item" [ngClass]="{ active: activeMenu === 'rapport' }" (click)="clickLi('rapport')">
+    <li class="menu-item" [ngClass]="{ active: activeMenu === 'rapport' }" (click)="clickLi('rapport')" *ngIf="(roleManager.isDroitVoirMenuRapport())">
       <a routerLink="/admin/rapport" class="menu-link">
         <div class="icon-box"><i class="mdi mdi-chart-bar"></i></div>
         <span class="menu-label">Rapports et statistiques</span>
@@ -49,7 +49,7 @@
     </li>
 
     <!-- Réclamations -->
-       <li class="menu-item" [ngClass]="{ active: activeMenu === 'reclamation' }" (click)="clickLi('reclamation')">
+       <li class="menu-item" [ngClass]="{ active: activeMenu === 'reclamation' }" (click)="clickLi('reclamation')" *ngIf="(roleManager.isDroitVoirMenuReclamation())">
       <a routerLink="/admin/reclamation" class="menu-link">
         <div class="icon-box"><i class="mdi mdi-alert-circle-outline"></i></div>
         <span class="menu-label">Incidents</span>
@@ -59,7 +59,7 @@
 
   
     <!-- Administration / Paramètres -->
-    <li class="menu-item" [ngClass]="{ active: activeMenu === 'parametre' }" (click)="clickLi('parametre')">
+    <li class="menu-item" [ngClass]="{ active: activeMenu === 'parametre' }" (click)="clickLi('parametre')" *ngIf="(roleManager.isDroitVoirMenuParametre())">
       <a routerLink="/admin/parametre" class="menu-link">
         <div class="icon-box"><i class="mdi mdi-settings"></i></div>
         <span class="menu-label">Paramètres</span>

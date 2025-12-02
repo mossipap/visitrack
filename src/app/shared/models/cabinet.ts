@@ -5,6 +5,7 @@ import { Utilisateur } from './utilisateur';
 @Injectable()
 export class Cabinet implements Deserializable<Cabinet> {
     id: number;
+    public user_id: number;
     designation: string;
     description: string;
     statut: string;

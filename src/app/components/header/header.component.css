@@ -46,7 +46,7 @@
 }
 .modal-content,
 .dropdown-item {
-    background-color: var(--confirm-bg) !important;
+    background-color: #ffffff !important;
 }
 .icon_mode {
     width: 30px;

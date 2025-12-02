@@ -204,6 +204,7 @@ ngAfterViewInit(): void {
     if (this.service) {
       console.log(`Suppression de ${this.service.designation}`);
        this.loading = true;
+      this.service.user_id = this.currentUser.id
       this.serviceService.delete(this.service).subscribe((ret:any) => {
        if (ret['code'] == 200) {
          this.service = ret['data'];
@@ -243,6 +244,7 @@ ngAfterViewInit(): void {
    Save() {
      this.service.statut = "Activé";
     // this.service.nombregreffier = 0;
+    this.service.user_id = this.currentUser.id
      this.loading = true;
      this.serviceService.save(this.service).subscribe(ret => {
        if (ret['code'] === 200) {
@@ -263,6 +265,7 @@ ngAfterViewInit(): void {
    }
      Update() {
     this.loading = true;
+    this.service.user_id = this.currentUser.id
     this.serviceService.update(this.service).subscribe(
       (ret:any) => {
        if (ret['code'] == 200) {
@@ -285,6 +288,7 @@ ngAfterViewInit(): void {
   }
    UpdateStatut(statut: string) {
      this.loading = true;
+     this.service.user_id = this.currentUser.id
      this.service.statut = statut;
      this.serviceService.updateStatut(this.service).subscribe(ret => {
        if (ret['code'] === 200) {
@@ -312,6 +316,7 @@ ngAfterViewInit(): void {
    }
       onDeleted(): void {
       this.loading = true;
+      this.service.user_id = this.currentUser.id
       this.serviceService.delete(this.service).subscribe((ret:any) => {
        if (ret['code'] == 200) {
          this.service = ret['data'];

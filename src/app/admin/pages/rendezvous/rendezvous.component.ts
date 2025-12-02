@@ -66,11 +66,11 @@ export class RendezvousComponent implements OnInit {
   @ViewChild('closeAddElementDialog') closeAddElementDialog: any;
   @ViewChild('fileInput', { static: false }) fileInput!: ElementRef;
   @ViewChild('canvas', { static: false }) canvas!: ElementRef<HTMLCanvasElement>;
+  
   private ctx!: CanvasRenderingContext2D;
   signatureImage: string | null = null;
   paginatedList: any[] = []; // la portion affichée
   itemsPerPage = 10; // nombre d’éléments par page
-  totalPages = 0;
   selectAll: boolean = false;
   public currentView = 'list';
   public currentPage = 1;
@@ -85,9 +85,16 @@ export class RendezvousComponent implements OnInit {
   indicatifsAdds: { country: string, dial: string, flag: string }[] = [];
   selectedIndicatif: { country: string, dial: string, flag: string };
   phoneNumber: string = '';
-  isDepartement: string = '';
   // Liste des objets possibles
   objetOptions = [
+    { id: 1, label: 'Téléphone portable', checked: false },
+    { id: 2, label: 'Pièce d\'identité', checked: false },
+    { id: 3, label: 'Ordinateur / Tablette', checked: false },
+    { id: 4, label: 'Objets dangereux', checked: false },
+    { id: 5, label: 'Autres objets', checked: false }
+  ];
+  // Liste des objets possibles
+  objetRetireOptions = [
     { id: 1, label: 'Téléphone portable', checked: false },
     { id: 2, label: 'Pièce d\'identité', checked: false },
     { id: 3, label: 'Ordinateur / Tablette', checked: false },
@@ -115,6 +122,10 @@ export class RendezvousComponent implements OnInit {
     { label: 'Expiré', value: 'Expiré' },
     { label: 'Terminé', value: 'Terminé' },
   ];
+  /* ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±± */
+  page = 1;
+  totalPages = 0;
+  pageSize = 10;// nombre d’éléments par page
   constructor(
     private demandeService: DemandeService,
     private cabinetService: CabinetService,
@@ -137,6 +148,7 @@ export class RendezvousComponent implements OnInit {
     this.editor1 = new Editor();
     this.search();
     this.searchParam.criteria === '1'
+    console.log("+++++++++++++++=+++++++++current user+++++++++++++",this.currentUser)
   }
    onChangeCritere() {
     if(this.searchParam.criteria === '3') {
@@ -287,7 +299,6 @@ export class RendezvousComponent implements OnInit {
       }
     });
   }
-
   showResetDialog(demande: Demande): void {
     this.demande = demande;
   }
@@ -308,46 +319,83 @@ export class RendezvousComponent implements OnInit {
   closeDeleteDialog(): void {
     this.deleteModal?.hide();
   }
-  search() {
-    this.loading = true;
-    this.demandeService.findAll().subscribe(
-      (ret) => {
-        this.loading = false;
-        if (ret['code'] == 200) {
-          this.demandes = ret['data']['data'];
-          // Séparer les listes
-          this.activeList = this.demandes.filter(d => d.statut === 'En cours');
-          this.bloqueList = this.demandes.filter(d => d.statut === 'Terminée');
-          this.suppriList = this.demandes.filter(d => d.statut === 'Supprimé');
-          // ✅ Tout afficher par défaut
-          this.allList = [...this.demandes];
-          // Calcul pagination
-          this.totalPages = Math.ceil(this.allList.length / this.itemsPerPage);
-          this.updatePaginatedList();
+search() {
+  this.loading = true;
 
-          this.toast.info(`${this.demandes.length} demande(s) trouvée(s)`);
-        } else {
-          this.toast.error(ret['message']);
+  this.demandeService.findAll().subscribe(
+    (ret) => {
+      this.loading = false;
+
+      if (ret['code'] == 200) {
+        console.log("🧑‍💼 CurrentUser :", this.currentUser);
+
+        this.demandes = ret['data']['data'];
+        console.log("📦 Total avant filtrage :", this.demandes.length);
+        // 🔥 Filtrage conditionnel
+        if (this.currentUser.profil.id !== 1) {
+          this.demandes = this.demandes.filter((d: any) => {
+            return (
+              d.service_id === this.currentUser.service_id ||
+              d.cabinet_id === this.currentUser.cabinet_id
+            );
+          });
         }
-      },
-      () => {
-        this.toast.error(environment.erreur_connexion_message);
-        this.loading = false;
-      }
-    );
-  }
 
+        console.log("🎯 Total après filtrage :", this.demandes.length);
+
+        // 🔥 Conversion téléphone
+        this.demandes = this.demandes.map((d: any) => ({
+          ...d,
+          visiteur: d.visiteur
+            ? {
+                ...d.visiteur,
+                numeroTelephone: d.visiteur.numeroTelephone
+                  ? d.visiteur.numeroTelephone.replace(/^00/, '+')
+                  : null
+              }
+            : null
+        }));
+
+        // 📌 Séparation des listes
+        this.activeList = this.demandes.filter(d => d.statut === 'En_attente');
+        this.bloqueList = this.demandes.filter(d => d.statut === 'Terminée');
+        this.suppriList = this.demandes.filter(d => d.statut === 'Supprimé');
+
+        this.allList = [...this.demandes];
+        this.updatePaginatedList();
+
+        this.toast.info(`${this.demandes.length} demande(s) trouvée(s)`);
+      } 
+      else {
+        this.toast.error(ret['message']);
+      }
+    },
+
+    () => {
+      this.toast.error(environment.erreur_connexion_message);
+      this.loading = false;
+    }
+  );
+}
+
+
+onPageChange(page: number) {
+    this.page = page;
+  }
   updatePaginatedList() {
     let sourceList: any[] = [];
     // 🟢 Choisir la liste selon le filtre actif
     switch (this.currentIndex) {
       case 1:
-        sourceList = this.activeFiltres();
+        sourceList = this.allFiltres();
         break;
       case 2:
-        sourceList = this.bloqueFiltres();
+        sourceList = this.activeFiltres();
         break;
       case 3:
+        sourceList = this.bloqueFiltres();
+        break;
+      case 4:
         sourceList = this.supprimeFiltres();
         break;
       default:
@@ -355,9 +403,8 @@ export class RendezvousComponent implements OnInit {
         break;
     }
     // Pagination
-    this.totalPages = Math.ceil(sourceList.length / this.itemsPerPage);
-    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
-    this.paginatedList = sourceList.slice(startIndex, startIndex + this.itemsPerPage);
+    
+    this.paginatedList = sourceList;
     //console.log("+++++ paginatedList affichée +++++", this.paginatedList);
   }
 
@@ -381,7 +428,6 @@ export class RendezvousComponent implements OnInit {
         .includes(search)
     );
   }
-
   bloqueFiltres() {
     if (!this.searchFilterText) return this.bloqueList;
     const search = this.searchFilterText.toLowerCase();
@@ -402,7 +448,6 @@ export class RendezvousComponent implements OnInit {
     this.currentIndex = index;
     this.currentPage = 1;
     this.updatePaginatedList();
-
     // Gérer les boutons actifs
     ['user_active', 'user_block', 'user_delete', 'user_all'].forEach(id => {
       const btn = document.getElementById(id);
@@ -415,9 +460,10 @@ export class RendezvousComponent implements OnInit {
 
   getButtonIdByIndex(index: number): string {
     switch (index) {
-      case 1: return 'user_active';
-      case 2: return 'user_block';
-      case 3: return 'user_delete';
+      case 1: return 'user_all';
+      case 2: return 'user_active';
+      case 3: return 'user_block';
+      case 4: return 'user_delete';
       default: return 'user_all'; // ✅ nouveau bouton "Tous"
     }
   }
@@ -442,68 +488,74 @@ export class RendezvousComponent implements OnInit {
       }
     } else {
       this.demande.objet_saisie = this.demande.objet_saisie.filter(x => x !== item.label);
-
       // Si "Autres objets" est décoché, vider le champ texte
       if (item.id === 5) {
         this.demande.autreObjet = '';
       }
     }
+   // console.log('Objets sélectionnés:', this.demande.objet_saisie);
+   // console.log('Autre objet:', this.demande.autreObjet);
+  }
+toggleSelectionObjet(item: any) {
+  // 🔒 Sécurisation : s'assurer que le tableau existe
+  if (!this.demande.objet_retirer) {
+    this.demande.objet_retirer = [];
+  }
 
-    console.log('Objets sélectionnés:', this.demande.objet_saisie);
-    console.log('Autre objet:', this.demande.autreObjet);
-  }
-  toggleSelectionObjet(item: any) {
-    if (item.checked) {
-      if (!this.demande.objet_retirer.includes(item.label)) {
-        this.demande.objet_retirer.push(item.label);
-      }
-    } else {
-      this.demande.objet_retirer = this.demande.objet_retirer.filter(x => x !== item.label);
-      // Si "Autres objets" est décoché, vider le champ texte
-      if (item.id === 5) {
-        this.demande.autreObjet = '';
-      }
+  if (item.checked) {
+    // Ajout si non déjà présent
+    if (!this.demande.objet_retirer.includes(item.label)) {
+      this.demande.objet_retirer.push(item.label);
     }
-    console.log('Objets sélectionnés:', this.demande.objet_retirer);
-    console.log('Autre objet:', this.demande.autreObjet);
+  } 
+  else {
+    // Suppression si décoché
+    this.demande.objet_retirer =
+      this.demande.objet_retirer.filter(x => x !== item.label);
+
+    // Si "Autres objets" est décoché (id === 5)
+    if (item.id === 5) {
+      this.demande.autreObjet = '';
+    }
   }
-  SaveSignature() {
-   /*  if (!this.demande.signature) {
-      this.toast.error('Veuillez ajouter la signature du visiteur ci-dessous.');
-      return;
-    } */
-    this.demande.statut = "En_attente";
-    this.currentUser = this.demande.user_id;
-    this.demande.objet_saisie
-    console.log("========== objet_saisie ±±±±±±±±±±±±±±±±±±±±±±±", this.demande.objet_saisie)
-    console.log("========== rendez-vous ±±±±±±±±±±±±±±±±±±±±±±±", this.demande)
-    // this.demande.user_personnel_id = null;
-    //this.demande.visiteur_id = null;
-    // this.loading = true;
-    this.demande.nomComplet = this.demande.prenom + ' ' + this.demande.nom;
-    this.demandeService.save(this.demande).subscribe(ret => {
+
+  console.log('Objets sélectionnés:', this.demande.objet_retirer);
+  console.log('Autre objet:', this.demande.autreObjet);
+}
+SaveSignature() {
+  this.demande.statut = "En_attente";
+  this.demande.user_id = this.currentUser.id;
+  //console.log("========== objet_retirer", this.demande.objet_retirer);
+ // console.log("========== rendez-vous", this.demande);
+  this.loading = true;
+  this.demande.nomComplet = this.demande.prenom + ' ' + this.demande.nom;
+
+  this.demandeService.update(this.demande).subscribe({
+    next: (ret) => {
       if (ret['code'] === 200) {
         this.demande = ret['data'];
-        // ✅ Sécurisation ici
+
         if (!Array.isArray(this.demandes)) {
           this.demandes = [];
         }
         this.demandes.push(this.demande);
-
-        this.closeAddElementDialog.nativeElement.click();
+       
         this.toast.success("Demande ajoutée avec succès");
-
-        this.search(); // Recharge les listes
+        this.search();
         this.showList();
+         this.closeAddElementDialog.nativeElement.click();
       } else {
         this.toast.error(ret['message']);
       }
       this.loading = false;
-    }, error => {
+    },
+    error: () => {
       this.toast.error(environment.erreur_connexion_message);
       this.loading = false;
-    });
-  }
+    }
+  });
+}
+
   Save() {
     if (!this.demande.scan_piece_verso) {
       this.toast.error('Veuillez selectionner la pièce justificatif du visiteur');
@@ -551,21 +603,17 @@ export class RendezvousComponent implements OnInit {
 
 
   Update() {
-    //this.loading = true;
+    this.loading = true;
     /* this.demande.cabinet_id = this.demande.cabinet.id;
     this.demande.service_id = this.demande.service.id;
     this.demande.profil_id = this.demande.profil.id; */
     this.demande.objet_retirer
+    this.demande.user_id = this.currentUser.id
     console.log("========== objet_saisie ±±±±±±±±±±±±±±±±±±±±±±±", this.demande.objet_retirer)
     console.log("========== rendez-vous ±±±±±±±±±±±±±±±±±±±±±±±", this.demande)
       this.demandeService.update(this.demande).subscribe(ret => {
         if (ret['code'] === 200) {
           this.demande = ret['data'];
-          this.demandes.forEach(user => {
-            if (user.id === this.demande.id) {
-              user = this.demande;
-            }
-          });
           this.closeAddElementDialog.nativeElement.click();
           this.toast.success("Demande modifié avec succès");
           this.loading = false;
@@ -585,6 +633,7 @@ export class RendezvousComponent implements OnInit {
     if (this.demande) {
       console.log(`Suppression de ${this.demande.visiteur.nomComplet}`);
       this.loading = true;
+      this.demande.user_id = this.currentUser.id
       this.demandeService.delete(this.demande).subscribe((ret: any) => {
         if (ret['code'] == 200) {
           this.demande = ret['data'];

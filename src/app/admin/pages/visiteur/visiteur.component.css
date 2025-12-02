@@ -568,3 +568,50 @@ h6 {
 /* ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±± */
 
 
+/* ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±± */
+/* Conteneur global */
+.phone-input-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem; /* espace entre le dropdown et l'input */
+  width: 100%;
+}
+
+/* Dropdown indicatif */
+.phone-input-container .p-dropdown {
+  width: 180px;          /* largeur fixe pour dropdown */
+}
+
+.phone-input-container .p-dropdown .p-dropdown-label {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-weight: 500;
+}
+
+/* Input numéro */
+.phone-input-container input[type="tel"] {
+  flex: 1;                /* prend tout l'espace restant */
+  padding-left: 0.75rem;
+}
+
+/* Placeholder plus lisible */
+.phone-input-container input::placeholder {
+  color: #aaa;
+}
+
+/* Optionnel : hover et focus */
+.phone-input-container .p-dropdown .p-dropdown-label:hover,
+.phone-input-container input:focus {
+  border-color: #409eff;
+  box-shadow: 0 0 0 0.2rem rgba(64, 158, 255, 0.25);
+  outline: none;
+}
+
+/* Style pour drapeaux dans le dropdown */
+.p-dropdown-items .p-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+

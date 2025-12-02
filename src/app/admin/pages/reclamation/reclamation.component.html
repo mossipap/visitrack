@@ -5,7 +5,7 @@
     <div [class]="isDark? 'tile theme-dark' : 'tile theme-light'">
       <!-- ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±± -->
       <!-- list -->
-      <div [class]="isDark? 'tile theme-dark' : 'tile theme-light'">
+      <div [class]="isDark? 'tile theme-dark' : 'tile theme-light'" *ngIf="currentView === 'list'">
         <!-- 🔹 HEADER -->
         <div class="user-header d-flex justify-content-between align-items-center p-3 shadow-sm rounded-3">
           <!-- 🔹 Titre -->
@@ -58,13 +58,14 @@
                   <th>Date</th>
                   <th>Visiteur</th>
                   <th>Télephone</th>
-                  <th>Objet perdus</th>
+                  <th>Description</th>
                   <th>Statut</th>
                   <th class="text-center action-buttons">Options</th>
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let reclamation of paginatedList">
+                <tr
+                  *ngFor="let reclamation of paginatedList | paginate: {itemsPerPage: pageSize, totalItems: totalPages, currentPage: page}">
                   <td>
                     <div class="animated-checkbox">
                       <label>
@@ -77,7 +78,7 @@
                   <td>{{ reclamation.created_at | date:'dd/MM/yyyy HH:mm' }}</td>
                   <td>{{ reclamation?.visiteur?.nomComplet }}</td>
                   <td>{{ reclamation?.visiteur?.numeroTelephone }}</td>
-                  <td>{{ reclamation.texte }}</td>
+                  <td [innerHTML]="reclamation.texte"></td>
                   <td>
                     <span class="badge" *ngIf="this.reclamation.statut ==='EN_COURS'" style="color: goldenrod;">En cours
                       d'investigation</span>
@@ -109,8 +110,11 @@
           </div>
 
           <!-- 🔹 PAGINATION -->
+          <pagination-controls (pageChange)="onPageChange($event)" previousLabel="« Précédent" nextLabel="Suivant »"
+            [autoHide]="true">
+          </pagination-controls>
           <!-- 🔹 PAGINATION DYNAMIQUE -->
-          <div class="pagination-wrapper d-flex justify-content-between align-items-center mt-3 p-2 border-top">
+          <!--  <div class="pagination-wrapper d-flex justify-content-between align-items-center mt-3 p-2 border-top">
             <div class="d-flex align-items-center gap-2">
               <button class="btn btn-outline-secondary btn-sm" [disabled]="currentPage === 1" (click)="previousPage()">
                 <i class="mdi mdi-chevron-left"></i> Précédent
@@ -133,233 +137,706 @@
               Page {{ currentPage }} sur {{ totalPages }}
             </div>
           </div>
+        </div> -->
         </div>
+        <!-- /list -->
+        <!-- ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±± -->
+
       </div>
       <!-- /list -->
-      <!-- ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±± -->
 
-    </div>
-    <!-- /list -->
+      <!-- add reclamation modal -->
+      <div class="container demo" *ngIf="currentView === 'add2'">
+        <div class="modal fade" id="reclamationModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel2"
+          aria-hidden="true">
 
-    <!-- add reclamation modal -->
-    <div class="container demo" *ngIf="currentView === 'add'">
-      <div class="modal fade" id="reclamationModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel2"
-        aria-hidden="true">
+          <!-- MODAL DIALOG LARGE -->
+          <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 700px; width: 100%;">
+            <!-- 👈 Largeur augmentée -->
 
-        <!-- MODAL DIALOG LARGE -->
-        <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 700px; width: 100%;">
-          <!-- 👈 Largeur augmentée -->
+            <div class="modal-content" [style]="{'background-color': isDark ? '#1f1f1f' : '#FFFFFF'}">
 
-          <div class="modal-content" [style]="{'background-color': isDark ? '#1f1f1f' : '#FFFFFF'}">
+              <form #formAddReclamation="ngForm">
 
-            <form #formAddReclamation="ngForm">
+                <!-- HEADER -->
+                <div class="modal-header">
+                  <h5 class="modal-title">
+                    {{ reclamation.id ? 'Modifier une réclamation' : 'Réclamation' }}
+                  </h5>
 
-              <!-- HEADER -->
-              <div class="modal-header">
-                <h5 class="modal-title">
-                  {{ reclamation.id ? 'Modifier une réclamation' : 'Réclamation' }}
-                </h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close" #closeAddElementDialog>
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
 
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close" #closeAddElementDialog>
-                  <span aria-hidden="true">&times;</span>
-                </button>
-              </div>
+                <!-- BODY -->
+                <div class="modal-body">
 
-              <!-- BODY -->
-              <div class="modal-body">
+                  <div class="form-group row">
 
-                <div class="form-group row">
+                    <!-- VISITEUR -->
+                    <div class="col-lg-6 mb-3">
+                      <div class="form-group has-success align-left ft-w-b">
+                        <label [class]="isDark?'form-control-label c-cab-1':'form-control-label c-cab-2'">
+                          Choisir un visiteur
+                        </label>
 
-                  <!-- VISITEUR -->
-                  <div class="col-lg-6 mb-3">
-                    <div class="form-group has-success align-left ft-w-b">
-                      <label [class]="isDark?'form-control-label c-cab-1':'form-control-label c-cab-2'">
-                        Choisir un visiteur
-                      </label>
+                        <div class="select select-add">
+                          <p-dropdown [options]="visiteurs" [(ngModel)]="reclamation.visiteur_id" [showClear]="true"
+                            [filter]="true" filterBy="nomComplet,numeroTelephone" optionValue="id"
+                            placeholder="Choisir un visiteur" styleClass="wd_100 initialwd">
 
-                      <div class="select select-add">
-                        <p-dropdown [options]="visiteurs" [(ngModel)]="reclamation.visiteur_id" [showClear]="true"
-                          [filter]="true" filterBy="nomComplet,numeroTelephone" optionValue="id"
-                          placeholder="Choisir un visiteur" styleClass="wd_100 initialwd">
+                            <!-- Sélectionné -->
+                            <ng-template let-visiteur pTemplate="selectedItem">
+                              <span *ngIf="visiteur">
+                                {{ visiteur.nomComplet }} / {{ visiteur.numeroTelephone }}
+                              </span>
+                            </ng-template>
 
-                          <!-- Sélectionné -->
-                          <ng-template let-visiteur pTemplate="selectedItem">
-                            <span *ngIf="visiteur">
-                              {{ visiteur.nomComplet }} / {{ visiteur.numeroTelephone }}
-                            </span>
-                          </ng-template>
+                            <!-- Liste -->
+                            <ng-template let-visiteur pTemplate="item">
+                              <span>{{ visiteur.nomComplet }} / {{ visiteur.numeroTelephone }}</span>
+                            </ng-template>
 
-                          <!-- Liste -->
-                          <ng-template let-visiteur pTemplate="item">
-                            <span>{{ visiteur.nomComplet }} / {{ visiteur.numeroTelephone }}</span>
-                          </ng-template>
+                          </p-dropdown>
 
-                        </p-dropdown>
-
-                        <div class="arrow" [class]="isDark?'option-select-d':'option-select-w'"></div>
+                          <div class="arrow" [class]="isDark?'option-select-d':'option-select-w'"></div>
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  <!-- TYPE INCIDENT -->
-                  <div class="col-lg-6 mb-3">
-                    <div class="form-group has-success align-left ft-w-b">
-                      <label [class]="isDark?'form-control-label c-cab-1':'form-control-label c-cab-2'">
-                        Type d’incident *
-                      </label>
+                    <!-- TYPE INCIDENT -->
+                    <div class="col-lg-6 mb-3">
+                      <div class="form-group has-success align-left ft-w-b">
+                        <label [class]="isDark?'form-control-label c-cab-1':'form-control-label c-cab-2'">
+                          Type d’incident *
+                        </label>
 
-                      <div class="select select-add">
-                        <p-dropdown [options]="typesIncidents" [(ngModel)]="reclamation.typeIncident"
-                          optionLabel="libelle" optionValue="id" placeholder="Choisir le type d’incident"
-                          styleClass="wd_100 initialwd">
-                        </p-dropdown>
+                        <div class="select select-add">
+                          <p-dropdown [options]="typesIncidents" [(ngModel)]="reclamation.typeIncident"
+                            optionLabel="libelle" optionValue="id" placeholder="Choisir le type d’incident"
+                            styleClass="wd_100 initialwd">
+                          </p-dropdown>
 
-                        <div class="arrow" [class]="isDark?'option-select-d':'option-select-w'"></div>
+                          <div class="arrow" [class]="isDark?'option-select-d':'option-select-w'"></div>
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  <!-- LABEL NIVEAU GRAVITÉ -->
-                  <div class="col-lg-6 mb-3">
-                    <label [class]="isDark?'form-control-label c-cab-1':'form-control-label c-cab-2'">
-                      Niveau de gravité *
-                    </label>
-                  </div>
+                    <!-- LABEL NIVEAU GRAVITÉ -->
+                    <div class="col-lg-6 mb-3">
+                      <div class="form-group has-success align-left ft-w-b">
+                        <label [class]="isDark?'form-control-label c-cab-1':'form-control-label c-cab-2'">
+                          Niveau de gravité <span class="text-danger">*</span>
+                        </label>
+                      </div>
+                    </div>
 
-                  <!-- RADIO NIVEAU GRAVITÉ -->
-                  <div class="col-lg-76mb-3">
-                    <div class="d-flex flex-row align-items-center flex-wrap" style="gap: 25px;">
+                    <!-- RADIO NIVEAU GRAVITÉ -->
+                    <div class="col-lg-76mb-3">
+                      <div class="d-flex flex-row align-items-center flex-wrap" style="gap: 25px;">
 
-                      <div *ngFor="let niveau of niveauxGravites" class="d-flex align-items-center gap-2">
+                        <div *ngFor="let niveau of niveauxGravites" class="d-flex align-items-center gap-2">
 
-                        <p-radioButton name="niveauxGravite" [value]="niveau.id"
-                          [(ngModel)]="reclamation.niveauxGravite">
-                        </p-radioButton>
+                          <p-radioButton name="niveauxGravite" [value]="niveau.id"
+                            [(ngModel)]="reclamation.niveauxGravite">
+                          </p-radioButton>
 
-                        <span class="fw-bold" [ngClass]="{
+                          <span class="fw-bold" [ngClass]="{
                         'text-success': niveau.libelle === 'Faible',
                         'text-warning': niveau.libelle === 'Modéré',
                         'text-danger': niveau.libelle === 'Critique'
                       }">
-                          {{ niveau.libelle }}
-                        </span>
+                            {{ niveau.libelle }}
+                          </span>
+
+                        </div>
 
                       </div>
+                    </div>
+
+                  </div>
+
+                  <!-- TEXTAREA -->
+                  <div class="col-lg-12 p-right-0">
+                    <div class="form-group align-left ft-w-b">
+                      <!-- Label avec style sombre/claire -->
+                      <label [class]="isDark ? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
+                        for="description"> Description <span class="text-danger">*</span>
+                      </label>
+                      <!-- Barre d'outils -->
+                      <ngx-editor-menu [editor]="editor"></ngx-editor-menu>
+                      <!-- Éditeur de texte riche -->
+                      <ngx-editor name="texte" outputFormat="html" [spellcheck]="true" [editor]="editor"
+                        [(ngModel)]="reclamation.texte" placeholder="Décrivez ici le contenu de l'incident" required>
+                      </ngx-editor>
+                      <!-- Message d'erreur si vide -->
 
                     </div>
                   </div>
 
+
                 </div>
 
-                <!-- TEXTAREA -->
-                <div class="col-lg-12 p-right-0">
-                  <div class="form-group align-left ft-w-b">
-                    <!-- Label avec style sombre/claire -->
-                    <label [class]="isDark ? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
-                      for="heureVisite">
-                      Objets Perdus <span class="text-danger">*</span>
-                    </label>
-                    <!-- Barre d'outils -->
-                    <ngx-editor-menu [editor]="editor"></ngx-editor-menu>
-                    <!-- Éditeur de texte riche -->
-                    <ngx-editor name="texte" outputFormat="html" [spellcheck]="true" [editor]="editor"
-                      [(ngModel)]="reclamation.texte" placeholder="Décrivez ici le motif de la visite" required>
-                    </ngx-editor>
-                    <!-- Message d'erreur si vide -->
-                    
+                <!-- FOOTER -->
+                <div class="modal-footer d-flex flex-column">
+                  <button [disabled]="!formAddReclamation.valid" class="btn btn-login btn-block btnn_save"
+                    (click)="reclamation.id ? Update() : Save()">
+
+                    <img src="assets/images/save.png" alt="" class="icon_save">
+                    Enregistrer et terminer
+                  </button>
+
+                  <label class="lab_reset mt-2" data-dismiss="modal" aria-label="Close">
+                    Fermer
+                  </label>
+                </div>
+
+              </form>
+
+            </div>
+
+
+            <div class="modal-body">
+              <form #formAddReclamation="ngForm">
+                <div class="progress-container mb-4">
+                  <div class="step" [class.active]="step >= 1">
+                    <div class="circle">1</div>
+                    <span>Informations personnelles</span>
+                  </div>
+                  <div class="line" [class.filled]="step >= 2"></div>
+                  <div class="step" [class.active]="step >= 2">
+                    <div class="circle">2</div>
+                    <span>Contacts et Pièces d’identité</span>
+                  </div>
+                  <div class="line" [class.filled]="step >= 3"></div>
+                  <div class="step" [class.active]="step >= 3">
+                    <div class="circle">3</div>
+                    <span>Informations générales</span>
+                  </div>
+                  <div class="line" [class.filled]="step >= 4"></div>
+                  <div class="step" [class.active]="step >= 4">
+                    <div class="circle">4</div>
+                    <span>Récapitulatif</span>
                   </div>
                 </div>
-                
 
-              </div>
+                <!-- Étape 1 : Informations du visiteur -->
+                <div *ngIf="step === 1" class="step-form fade-in">
+                  <div class="col-md-12 col-lg-12 p-right-0">
+                    <div [class]="isDark? 'card cust_card_d':'card cust_card_w'">
+                      <div class="card-block">
+                        <div class="row mb-l20" *ngIf="!isNumberPhone">
+                          <div class="col-12 d-flex justify-content-center pt-5">
+                            <div class="search-box text-center">
+                              <h5 class="text-danger mb-4">Veuillez renseigner le numéro de téléphone.</h5>
+                              <form #elementForm="ngForm">
+                                <div class="col-lg-12 p-right-0">
+                                  <div class="form-group has-success align-left ft-w-b">
+                                    <div class="phone-input-container">
+                                      <!-- Dropdown indicatif -->
+                                      <p-dropdown [options]="indicatifsNums" name="indicatif" [(ngModel)]="indicatif1"
+                                        optionLabel="label" placeholder="Indicatif" [filter]="true" [showClear]="false"
+                                        [filterBy]="'label'" styleClass="wd_100">
+                                        <!-- Champ sélectionné : drapeau + indicatif -->
+                                        <ng-template let-item pTemplate="selectedItem">
+                                          <span *ngIf="item">{{item.flag}} {{item.value}}</span>
+                                        </ng-template>
+                                        <!-- Menu déroulant : drapeau + pays + indicatif -->
+                                        <ng-template let-item pTemplate="item">
+                                          <span>{{item.flag}} {{item.label}} ({{item.value}})</span>
+                                        </ng-template>
+                                      </p-dropdown>
+                                      <!-- Input numéro -->
+                                      <input
+                                        [class]="isDark? 'form-control form-control-d is-valid' : 'form-control form-control-w is-valid'"
+                                        (keyup.enter)="searchVisiteurByNumber(searchParam.query)" id="numeroTelephone"
+                                        name="numeroTelephone" type="tel" placeholder="Ex: 0707070707"
+                                        [(ngModel)]="searchParam.query" required>
+                                    </div>
+                                  </div>
+                                </div>
+                              </form>
+                              <!-- Boutons en bas -->
+                              <div class="d-flex justify-content-center gap-3 mt-4">
+                                <button (click)="showList()" class="btn btn-outline-danger btn-sm rounded-pill">
+                                  <i class="mdi mdi-close"></i> Fermer
+                                </button>
 
-              <!-- FOOTER -->
-              <div class="modal-footer d-flex flex-column">
-                <button [disabled]="!formAddReclamation.valid" class="btn btn-login btn-block btnn_save"
-                  (click)="reclamation.id ? Update() : Save()">
+                                <button class="btn btn-dark d-flex align-items-center gap-1 px-3"
+                                  [disabled]="!elementForm.form.valid"
+                                  (click)="searchVisiteurByNumber(searchParam.query)"><i
+                                    class="mdi mdi-magnify"></i><span>Chercher</span>
+                                </button>
 
-                  <img src="assets/images/save.png" alt="" class="icon_save">
-                  Enregistrer et terminer
-                </button>
+                              </div>
 
-                <label class="lab_reset mt-2" data-dismiss="modal" aria-label="Close">
-                  Fermer
-                </label>
-              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <!-- Étape 2 : Informations du visiteur -->
+                <div *ngIf="step === 2" class="step-form fade-in">
+                  <div class="col-md-12 col-lg-12 p-right-0">
+                    <div [class]="isDark? 'card cust_card_d':'card cust_card_w'">
+                      <div class="card-block">
 
-            </form>
+                        <div class="row mb-l20" *ngIf="isNumberPhone">
 
+                          <!-- VISITEUR -->
+                          <div class="col-lg-6 mb-3">
+                            <div class="form-group has-success align-left ft-w-b">
+                              <label [class]="isDark?'form-control-label c-cab-1':'form-control-label c-cab-2'">
+                                Choisir un visiteur
+                              </label>
+
+                              <div class="select select-add">
+                                <p-dropdown [options]="visiteurs" [(ngModel)]="reclamation.visiteur_id"
+                                  [showClear]="true" [filter]="true" filterBy="nomComplet,numeroTelephone"
+                                  optionValue="id" placeholder="Choisir un visiteur" styleClass="wd_100 initialwd">
+
+                                  <!-- Sélectionné -->
+                                  <ng-template let-visiteur pTemplate="selectedItem">
+                                    <span *ngIf="visiteur">
+                                      {{ visiteur.nomComplet }} / {{ visiteur.numeroTelephone }}
+                                    </span>
+                                  </ng-template>
+
+                                  <!-- Liste -->
+                                  <ng-template let-visiteur pTemplate="item">
+                                    <span>{{ visiteur.nomComplet }} / {{ visiteur.numeroTelephone }}</span>
+                                  </ng-template>
+
+                                </p-dropdown>
+
+                                <div class="arrow" [class]="isDark?'option-select-d':'option-select-w'"></div>
+                              </div>
+                            </div>
+                          </div>
+
+                          <!-- TYPE INCIDENT -->
+                          <div class="col-lg-6 mb-3">
+                            <div class="form-group has-success align-left ft-w-b">
+                              <label [class]="isDark?'form-control-label c-cab-1':'form-control-label c-cab-2'">
+                                Type d’incident *
+                              </label>
+
+                              <div class="select select-add">
+                                <p-dropdown [options]="typesIncidents" [(ngModel)]="reclamation.typeIncident"
+                                  optionLabel="libelle" optionValue="id" placeholder="Choisir le type d’incident"
+                                  styleClass="wd_100 initialwd">
+                                </p-dropdown>
+
+                                <div class="arrow" [class]="isDark?'option-select-d':'option-select-w'"></div>
+                              </div>
+                            </div>
+                          </div>
+
+                          <!-- LABEL NIVEAU GRAVITÉ -->
+                          <div class="col-lg-6 mb-3">
+                            <div class="form-group has-success align-left ft-w-b">
+                              <label [class]="isDark?'form-control-label c-cab-1':'form-control-label c-cab-2'">
+                                Niveau de gravité <span class="text-danger">*</span>
+                              </label>
+                            </div>
+                          </div>
+
+                          <!-- RADIO NIVEAU GRAVITÉ -->
+                          <div class="col-lg-76mb-3">
+                            <div class="d-flex flex-row align-items-center flex-wrap" style="gap: 25px;">
+
+                              <div *ngFor="let niveau of niveauxGravites" class="d-flex align-items-center gap-2">
+
+                                <p-radioButton name="niveauxGravite" [value]="niveau.id"
+                                  [(ngModel)]="reclamation.niveauxGravite">
+                                </p-radioButton>
+
+                                <span class="fw-bold" [ngClass]="{
+                        'text-success': niveau.libelle === 'Faible',
+                        'text-warning': niveau.libelle === 'Modéré',
+                        'text-danger': niveau.libelle === 'Critique'
+                      }">
+                                  {{ niveau.libelle }}
+                                </span>
+
+                              </div>
+
+                            </div>
+                          </div>
+
+                        </div>
+
+                        <!-- TEXTAREA -->
+                        <div class="col-lg-12 p-right-0">
+                          <div class="form-group align-left ft-w-b">
+                            <!-- Label avec style sombre/claire -->
+                            <label [class]="isDark ? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'"
+                              for="description"> Description <span class="text-danger">*</span>
+                            </label>
+                            <!-- Barre d'outils -->
+                            <ngx-editor-menu [editor]="editor"></ngx-editor-menu>
+                            <!-- Éditeur de texte riche -->
+                            <ngx-editor name="texte" outputFormat="html" [spellcheck]="true" [editor]="editor"
+                              [(ngModel)]="reclamation.texte" placeholder="Décrivez ici le contenu de l'incident"
+                              required>
+                            </ngx-editor>
+                            <!-- Message d'erreur si vide -->
+
+                          </div>
+                        </div>
+
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="d-flex justify-content-between mt-4">
+                  <button type="button" class="btn btn-dark d-flex align-items-center gap-1 px-3" (click)="step = 1">
+                    <i class="mdi mdi-arrow-left me-1"></i> Précédent
+                  </button>
+
+                  <button [disabled]="!formAddReclamation.valid" type="button"
+                    class="btn btn-dark d-flex align-items-center gap-1 px-3" (click)="step = 3">
+                    <i class="mdi mdi-arrow-right me-1"></i> Suivant
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
+
+        </div>
+      </div>
+
+      <!-- ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±± -->
+      <!-- ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±± -->
+      <div *ngIf="currentView === 'add'" [style]="{'background-color': isDark ? '#1f1f1f' : '#FFFFFF'}">
+        <div class="row">
+          <div class="col-md-2"></div>
+          <div class="col-md-8 ta-center" style="margin-top: 30px;margin-bottom: 20px;">
+            <label class="title_headtx titre_traitement mt-2" style="font-size: 20px;">Nouveau reclamation / incident
+            </label>
+          </div>
+        </div>
+        <div class="row" style="padding-bottom: 420px;">
+          <div class="col-md-3"></div>
+          <div class="col-md-6">
+            <div class="modal-content" [style]="{'background-color': isDark ? '#1f1f1f' : '#FFFFFF'}">
+              <div class="d-flex" style="margin-top: 15px;">
+                <button type="button" class="close" (click)="showList()" style="margin-left: 10px;">
+                  <span aria-hidden="true">
+                    <i
+                      [class]="isDark? 'txt-title-d mdi mdi-arrow-left-bold-circle' : 'mdi mdi-arrow-left-bold-circle'"></i>
+                  </span>
+                  <label [class]="isDark? 'txt-title-d ml-2': 'ml-1'" style="font-size: 14px;"> Retour</label>
+                </button>
+              </div>
+              <div class="modal-body">
+                <form #formAddReclamation="ngForm">
+                  <div class="progress-container mb-4">
+                    <div class="step" [class.active]="step >= 1">
+                      <div class="circle">1</div>
+                      <span>Rechercher le numéro Télephone</span>
+                    </div>
+
+                    <div class="line" [class.filled]="step >= 2"></div>
+                    <div class="step" [class.active]="step >= 2">
+                      <div class="circle">2</div>
+                      <span>Informations générales</span>
+                    </div>
+                  </div>
+
+                  <!-- Étape 1 : Informations du visiteur -->
+
+                  <!-- Étape 2 : Informations du visiteur -->
+                  <div class="step-form fade-in">
+                    <div class="col-md-12 col-lg-12 p-right-0">
+                      <div [class]="isDark? 'card cust_card_d':'card cust_card_w'">
+                        <div class="card-block">
+                          <div class="row mb-l20">
+                          <div class="modal-body p-4">
+
+                            <!-- 🔍 Zone de recherche du numéro -->
+                            <div class="d-flex justify-content-center">
+                              <div class="search-box w-100" style="max-width: 650px;">
+                                <h5 class="text-danger fw-bold text-center mb-4">
+                                  Veuillez renseigner le numéro de téléphone
+                                </h5>
+
+                                <form #elementForm="ngForm">
+
+                                  <!-- Ligne : Dropdown + Input + Button -->
+                                  <div class="d-flex align-items-center gap-2">
+
+                                    <!-- Dropdown indicatif -->
+                                    <p-dropdown
+                                      [options]="indicatifsNums"
+                                      name="indicatif"
+                                      [(ngModel)]="indicatif1"
+                                      optionLabel="label"
+                                      placeholder="Indicatif"
+                                      [filter]="true"
+                                      [showClear]="false"
+                                      [filterBy]="'label'"
+                                      styleClass="wd_100 shadow-sm">
+                                      <ng-template let-item pTemplate="selectedItem">
+                                        <span *ngIf="item">{{ item.flag }} {{ item.value }}</span>
+                                      </ng-template>
+                                      <ng-template let-item pTemplate="item">
+                                        <span>{{ item.flag }} {{ item.label }} ({{ item.value }})</span>
+                                      </ng-template>
+                                    </p-dropdown>
+
+                                    <!-- Input numéro -->
+                                    <input
+                                      [class]="isDark ? 'form-control form-control-d is-valid shadow-sm' :
+                                                        'form-control form-control-w is-valid shadow-sm'"
+                                      (keyup.enter)="searchVisiteurByNumber(searchParam.query)"
+                                      id="numeroTelephone"
+                                      name="numeroTelephone"
+                                      type="tel"
+                                      placeholder="Ex: 0707070707"
+                                      [(ngModel)]="searchParam.query"
+                                      required
+                                      class="flex-grow-1">
+
+                                    <!-- Button -->
+                                    <button
+                                      class="btn btn-dark d-flex align-items-center gap-1 px-3 shadow-sm"
+                                      [disabled]="!elementForm.form.valid"
+                                      (click)="searchVisiteurByNumber(searchParam.query)">
+                                      <i class="mdi mdi-magnify fs-5"></i>
+                                    </button>
+
+                                  </div>
+
+                                </form>
+                              </div>
+                            </div>
+
+                            <!-- 👤 Informations visiteur -->
+                            <div class="info-card rounded-3 shadow-sm p-4 mt-5" *ngIf="isNumberPhone">
+                              <h3 class="section-title fw-bold mb-4">
+                                <i class="mdi mdi-account-badge-outline text-primary me-2"></i>
+                                Informations du visiteur
+                              </h3>
+
+                              <div class="row g-4">
+
+                                <!-- Colonne gauche -->
+                                <div class="col-md-6">
+                                  <div class="info-row">
+                                    <i class="mdi mdi-account text-primary"></i>
+                                    <span class="label">Nom complet :</span>
+                                    <span class="value">{{ visiteur?.nomComplet }}</span>
+                                  </div>
+
+                                  <div class="info-row">
+                                    <i class="mdi mdi-gender-male-female text-primary"></i>
+                                    <span class="label">Sexe :</span>
+                                    <span class="value">{{ visiteur?.sexe }}</span>
+                                  </div>
+
+                                  <div class="info-row">
+                                    <i class="mdi mdi-card-account-details-outline text-primary"></i>
+                                    <span class="label">Type de pièce :</span>
+                                    <span class="value">{{ visiteur?.typePiece }}</span>
+                                  </div>
+
+                                  <div class="info-row">
+                                    <i class="mdi mdi-card-text-outline text-primary"></i>
+                                    <span class="label">N° de pièce :</span>
+                                    <span class="value">{{ visiteur?.numeroPiece }}</span>
+                                  </div>
+                                </div>
+
+                                <!-- Colonne droite -->
+                                <div class="col-md-6">
+                                  <div class="info-row">
+                                    <i class="mdi mdi-phone text-primary"></i>
+                                    <span class="label">Téléphone :</span>
+                                    <span class="value">{{ visiteur?.numeroTelephone }}</span>
+                                  </div>
+
+                                  <div class="info-row">
+                                    <i class="mdi mdi-map-marker text-primary"></i>
+                                    <span class="label">Adresse :</span>
+                                    <span class="value">{{ visiteur?.adresse }}</span>
+                                  </div>
+
+                                  <div class="info-row">
+                                    <i class="mdi mdi-briefcase-account text-primary"></i>
+                                    <span class="label">Fonction :</span>
+                                    <span class="value">{{ visiteur?.fonction }}</span>
+                                  </div>
+                                </div>
+
+                              </div>
+                            </div>
+
+                            <!-- FORMULAIRE D’INCIDENT -->
+                            <div class="row mt-4" *ngIf="isNumberPhone">
+
+                              <!-- Type incident -->
+                              <div class="col-lg-6 mb-3">
+                                <label [class]="isDark ? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'">
+                                  Type d’incident <span class="text-danger">*</span>
+                                </label>
+
+                                <div class="select select-add">
+                                  <p-dropdown
+                                    [options]="typesIncidents"
+                                    name="typeIncident"
+                                    [(ngModel)]="reclamation.typeIncident"
+                                    optionLabel="libelle"
+                                    optionValue="id"
+                                    placeholder="Choisir le type d’incident"
+                                    styleClass="wd_100 initialwd shadow-sm">
+                                  </p-dropdown>
+                                  <div class="arrow" [class]="isDark ? 'option-select-d':'option-select-w'"></div>
+                                </div>
+                              </div>
+
+                              <!-- Gravité -->
+                              <div class="col-lg-6 mb-3">
+                                <label [class]="isDark ? 'form-control-label c-cab-1' : 'form-control-label c-cab-2'">
+                                  Niveau de gravité <span class="text-danger">*</span>
+                                </label>
+
+                                <div class="d-flex flex-wrap align-items-center gap-4 mt-2">
+                                  <div *ngFor="let niveau of niveauxGravites" class="d-flex align-items-center gap-2">
+                                    <p-radioButton name="niveauxGravite" [value]="niveau.id"
+                                                  [(ngModel)]="reclamation.niveauxGravite"></p-radioButton>
+
+                                    <span class="fw-bold"
+                                          [ngClass]="{
+                                            'text-success': niveau.libelle === 'Faible',
+                                            'text-warning': niveau.libelle === 'Modéré',
+                                            'text-danger': niveau.libelle === 'Critique'
+                                          }">
+                                      {{ niveau.libelle }}
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+
+                            </div>
+
+                            <!-- Description -->
+                            <div class="mt-3" *ngIf="isNumberPhone">
+                              <label [class]="isDark ? 'form-control-label c-cab-1':'form-control-label c-cab-2'">
+                                Description <span class="text-danger">*</span>
+                              </label>
+
+                              <ngx-editor-menu [editor]="editor"></ngx-editor-menu>
+
+                              <ngx-editor
+                                name="texte"
+                                outputFormat="html"
+                                [spellcheck]="true"
+                                [editor]="editor"
+                                [(ngModel)]="reclamation.texte"
+                                placeholder="Décrivez ici le contenu de l'incident"
+                                required>
+                              </ngx-editor>
+                            </div>
+
+                          </div>
+
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="d-flex justify-content-center gap-3 mt-4">
+                      <button (click)="showList()" class="btn btn-outline-danger btn-sm rounded-pill">
+                        <i class="mdi mdi-close"></i> Fermer
+                      </button>
+
+                      <button class="btn btn-dark d-flex align-items-center gap-1 px-3"
+                        [disabled]="!formAddReclamation.form.valid" (click)="reclamation.id ? Update() : Save()"><i
+                          class="mdi mdi-check-circle"></i><span>Enregistrer</span>
+                      </button>
+
+                    </div>
+
+                  </div>
+
+                </form>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±± -->
+      <!-- ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±± -->
+
+    </div>
+  </div>
+
+
+
+  <!-- ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±± -->
+  <!-- Modal Suppression -->
+  <div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog modal-sm">
+      <div class="modal-content">
+
+        <div class="modal-header bg-danger text-white">
+          <h5 class="modal-title">
+            <i class="mdi mdi-delete-forever me-1"></i> Confirmer la suppression
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+
+        <div class="modal-body text-center">
+          <p class="fw-bold mb-2">Voulez-vous vraiment supprimer ?</p>
+          <p class="text-muted mb-0">{{ reclamation?.visiteur?.nomComplet }}</p>
+        </div>
+
+        <div class="modal-footer d-flex justify-content-between">
+          <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">
+            Annuler
+          </button>
+
+          <button type="button" class="btn btn-danger btn-sm" (click)="DeleteReclamation()">
+            Supprimer
+          </button>
         </div>
 
       </div>
     </div>
-
   </div>
-</div>
+  <!-- ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±± -->
+  <!-- ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±± -->
+  <!-- Modal Récupération -->
+  <div class="modal fade" id="restoreModal" tabindex="-1">
+    <div class="modal-dialog modal-sm">
+      <div class="modal-content">
 
+        <div class="modal-header bg-success text-white">
+          <h5 class="modal-title">
+            <i class="mdi mdi-backup-restore me-1"></i> Restaurer l'élément
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
 
+        <div class="modal-body text-center">
+          <p class="fw-bold mb-2">Voulez-vous restaurer cet élément ?</p>
+          <p class="text-muted mb-0">{{ reclamation?.visiteur?.nomComplet }}</p>
+        </div>
 
-<!-- ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±± -->
-<!-- Modal Suppression -->
-<div class="modal fade" id="deleteModal" tabindex="-1">
-  <div class="modal-dialog modal-sm">
-    <div class="modal-content">
+        <div class="modal-footer d-flex justify-content-between">
+          <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">
+            Annuler
+          </button>
+          <button type="button" class="btn btn-success btn-sm" (click)="RetirerObjet()">
+            Restituer
+          </button>
+        </div>
 
-      <div class="modal-header bg-danger text-white">
-        <h5 class="modal-title">
-          <i class="mdi mdi-delete-forever me-1"></i> Confirmer la suppression
-        </h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
-
-      <div class="modal-body text-center">
-        <p class="fw-bold mb-2">Voulez-vous vraiment supprimer ?</p>
-        <p class="text-muted mb-0">{{ reclamation?.visiteur?.nomComplet }}</p>
-      </div>
-
-      <div class="modal-footer d-flex justify-content-between">
-        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">
-          Annuler
-        </button>
-
-        <button type="button" class="btn btn-danger btn-sm" (click)="DeleteReclamation()">
-          Supprimer
-        </button>
-      </div>
-
     </div>
   </div>
-</div>
-<!-- ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±± -->
-<!-- ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±± -->
-<!-- Modal Récupération -->
-<div class="modal fade" id="restoreModal" tabindex="-1">
-  <div class="modal-dialog modal-sm">
-    <div class="modal-content">
-
-      <div class="modal-header bg-success text-white">
-        <h5 class="modal-title">
-          <i class="mdi mdi-backup-restore me-1"></i> Restaurer l'élément
-        </h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-
-      <div class="modal-body text-center">
-        <p class="fw-bold mb-2">Voulez-vous restaurer cet élément ?</p>
-        <p class="text-muted mb-0">{{ reclamation?.visiteur?.nomComplet }}</p>
-      </div>
-
-      <div class="modal-footer d-flex justify-content-between">
-        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">
-          Annuler
-        </button>
-        <button type="button" class="btn btn-success btn-sm" (click)="RetirerObjet()">
-          Restituer
-        </button>
-      </div>
-
-    </div>
-  </div>
-</div>
-<!-- ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±± -->
+  <!-- ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±± -->

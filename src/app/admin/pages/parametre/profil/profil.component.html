@@ -271,8 +271,11 @@
           </div>
           <div class="modal-footer">
             <div style="width: 100%;">
-              <button class="btn btn-blocked btn-sm mr-3 ml-2" type="button" (click)="UpdateStatut('Bloqué')">
+              <button *ngIf="this.profil?.statut ==='Activ\u00e9'" class="btn btn-blocked btn-sm mr-3 ml-2" type="button" (click)="Desactiver()">
                 <label class="txt_blocked">Bloquer</label>
+              </button>
+              <button *ngIf="this.profil?.statut ==='D\u00e9sactiv\u00e9'" class="btn btn-blocked btn-sm mr-3 ml-2" type="button" (click)="Activer()" style="background-color: green;">
+                <label class="txt_blocked">Débloquer</label>
               </button>
               <button class="btn btn-cancel btn-sm" type="button" data-dismiss="modal">
                 <label class="txt_blocked">Annuler</label>
